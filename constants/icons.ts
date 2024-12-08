@@ -7,7 +7,7 @@ import menu from "../assets/icons/menu.png";
 import search from "../assets/icons/search.png";
 import rightArrow from "../assets/icons/right-arrow.png";
 import logout from "../assets/icons/logout.png";
-
+import logo from "../assets/images/logoPolyRecipe.png";
 
 export const icons = {
   bookmark,
@@ -18,5 +18,6 @@ export const icons = {
   menu,
   search,
   rightArrow,
-  logout
+  logout,
+  logo
 };

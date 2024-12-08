@@ -4,7 +4,7 @@
     "slug": "zegroupevento",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/logoPolyRecipe.png",
     "scheme": "ZeGroupEvento",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
