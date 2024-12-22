@@ -1,7 +1,7 @@
 import { StyleSheet, View, Image, ScrollView, Text } from 'react-native'
 import React, { useState } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
-import {Link} from 'expo-router';
+import {Link, router} from 'expo-router';
 
 import {icons} from '../../constants/icons';
 import FormField from '../../components/FormField';
@@ -15,15 +15,26 @@ const SignIn = () => {
 
   const [isSubmitting, setisSubmitting] = useState(false)
 
-  const submit = () => {
-    
+  const submit = async () => {
+    setisSubmitting(true);
+    try {
+      // Ici vous devrez appeler votre API d'authentification
+      // Exemple :
+      // await loginUser(form.email, form.password);
+      router.replace('/home'); // Redirection après succès
+    } catch (error) {
+      console.error(error);
+      // Gérer l'erreur
+    } finally {
+      setisSubmitting(false);
+    }
   }
-  
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView>
         <View style={styles.view}>
-        <Image 
+        <Image
             source={icons.logo}
             resizeMode='contain'
             style={styles.logo}/>
