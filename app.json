@@ -3,7 +3,7 @@
     "name": "ZeGroupEvento",
     "slug": "zegroupevento",
     "version": "1.0.0",
-    "orientation": "portrait",
+    "orientation": "default",
     "icon": "./assets/images/logoPolyRecipe.png",
     "scheme": "ZeGroupEvento",
     "userInterfaceStyle": "automatic",
