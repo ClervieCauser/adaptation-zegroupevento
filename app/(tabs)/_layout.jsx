@@ -1,94 +1,214 @@
-import { StyleSheet, View, Text, Image } from 'react-native';
-import { Tabs, Redirect } from 'expo-router';
+import { StyleSheet, View, Image, Text } from 'react-native';
+import { Tabs } from 'expo-router';
+import { ThemedView } from '../../components/ThemedView';
 import { icons } from '../../constants/icons';
+import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
+import TabletNavigation from "../../components/ui/TabletNavigation";
 
 const TabIcon = ({ icon, color, name, focused }) => {
-  return (
-    <View style={styles.iconContainer}>
-      <Image
-        source={icon}
-        resizeMode="contain"
-        style={[styles.icon, { tintColor: color }]}
-      />
-      <Text style={styles.iconText} numberOfLines={1}>
-        {name}
-      </Text>
-    </View>
-  );
+    const { isTablet, isDesktop } = useResponsiveLayout();
+
+    return (
+        <View style={[
+            styles.iconContainer,
+            isTablet && styles.tabletIconContainer,
+            isDesktop && styles.desktopIconContainer
+        ]}>
+            <Image
+                source={icon}
+                resizeMode="contain"
+                style={[
+                    styles.icon,
+                    isTablet && styles.tabletIcon,
+                    isDesktop && styles.desktopIcon,
+                    { tintColor: color }
+                ]}
+            />
+            <Text style={[
+                styles.iconText,
+                isTablet && styles.tabletIconText,
+                isDesktop && styles.desktopIconText
+            ]} numberOfLines={1}>
+                {name}
+            </Text>
+        </View>
+    );
 };
 
 const TabLayout = () => {
-  return (
-    <>
-      <Tabs
-        screenOptions={{
-            tabBarShowLabel: false,
-            tabBarActiveTintColor: '#ED9405',
-            tabBarInactiveTintColor: '#CDCDE0',
-        }}
+    const { isTablet } = useResponsiveLayout();
+
+    if (isTablet) {
+        return (
+            <ThemedView style={styles.container}>
+                <TabletNavigation />
+                <View style={styles.content}>
+                    <Tabs screenOptions={{
+                        headerShown: false,
+                        tabBarStyle: { display: 'none' },
+                    }}>
+                        <Tabs.Screen
+                            name="index" // Renommé de "home" à "index"
+                            options={{ href: null }}
+                        />
+                        <Tabs.Screen
+                            name="orders" // Correspond à votre fichier orders.tsx
+                            options={{ href: null }}
+                        />
+                        <Tabs.Screen
+                            name="create"
+                            options={{ href: null }}
+                        />
+                        <Tabs.Screen
+                            name="settings"
+                            options={{ href: null }}
+                        />
+                    </Tabs>
+                </View>
+            </ThemedView>
+        );
+    }
+
+    // Version mobile (téléphone)
+    return (
+        <Tabs
+            screenOptions={{
+                tabBarShowLabel: false,
+                tabBarActiveTintColor: '#ED9405',
+                tabBarInactiveTintColor: '#CDCDE0',
+            }}
         >
-        <Tabs.Screen
-          name="home"
-          options={{
-            title: 'Home',
-            headerShown: false,
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon icon={icons.home} color={color} name="Home" focused={focused} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="favorites"
-          options={{
-            title: 'Favorites',
-            headerShown: false,
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon icon={icons.bookmark} color={color} name="Favorites" focused={focused} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="create"
-          options={{
-            title: 'Create',
-            headerShown: false,
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon icon={icons.plus} color={color} name="Create" focused={focused} />
-            ),
-          }}
-        />
-        <Tabs.Screen
-          name="settings"
-          options={{
-            title: 'Settings',
-            headerShown: false,
-            tabBarIcon: ({ color, focused }) => (
-              <TabIcon icon={icons.profile} color={color} name="Settings" focused={focused} />
-            ),
-          }}
-        />
-      </Tabs>
-    </>
-  );
+            <Tabs.Screen
+                name="home"
+                options={{
+                    title: 'Home',
+                    headerShown: false,
+                    tabBarIcon: ({ color, focused }) => (
+                        <TabIcon icon={icons.home} color={color} name="Home" focused={focused} />
+                    ),
+                }}
+            />
+            <Tabs.Screen
+                name="favorites"
+                options={{
+                    title: 'Favorites',
+                    headerShown: false,
+                    tabBarIcon: ({ color, focused }) => (
+                        <TabIcon icon={icons.bookmark} color={color} name="Favorites" focused={focused} />
+                    ),
+                }}
+            />
+            <Tabs.Screen
+                name="create"
+                options={{
+                    title: 'Create',
+                    headerShown: false,
+                    tabBarIcon: ({ color, focused }) => (
+                        <TabIcon icon={icons.plus} color={color} name="Create" focused={focused} />
+                    ),
+                }}
+            />
+            <Tabs.Screen
+                name="settings"
+                options={{
+                    title: 'Settings',
+                    headerShown: false,
+                    tabBarIcon: ({ color, focused }) => (
+                        <TabIcon icon={icons.profile} color={color} name="Settings" focused={focused} />
+                    ),
+                }}
+            />
+        </Tabs>
+    );
 };
 
-export default TabLayout;
-
 const styles = StyleSheet.create({
+    // Styles de base (mobile)
     iconContainer: {
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
+        flexDirection: 'column',
+        alignItems: 'center',
+        justifyContent: 'center',
     },
     icon: {
-      width: 20,
-      height: 20,
+        width: 20,
+        height: 20,
     },
     iconText: {
-      fontSize: 12,
-      fontFamily: 'jua',
-      textAlign: 'center',
-      width: 100,
-      marginTop: 4,
+        fontSize: 12,
+        fontFamily: 'jua',
+        textAlign: 'center',
+        width: 100,
+        marginTop: 4,
     },
-  });
+
+    // Styles tablette
+    tabletContainer: {
+        flexDirection: 'row',
+        height: '100%',
+    },
+    tabletSidebar: {
+        width: 80,
+        backgroundColor: '#ffffff',
+        paddingVertical: 20,
+        alignItems: 'center',
+        borderRightWidth: 1,
+        borderRightColor: '#CDCDE0',
+    },
+    tabletContent: {
+        flex: 1,
+    },
+    tabletIconContainer: {
+        marginVertical: 20,
+    },
+    tabletIcon: {
+        width: 24,
+        height: 24,
+    },
+    tabletIconText: {
+        fontSize: 14,
+    },
+
+    // Styles desktop
+    desktopContainer: {
+        flexDirection: 'row',
+        height: '100%',
+    },
+    desktopSidebar: {
+        width: 240,
+        backgroundColor: '#ffffff',
+        paddingVertical: 30,
+        alignItems: 'flex-start',
+        paddingLeft: 30,
+        borderRightWidth: 1,
+        borderRightColor: '#CDCDE0',
+    },
+    desktopContent: {
+        flex: 1,
+    },
+    desktopIconContainer: {
+        flexDirection: 'row',
+        marginVertical: 15,
+        width: '100%',
+    },
+    desktopIcon: {
+        width: 28,
+        height: 28,
+        marginRight: 15,
+    },
+    desktopIconText: {
+        fontSize: 16,
+        width: 'auto',
+        marginTop: 0,
+    },
+    container: {
+        flex: 1,
+        flexDirection: 'row',
+        backgroundColor: '#F9F7FA',
+    },
+    content: {
+        flex: 1,
+        backgroundColor: '#F9F7FA',
+    },
+});
+
+export default TabLayout;
