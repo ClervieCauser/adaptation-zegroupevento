@@ -6,6 +6,7 @@ import { ThemedText } from '@/components/ThemedText';
 import SearchBar from '@/components/ui/SearchBar';
 import OrderCard from '@/components/ui/OrderCard';
 import { MOCK_ORDERS } from '@/types/order';
+import { router } from 'expo-router';
 
 const FilterButton = ({ label, active, onPress }) => (
     <TouchableOpacity
@@ -22,6 +23,10 @@ const PendingOrders = () => {
     const [searchText, setSearchText] = useState('');
     const [activeFilter, setActiveFilter] = useState('Meal');
     const [expandedCardId, setExpandedCardId] = useState(null);
+
+    const handleCookPress = () => {
+        router.push('/pages/recipe');
+      };
 
     return (
         <ThemedView style={styles.container}>
@@ -51,7 +56,10 @@ const PendingOrders = () => {
                             onToggleExpand={() => {
                                 setExpandedCardId(expandedCardId === order.id ? null : order.id);
                             }}
-                            onCook={() => console.log('Cook order:', order.id)}
+                            onCook={() => {
+                                console.log('Cook order:', order.id);
+                                handleCookPress();
+                            }}
                         />
                     ))}
                 </View>

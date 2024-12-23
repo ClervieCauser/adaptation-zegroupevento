@@ -4,6 +4,7 @@ import { ThemedView } from '../../components/ThemedView';
 import { icons } from '../../constants/icons';
 import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
 import TabletNavigation from "../../components/ui/TabletNavigation";
+import PendingOrders from './pending-orders';
 
 const TabIcon = ({ icon, color, name, focused }) => {
     const { isTablet, isDesktop } = useResponsiveLayout();
@@ -52,8 +53,8 @@ const TabLayout = () => {
                             options={{ href: null }}
                         />
                         <Tabs.Screen
-                            name="orders" // Correspond à votre fichier orders.tsx
-                            options={{ href: null }}
+                            name="pending-orders" // Correspond à votre fichier orders.tsx
+                            options={{ href: PendingOrders }}
                         />
                         <Tabs.Screen
                             name="create"
@@ -89,12 +90,12 @@ const TabLayout = () => {
                 }}
             />
             <Tabs.Screen
-                name="favorites"
+                name="pending-orders"
                 options={{
-                    title: 'Favorites',
+                    title: 'Pending Orders',
                     headerShown: false,
                     tabBarIcon: ({ color, focused }) => (
-                        <TabIcon icon={icons.bookmark} color={color} name="Favorites" focused={focused} />
+                        <TabIcon icon={icons.bookmark} color={color} name="Pending Orders" focused={focused} />
                     ),
                 }}
             />
