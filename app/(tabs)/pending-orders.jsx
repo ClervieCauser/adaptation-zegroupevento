@@ -10,6 +10,7 @@ import { MOCK_USER } from '@/types/user';
 import CustomButton from '@/components/CustomButton';
 import { router } from 'expo-router';
 import CustomHeader from "../../components/ui/CustomHeader";
+import {useOrderSelection} from "../../hooks/UseOrderSelection";
 
 const FilterButton = ({ label, active, onPress }) => (
     <TouchableOpacity
@@ -28,16 +29,9 @@ const PendingOrders = () => {
     const [searchText, setSearchText] = useState('');
     const [activeFilter, setActiveFilter] = useState('Meal');
     const [expandedCardId, setExpandedCardId] = useState(null);
-    const [isSelectMode, setIsSelectMode] = useState(false);
-    const [selectedOrders, setSelectedOrders] = useState([]);
+    const { isSelectMode, selectedIds, toggleSelectMode, toggleOrderSelection } = useOrderSelection();
 
-    const toggleOrderSelection = (orderId) => {
-        setSelectedOrders(prev =>
-            prev.includes(orderId)
-                ? prev.filter(id => id !== orderId)
-                : [...prev, orderId]
-        );
-    };
+
 
     const handleCookPress = () => {
         router.push('/pages/recipe');
@@ -62,7 +56,7 @@ const PendingOrders = () => {
                             {!isSelectMode ? (
                                 <TouchableOpacity
                                     style={styles.selectButton}
-                                    onPress={() => setIsSelectMode(true)}
+                                    onPress={toggleSelectMode}
                                 >
                                     <ThemedText style={styles.selectButtonText}>Select</ThemedText>
                                 </TouchableOpacity>
@@ -73,15 +67,12 @@ const PendingOrders = () => {
                                         onPress={() => handleCookSelected()}
                                     >
                                         <ThemedText style={styles.cookButtonText}>
-                                            Cook({selectedOrders.length})
+                                            Cook({selectedIds.length})
                                         </ThemedText>
                                     </TouchableOpacity>
                                     <TouchableOpacity
                                         style={styles.cancelButton}
-                                        onPress={() => {
-                                            setIsSelectMode(false);
-                                            setSelectedOrders([]);
-                                        }}
+                                        onPress={toggleSelectMode}
                                     >
                                         <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
                                     </TouchableOpacity>
@@ -101,7 +92,7 @@ const PendingOrders = () => {
                                     onToggleExpand={() => setExpandedCardId(expandedCardId === order.id ? null : order.id)}
                                     onCook={handleCookPress}
                                     isSelectMode={isSelectMode}
-                                    isSelected={selectedOrders.includes(order.id)}
+                                    isSelected={selectedIds.includes(order.id)}
                                     onSelect={toggleOrderSelection}
                                 />
                             ))}
@@ -267,6 +258,31 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFFFFF',
         justifyContent: 'space-between',
     },
+
+    actionButtons: {
+        flexDirection: 'row',
+        gap: 8,
+    },
+    cancelButton: {
+        backgroundColor: '#E8A85F',
+        paddingVertical: 8,
+        paddingHorizontal: 24,
+        borderRadius: 20,
+    },
+    cancelButtonText: {
+        color: '#FFFFFF',
+        fontFamily: 'Jua',
+    },
+    cookButton: {
+        backgroundColor: '#E8A85F',
+        paddingVertical: 8,
+        paddingHorizontal: 24,
+        borderRadius: 20,
+    },
+    cookButtonText: {
+        color: '#FFFFFF',
+        fontFamily: 'Jua',
+    }
 
 
 });

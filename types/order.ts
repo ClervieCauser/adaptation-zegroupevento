@@ -11,6 +11,10 @@ export type Order = {
     items: OrderItem[];
 };
 
+export type OrderSelectionState = {
+    isSelectMode: boolean;
+    selectedIds: string[];
+};
 // Sample data
 export const MOCK_ORDERS: Order[] = [
     {
