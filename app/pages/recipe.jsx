@@ -7,14 +7,8 @@ import Tags from '../../components/ui/Tags';
 import TabButton from '../../components/ui/TabButton';
 import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
 import CustomHeader from '../../components/ui/CustomHeader';
-
-
-const IngredientRow = ({ ingredient, quantity, unit }) => (
-  <View style={styles.ingredientRow}>
-    <Text style={styles.ingredientName}>{ingredient}</Text>
-    <Text style={styles.ingredientQuantity}>{quantity} {unit}</Text>
-  </View>
-);
+import IngredientRow from '../../components/ui/IngredientRow';
+import Counter from '../../components/ui/Counter';
 
 const RecipePage = () => {
   const { isTablet } = useResponsiveLayout();
@@ -24,6 +18,8 @@ const RecipePage = () => {
       <ScrollView style={styles.container}>
         <CustomHeader />
     
+          <Text style={styles.title}>Poulet Citron</Text>
+          
           <View style={styles.tagContainer}>
               <Tags text="Four" />
               <Tags text="Simple" />
@@ -31,55 +27,51 @@ const RecipePage = () => {
               <Tags text="Léger" />
           </View>
 
-        <View style={styles.mainImageContainer}>
-          <Image
-            source={require('../../assets/images/citron.jpg')}
-            style={styles.mainImage}
-          />
-        </View>
+        <View style={styles.imageAndText}>
+          <View style={styles.mainImageContainer}>
+            <Image
+              source={require('../../assets/images/citron.jpg')}
+              style={styles.mainImage}
+            />
+          </View>
 
-        <View style={styles.servingContainer}>
-          <Text style={styles.sectionTitle}>Ingredients</Text>
-          <View style={styles.servingAdjuster}>
-            <TouchableOpacity style={styles.adjustButton}>
-              <Feather name="minus" size={20} color="#666" />
-            </TouchableOpacity>
-            <Text style={styles.servingNumber}>4</Text>
-            <TouchableOpacity style={styles.adjustButton}>
-              <Feather name="plus" size={20} color="#666" />
-            </TouchableOpacity>
+          <View style={styles.ingredients}>
+            <View style={styles.ingredientTextAndCounter}>
+              <Text style={styles.ingredientsText}>Ingredients</Text>
+              <Counter/>  
+            </View>
+            
+            <View style={styles.ingredientsContainer}>
+              <IngredientRow ingredient="Poulet" quantity="1.2" unit="kg" />
+              <IngredientRow ingredient="Citrons jaunes" quantity="200" unit="g" />
+              <IngredientRow ingredient="Ails" quantity="4" unit="gousses" />
+              <IngredientRow ingredient="Romarins" quantity="2" unit="brins" />
+              <IngredientRow ingredient="Thym" quantity="2" unit="brins" />
+              <IngredientRow ingredient="Huile d'olive" quantity="3" unit="c. à soupe" />
+              <IngredientRow ingredient="Beurre" quantity="20" unit="g" />
+              <IngredientRow ingredient="Sel" quantity="1" unit="c. à café" />
+              <IngredientRow ingredient="Poivre" quantity="1/2" unit="c. à café" />
+            </View>
           </View>
         </View>
 
-        <View style={styles.ingredientsContainer}>
-          <IngredientRow ingredient="Poulet" quantity="1.2" unit="kg" />
-          <IngredientRow ingredient="Citrons jaunes" quantity="200" unit="g" />
-          <IngredientRow ingredient="Ails" quantity="4" unit="gousses" />
-          <IngredientRow ingredient="Romarins" quantity="2" unit="brins" />
-          <IngredientRow ingredient="Thym" quantity="2" unit="brins" />
-          <IngredientRow ingredient="Huile d'olive" quantity="3" unit="c. à soupe" />
-          <IngredientRow ingredient="Beurre" quantity="20" unit="g" />
-          <IngredientRow ingredient="Sel" quantity="1" unit="c. à café" />
-          <IngredientRow ingredient="Poivre" quantity="1/2" unit="c. à café" />
-        </View>
-
         <View style={styles.timeContainer}>
-          <Text style={styles.timeLabel}>Total:</Text>
-          <Text style={styles.timeValue}>1h</Text>
-          <Text style={styles.timeLabel}>Cuisson au four:</Text>
-          <Text style={styles.timeValue}>50 min</Text>
-          <Text style={styles.timeLabel}>Préparation des ingrédients:</Text>
-          <Text style={styles.timeValue}>10 min</Text>
-        </View>
+              <Text style={styles.timeLabel}>Total:</Text>
+              <Text style={styles.timeValue}>1h</Text>
+              <Text style={styles.timeLabel}>Cuisson au four:</Text>
+              <Text style={styles.timeValue}>50 min</Text>
+              <Text style={styles.timeLabel}>Préparation des ingrédients:</Text>
+              <Text style={styles.timeValue}>10 min</Text>
+            </View>
 
-        <NutritionalInfo
-          calories={380}
-          proteins={42}
-          carbs={22}
-          sugar={4}
-          fiber={1}
-        />
-
+            <NutritionalInfo
+              calories={380}
+              proteins={42}
+              carbs={22}
+              sugar={4}
+              fiber={1}
+            />
+      
         <TouchableOpacity style={styles.startButton}>
           <Text style={styles.startButtonText}>Commencer la recette !</Text>
         </TouchableOpacity>
@@ -90,6 +82,9 @@ const RecipePage = () => {
   return (
     <ScrollView style={styles.container}>
       <CustomHeader/>
+
+      <Text style={styles.title}>Poulet Citron</Text>
+
         <View style={styles.tagContainer}>
             <Tags text="Four" />
             <Tags text="Simple" />
@@ -103,25 +98,16 @@ const RecipePage = () => {
           <TabButton text="Autres" />
         </View>
 
-      <View style={styles.mainImageContainer}>
-        <Image
-          source={require('../../assets/images/citron.jpg')}
-          style={styles.mainImage}
-        />
-      </View>
+        <View style={styles.imageAndText}>
+          <View style={styles.mainImageContainer}>
+            <Image
+              source={require('../../assets/images/citron.jpg')}
+              style={styles.mainImage}
+            />
+          </View>
 
-      <View style={styles.servingContainer}>
-        <Text style={styles.sectionTitle}>Ingredients</Text>
-        <View style={styles.servingAdjuster}>
-          <TouchableOpacity style={styles.adjustButton}>
-            <Feather name="minus" size={20} color="#666" />
-          </TouchableOpacity>
-          <Text style={styles.servingNumber}>4</Text>
-          <TouchableOpacity style={styles.adjustButton}>
-            <Feather name="plus" size={20} color="#666" />
-          </TouchableOpacity>
+          <Counter/>
         </View>
-      </View>
 
       <View style={styles.ingredientsContainer}>
         <IngredientRow ingredient="Poulet" quantity="1.2" unit="kg" />
@@ -175,46 +161,32 @@ const styles = StyleSheet.create({
     height: '100%',
     borderRadius: 8,
   },
-  servingContainer: {
+  imageAndText: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
+    paddingHorizontal: 16,
   },
-  sectionTitle: {
-    fontSize: 20,
+  ingredients:{
+    width: '60%',
+  },
+  ingredientsText: {
+    fontSize: 34,
     fontWeight: 'bold',
-  },
-  servingAdjuster: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  adjustButton: {
-    backgroundColor: '#f0f0f0',
-    padding: 8,
-    borderRadius: 20,
-  },
-  servingNumber: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    textAlign: 'center',
+    fontFamily:'Jua'
   },
   ingredientsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
     padding: 16,
   },
-  ingredientRow: {
+  ingredientTextAndCounter:{
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 8,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  ingredientName: {
-    fontSize: 16,
-  },
-  ingredientQuantity: {
-    fontSize: 16,
-    color: '#666',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    marginBottom: 25,
   },
   tabContainer: {
     flexDirection: 'row',
@@ -240,6 +212,12 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: 'bold',
     marginBottom: 8,
+  },
+  title: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontFamily: 'Jua',
   },
   startButton: {
     backgroundColor: '#E9A23B',
