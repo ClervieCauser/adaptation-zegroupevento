@@ -3,7 +3,7 @@ import React from 'react'
 
 const CustomButton = ({ title, handlePress, containerStyles, textStyles, isLoading}) => {
   return (
-    <TouchableOpacity 
+    <TouchableOpacity
         onPress={handlePress}
         activeOpacity={0.7}
         style={[styles.button, containerStyles]}
@@ -19,7 +19,6 @@ const styles = StyleSheet.create({
     button: {
         backgroundColor: '#ED9405',
         padding: 10,
-        borderRadius: 5,
         marginTop: 20,
         borderRadius: 12,
         minHeight: 60,

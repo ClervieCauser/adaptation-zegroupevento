@@ -10,9 +10,19 @@ type OrderCardProps = {
     onCook: () => void;
     expanded: boolean;
     onToggleExpand: () => void;
+    isSelectMode: boolean;
+    isSelected: boolean;
+    onSelect: (id: string) => void;
 };
-
-const OrderCard = ({ order, onCook, expanded, onToggleExpand }: OrderCardProps) => {
+const OrderCard = ({
+                       order,
+                       onCook,
+                       expanded,
+                       onToggleExpand,
+                       isSelectMode,
+                       isSelected,
+                       onSelect
+                   }) => {
     const GRID_COLUMNS = 2;
     const MAX_VISIBLE_ROWS = 2;
     const EXPANDED_COLUMNS = 8; // Augmenté pour avoir plus de colonnes en mode étendu
@@ -63,8 +73,15 @@ const OrderCard = ({ order, onCook, expanded, onToggleExpand }: OrderCardProps) 
         <ThemedView style={[
             styles.card,
             expanded && styles.cardExpanded,
-            { width: expanded ? '100%' : 'calc(25% - 12px)' }
-        ]}>
+            { width: expanded ? '100%' : 'calc(25% - 12px)' }]}>
+            {isSelectMode && (
+                <TouchableOpacity
+                    style={[styles.selectCircle, isSelected && styles.selectCircleActive]}
+                    onPress={() => onSelect?.(order.id)}
+                >
+                    {isSelected && <View style={styles.selectCircleDot} />}
+                </TouchableOpacity>
+            )}
             <View style={styles.cardContent}>
                 <View style={styles.header}>
                     <View style={styles.orderInfo}>
@@ -97,10 +114,14 @@ const OrderCard = ({ order, onCook, expanded, onToggleExpand }: OrderCardProps) 
                 >
                     <ThemedText style={styles.cookButtonText}>Cook</ThemedText>
                 </TouchableOpacity>
+
             </View>
+
         </ThemedView>
     );
 };
+
+
 
 const styles = StyleSheet.create({
     card: {
@@ -217,6 +238,43 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: 'Jua',
     },
+
+    selectCircle: {
+        position: 'absolute',
+        top: 12,
+        right: 12,
+        width: 24,
+        height: 24,
+        borderRadius: 12,
+        borderWidth: 2,
+        borderColor: '#E8A85F',
+        justifyContent: 'center',
+        alignItems: 'center',
+    },
+    selectCircleActive: {
+        backgroundColor: '#E8A85F',
+    },
+    selectCircleDot: {
+        width: 10,
+        height: 10,
+        borderRadius: 5,
+        backgroundColor: 'white',
+    },
+    actionButtons: {
+        flexDirection: 'row',
+        gap: 8,
+    },
+    cancelButton: {
+        borderWidth: 1,
+        borderColor: '#E8A85F',
+        paddingVertical: 8,
+        paddingHorizontal: 24,
+        borderRadius: 20,
+    },
+    cancelButtonText: {
+        color: '#E8A85F',
+        fontFamily: 'Jua',
+    }
 });
 
 export default OrderCard;
