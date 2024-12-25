@@ -5,13 +5,16 @@ interface IngredientRowProps {
   ingredient: string;
   quantity: number | string;
   unit: string;
+  nameStyle?: object;
+  quantityStyle?: object;
+  containerStyle?: object;
 }
 
-const IngredientRow: React.FC<IngredientRowProps> = ({ ingredient, quantity, unit }) => {
+const IngredientRow: React.FC<IngredientRowProps> = ({ ingredient, quantity, unit, nameStyle, quantityStyle, containerStyle }) => {
   return (
-    <View style={styles.ingredientRow}>
-      <Text style={styles.ingredientName}>{ingredient}</Text>
-      <Text style={styles.ingredientQuantity}>{quantity} {unit}</Text>
+    <View style={[styles.ingredientRow, containerStyle]}>
+      <Text style={[styles.ingredientName, nameStyle]}>{ingredient}</Text>
+      <Text style={[styles.ingredientQuantity, quantityStyle]}>{quantity} {unit}</Text>
     </View>
   );
 };

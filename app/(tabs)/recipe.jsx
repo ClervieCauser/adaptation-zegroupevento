@@ -7,7 +7,7 @@ import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
 import CustomHeader from '../../components/ui/CustomHeader';
 import IngredientRow from '../../components/ui/IngredientRow';
 import Counter from '../../components/ui/Counter';
-import CustomButton from '../../components/CustomButton';
+import CustomButton from '../../components/ui/CustomButton';
 import Pagination from '../../components/ui/Pagination';
 import UtensilRow from '../../components/ui/UtensilRow';
 
@@ -41,6 +41,98 @@ const RecipePage = () => {
   const handlePageChange = (page) => {
     setActivePage(page);
     setActiveTab(page === 0 ? 'ingredients' : 'utensils');
+  };
+
+  const renderContent = () => {
+    switch (activeTab) {
+      case 'ingredients':
+        return (
+          <>
+            <View style={styles.imageAndText}>
+              <View style={styles.mainImageContainer}>
+                <Image
+                  source={require('../../assets/images/citron.jpg')}
+                  style={styles.mainImage}
+                />
+              </View>
+
+              <Counter/>
+            </View>
+
+            <ScrollView style={styles.scrollableContainerPhone} contentContainerStyle={styles.ingredientsContainer}>
+            {ingredients.map((item, index) => (
+                <View key={index} style={styles.ingredientContainer}>
+                  <IngredientRow 
+                    ingredient={item.ingredient} 
+                    quantity={item.quantity} 
+                    unit={item.unit} 
+                    quantityStyle={styles.textPhone} 
+                    nameStyle={styles.textPhone} 
+                    containerStyle={styles.ingredientRowPhone}
+                  />
+                </View>
+              ))}
+            </ScrollView>
+          </>
+        );
+      case 'utensils':
+        return (
+          <>
+            <View style={styles.imageAndText}>
+              <View style={styles.mainImageContainer}>
+                <Image
+                  source={require('../../assets/images/citron.jpg')}
+                  style={styles.mainImage}
+                />
+              </View>
+            </View>
+                <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
+                  {utensils.map((item, index) => (
+                    <View key={index} style={styles.ingredientContainer}>
+                      <UtensilRow utensil={item.utensil} styleText={styles.textPhone} styleContainer={styles.utensilRowPhone}/>
+                    </View>
+                  ))}
+                </ScrollView>
+              </>
+        );
+      case 'autres':
+        return (
+          <>
+            <View style={styles.imageAndText}>
+              <View style={styles.mainImageContainer}>
+                <Image
+                  source={require('../../assets/images/citron.jpg')}
+                  style={styles.mainImage}
+                />
+              </View>
+            </View>
+
+            <View style={styles.contentContainer}>
+              <View style={styles.timeContainer}>
+                <Text style={styles.timeLabelPhone}>Total:</Text>
+                <Text style={styles.timeValuePhone}>1h</Text>
+              </View>
+              <View style={styles.timeContainer}>
+                <Text style={styles.timeLabelPhone}>Cuisson au four:</Text>
+                <Text style={styles.timeValuePhone}>50 min</Text>
+              </View>
+              <View style={styles.timeContainer}>
+                <Text style={styles.timeLabelPhone}>Préparation des ingrédients:</Text>
+                <Text style={styles.timeValuePhone}>10 min</Text>
+              </View>
+              <View style={styles.nutritionalInfoContainer}>
+                <NutritionalInfo quantity='380' text='kcal'/>
+                <NutritionalInfo quantity='42g' text='protéines'/>
+                <NutritionalInfo quantity='22g' text='glucides'/>
+                <NutritionalInfo quantity='4g' text='sucre'/>
+                <NutritionalInfo quantity='1g' text='fibres'/>
+              </View>
+            </View>
+          </>
+        );
+      default:
+        return null;
+    }
   };
 
   if(isTablet) {
@@ -137,7 +229,7 @@ const RecipePage = () => {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView style={styles.containerPhone}>
       <CustomHeader/>
 
       <Text style={styles.title}>Poulet Citron</Text>
@@ -149,60 +241,58 @@ const RecipePage = () => {
         <Tags text="Léger" />
       </View>
 
-      <View style={styles.tabContainer}>
-        <TabButton text="Ingredients" isActive={true} />
-        <TabButton text="Ustensiles" />
-        <TabButton text="Autres" />
-      </View>
-
-      <View style={styles.imageAndText}>
-        <View style={styles.mainImageContainer}>
-          <Image
-            source={require('../../assets/images/citron.jpg')}
-            style={styles.mainImage}
+      <View style={styles.tabsContainer}>
+          <TabButton 
+            text="Ingredients" 
+            isActive={activeTab === 'ingredients'}
+            onPress={() => setActiveTab('ingredients')}
+          />
+          <TabButton 
+            text="Ustensiles" 
+            isActive={activeTab === 'utensils'}
+            onPress={() => setActiveTab('utensils')}
+          />
+          <TabButton 
+            text="Autres" 
+            isActive={activeTab === 'autres'}
+            onPress={() => setActiveTab('autres')}
           />
         </View>
 
-        <Counter/>
+      <View style={styles.border}>
+        {renderContent()}
       </View>
 
-      <View style={styles.ingredientsContainer}>
-        {ingredients.map((item, index) => (
-          <View key={index} style={styles.ingredientContainer}>
-            <IngredientRow ingredient={item.ingredient} quantity={item.quantity} unit={item.unit} />
-          </View>
-        ))}
-      </View>
-
-      <View style={styles.timeContainer}>
-        <Text style={styles.timeLabel}>Total:</Text>
-        <Text style={styles.timeValue}>1h</Text>
-        <Text style={styles.timeLabel}>Cuisson au four:</Text>
-        <Text style={styles.timeValue}>50 min</Text>
-        <Text style={styles.timeLabel}>Préparation des ingrédients:</Text>
-        <Text style={styles.timeValue}>10 min</Text>
-      </View>
-
-      <NutritionalInfo
-        calories={380}
-        proteins={42}
-        carbs={22}
-        sugar={4}
-        fiber={1}
+      <CustomButton 
+        title="Commencer la recette !" 
+        textStyles={styles.startButtonTextPhone} 
+        containerStyles={styles.startButtonPhone}
+        style={styles.paginationDots}
       />
-
-      <TouchableOpacity style={styles.startButton}>
-        <Text style={styles.startButtonText}>Commencer la recette !</Text>
-      </TouchableOpacity>
     </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
+  border: {
+    borderColor: '#ED9405',
+    borderWidth: 2,
+    marginLeft: 8,
+    marginRight: 8,
+    maxHeight: 450,
+    minHeight: 450,
+  },
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F9F7FA',
     paddingTop: 24,
+  },
+  containerPhone: {
+    flex: 1,
+    backgroundColor: '#fff',
+  },
+  contentContainer: {
+    padding: 16,
   },
   mainImageContainer: {
     width: '40%',
@@ -232,6 +322,9 @@ const styles = StyleSheet.create({
   scrollableContainer: {
     maxHeight: 400,
   },
+  scrollableContainerPhone: {
+    maxHeight: 300,
+  },
   ingredientsContainer: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -243,6 +336,17 @@ const styles = StyleSheet.create({
   ingredientContainer: {
     width: '48%',
     marginBottom: 16,
+  },
+  ingredientRowPhone: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 5,
+    backgroundColor: "#FFEFDF",
+    borderRadius: 11,
+    paddingHorizontal: 10,
+    marginHorizontal: 5,
+    height: 40,
   },
   ingredientTextAndCounter: {
     flexDirection: 'row',
@@ -259,10 +363,11 @@ const styles = StyleSheet.create({
   paginationDots: {
     alignSelf: 'center',
   },
-  tabContainer: {
+  tabsContainer: {
     flexDirection: 'row',
-    padding: 16,
-    gap: 8,
+    backgroundColor: '#FFF',
+    marginLeft: 8,
+    marginRight: 8,
   },
   tagContainer: {
     flexDirection: 'row',
@@ -272,6 +377,10 @@ const styles = StyleSheet.create({
     padding: 16,
     gap: 8,
   },
+  textPhone: {
+    fontSize: 12,
+    fontFamily: 'Jua',
+  },
   timeContainer: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -280,8 +389,19 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Jua',
   },
+  timeLabelPhone:{
+    fontSize: 12,
+    fontFamily: 'Jua',
+  },
   timeValue: {
     fontSize: 16,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    fontFamily: 'Jua',
+    color: '#ED9405',
+  },
+  timeValuePhone:{
+    fontSize: 12,
     fontWeight: 'bold',
     marginBottom: 8,
     fontFamily: 'Jua',
@@ -302,12 +422,37 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     alignSelf: 'center',
   },
+  startButtonPhone:{
+    backgroundColor: '#E9A23B',
+    margin: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: 30,
+    alignItems: 'center',
+    alignSelf: 'center',
+  },
   startButtonText: {
     color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
     fontFamily: 'Jua',
   },
+  startButtonTextPhone:{
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: 'bold',
+    fontFamily: 'Jua',
+  },
+  utensilRowPhone:{
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 5,
+    backgroundColor: "#FFEFDF",
+    borderRadius: 11,
+    paddingHorizontal: 10,
+    marginHorizontal: 3,
+    height: 40,
+  }
 });
 
 export default RecipePage;

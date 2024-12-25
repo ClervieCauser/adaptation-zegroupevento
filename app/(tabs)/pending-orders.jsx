@@ -7,7 +7,6 @@ import SearchBar from '@/components/ui/SearchBar';
 import OrderCard from '@/components/ui/OrderCard';
 import { MOCK_ORDERS } from '@/types/order';
 import { MOCK_USER } from '@/types/user';
-import CustomButton from '@/components/CustomButton';
 import { router } from 'expo-router';
 import CustomHeader from "../../components/ui/CustomHeader";
 import {useOrderSelection} from "../../hooks/UseOrderSelection";

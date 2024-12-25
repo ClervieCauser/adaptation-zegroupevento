@@ -3,12 +3,14 @@ import { View, Text, StyleSheet } from 'react-native';
 
 interface UtensilRowProps {
     utensil: string;
+    styleText?: object;
+    styleContainer?: object;
 }
 
-const UtensilRow: React.FC<UtensilRowProps> = ({ utensil }) => {
+const UtensilRow: React.FC<UtensilRowProps> = ({ utensil, styleText, styleContainer }) => {
   return (
-    <View style={styles.utensilRow}>
-      <Text style={styles.utensilName}>{utensil}</Text>
+    <View style={[styles.utensilRow, styleContainer]}>
+      <Text style={[styles.utensilName, styleText]}>{utensil}</Text>
     </View>
   );
 };
@@ -16,7 +18,7 @@ const UtensilRow: React.FC<UtensilRowProps> = ({ utensil }) => {
 export default UtensilRow;
 
 const styles = StyleSheet.create({
-    utensilRow: {
+  utensilRow: {
     flexDirection: 'row',
     alignItems: 'center',
     paddingVertical: 10,

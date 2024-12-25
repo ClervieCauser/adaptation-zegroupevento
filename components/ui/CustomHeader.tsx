@@ -36,10 +36,14 @@ const CustomHeader = ({ user }: CustomHeaderProps) => {
     }
 
     return(
-        <View style={styles.header}>
+        <View style={styles.headerPhone}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity>
-                        <Feather name="mic" size={24} color="#666" />
+                            <Feather
+                                name={MOCK_USER.micEnabled ? 'mic' : 'mic-off'}
+                                size={24}
+                                color="#666"
+                            />                        
                     </TouchableOpacity>
                 </View>
                 <View style={styles.appTitle}>
@@ -47,11 +51,8 @@ const CustomHeader = ({ user }: CustomHeaderProps) => {
                         <Text style={styles.nom}>Recipe_</Text>
                     </View>
                 <View style={styles.headerRight}>
-                    <TouchableOpacity>
-                        <Feather name="bell" size={24} color="#666" />
-                    </TouchableOpacity>
                     <View style={styles.levelBadge}>
-                    <Text style={styles.levelText}>Novice</Text>
+                        <Text style={styles.levelText}>Novice</Text>
                     </View>
                 </View>
             </View>
@@ -64,6 +65,13 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         alignItems: 'center',
         padding: 16,
+      },
+      headerPhone: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 16,
+        marginTop: 50,
       },
       headerLeft: {
         flexDirection: 'row',
@@ -92,12 +100,12 @@ const styles = StyleSheet.create({
       nomViolet: {
         color: '#3A1994',
         fontFamily: 'Jua',
-        fontSize: 24,
+        fontSize: 16,
       },
       nom: {
         color: '#E8A85F',
         fontFamily: 'Jua',
-        fontSize: 24,
+        fontSize: 16,
       },
     userName: {
         fontSize: 16,
@@ -128,7 +136,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingHorizontal: 16,
         paddingTop: 8,
-        backgroundColor: '#FFFFFF',
+        backgroundColor: '#F9F7FA',
     },
     rightContent: {
         flexDirection: 'row',
