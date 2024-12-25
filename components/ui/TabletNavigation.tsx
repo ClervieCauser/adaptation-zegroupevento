@@ -22,7 +22,7 @@ const TabletNavigation = () => {
     const handleNavigation = (route: string) => {
         // Supprime le préfixe "(tabs)" pour la navigation
         const cleanRoute = route.replace('/(tabs)', '');
-        router.push(cleanRoute);
+        router.push(cleanRoute as any);
     };
 
     return (

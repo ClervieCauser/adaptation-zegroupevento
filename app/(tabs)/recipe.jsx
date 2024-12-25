@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, Image, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, ScrollView, StyleSheet } from 'react-native';
 import NutritionalInfo from '../../components/ui/NutritionalInfo';
 import Tags from '../../components/ui/Tags';
 import TabButton from '../../components/ui/TabButton';

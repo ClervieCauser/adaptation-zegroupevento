@@ -140,7 +140,8 @@ const styles = StyleSheet.create({
         zIndex: 1,
     },
     searchContainer:{
-        marginTop: 15,
+        marginLeft: 15,
+        marginRight: 15,
     },
     filtersContainer: {
         flexDirection: 'row',
