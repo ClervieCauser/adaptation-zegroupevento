@@ -20,7 +20,6 @@ export default IngredientRow;
 
 const styles = StyleSheet.create({
   ingredientRow: {
-    width: '46%',
     flexDirection: 'row',
     justifyContent: 'center',
     alignItems: 'center',
@@ -28,8 +27,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#FFEFDF",
     borderRadius: 11,
     paddingHorizontal: 10,
-    marginVertical: 5,
     marginHorizontal: 5,
+    height: 60,
   },
   ingredientName: {
     fontSize: 16,

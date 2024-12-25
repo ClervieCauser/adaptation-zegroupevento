@@ -15,18 +15,20 @@ const CustomHeader = ({ user }: CustomHeaderProps) => {
         return (
             <View style={styles.headerContainer}>
                 <View style={styles.rightContent}>
-                    <View style={styles.micContainer}>
-                        <ThemedText style={styles.micStatus}>
-                            {MOCK_USER.micEnabled ? 'MIC ON' : 'MIC OFF'}
-                        </ThemedText>
-                    </View>
+                    <TouchableOpacity>
+                        <Feather
+                            name={MOCK_USER.micEnabled ? 'mic' : 'mic-off'}
+                            size={24}
+                            color="#666"
+                        />                        
+                    </TouchableOpacity>
                     <View style={styles.avatarSection}>
+                        <ThemedText style={styles.levelBadge}>{MOCK_USER.level}</ThemedText>
                         <View style={styles.avatarContainer}>
                             <ThemedText style={styles.avatarText}>
                                 {MOCK_USER.name.charAt(0)}
                             </ThemedText>
                         </View>
-                        <ThemedText style={styles.levelBadge}>{MOCK_USER.level}</ThemedText>
                     </View>
                 </View>
             </View>
@@ -37,16 +39,16 @@ const CustomHeader = ({ user }: CustomHeaderProps) => {
         <View style={styles.header}>
                 <View style={styles.headerLeft}>
                     <TouchableOpacity>
-                    <Feather name="mic" size={24} color="#666" />
+                        <Feather name="mic" size={24} color="#666" />
                     </TouchableOpacity>
                 </View>
                 <View style={styles.appTitle}>
                         <Text style={styles.nomViolet}>Poly</Text>
-                        <Text style={styles.nom}>Recipe</Text>
+                        <Text style={styles.nom}>Recipe_</Text>
                     </View>
                 <View style={styles.headerRight}>
                     <TouchableOpacity>
-                    <Feather name="bell" size={24} color="#666" />
+                        <Feather name="bell" size={24} color="#666" />
                     </TouchableOpacity>
                     <View style={styles.levelBadge}>
                     <Text style={styles.levelText}>Novice</Text>
@@ -55,8 +57,6 @@ const CustomHeader = ({ user }: CustomHeaderProps) => {
             </View>
     )
 }
-
-export default CustomHeader
 
 const styles = StyleSheet.create({
     header: {
@@ -73,9 +73,6 @@ const styles = StyleSheet.create({
       appTitle: {
         flexDirection: 'row',
         textAlign: 'center',
-        fontSize: 18,
-        fontWeight: 'bold',
-        color: '#4A3AFF',
       },
       headerRight: {
         flexDirection: 'row',
@@ -94,9 +91,13 @@ const styles = StyleSheet.create({
       },
       nomViolet: {
         color: '#3A1994',
+        fontFamily: 'Jua',
+        fontSize: 24,
       },
       nom: {
         color: '#E8A85F',
+        fontFamily: 'Jua',
+        fontSize: 24,
       },
     userName: {
         fontSize: 16,
@@ -116,18 +117,17 @@ const styles = StyleSheet.create({
         fontFamily: 'Jua',
         color: '#1C0D45',
     },
-
     userSection: {
         flexDirection: 'row',
         alignItems: 'center',
         gap: 16,
     },
-
     headerContainer: {
         flexDirection: 'row',
         justifyContent: 'flex-end',
         alignItems: 'center',
-        padding: 16,
+        paddingHorizontal: 16,
+        paddingTop: 8,
         backgroundColor: '#FFFFFF',
     },
     rightContent: {
@@ -135,12 +135,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         gap: 24,
     },
-    micContainer: {
-        marginRight: 16,
-    },
     avatarSection: {
+        flexDirection: 'row',
         alignItems: 'center',
-        gap: 4,
+        gap: 8,
     },
     avatarContainer: {
         height: 40,

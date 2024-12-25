@@ -33,17 +33,17 @@ const PendingOrders = () => {
 
 
 
-    const handleCookPress = () => {
-        router.push('/pages/recipe');
+    const handleCookPress = (order) => {
+        router.push('/recipe');
       };
 
     return (
         <ThemedView style={styles.container}>
             <View style={styles.topSection}>
+                <CustomHeader />
                 <View style={styles.searchContainer}>
                     <SearchBar value={searchText} onChangeText={setSearchText} />
                 </View>
-                <CustomHeader />
             </View>
             <ScrollView style={styles.mainContent}>
                     <View style={styles.headerSection}>
@@ -90,7 +90,7 @@ const PendingOrders = () => {
                                     order={order}
                                     expanded={expandedCardId === order.id}
                                     onToggleExpand={() => setExpandedCardId(expandedCardId === order.id ? null : order.id)}
-                                    onCook={handleCookPress}
+                                    onCook={() =>handleCookPress(order)}
                                     isSelectMode={isSelectMode}
                                     isSelected={selectedIds.includes(order.id)}
                                     onSelect={toggleOrderSelection}
@@ -127,6 +127,7 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         backgroundColor: '#F9F7FA',
+        paddingTop: 24,
     },
     header: {
         paddingHorizontal: 32,
@@ -139,7 +140,9 @@ const styles = StyleSheet.create({
         backgroundColor: '#F9F7FA',
         zIndex: 1,
     },
-
+    searchContainer:{
+        marginTop: 15,
+    },
     filtersContainer: {
         flexDirection: 'row',
         gap: 12,
@@ -252,13 +255,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#F9F7FA',
         borderTop: '1px solid #EAEAEA',
     },
-    topSection: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF',
-        justifyContent: 'space-between',
-    },
-
     actionButtons: {
         flexDirection: 'row',
         gap: 8,

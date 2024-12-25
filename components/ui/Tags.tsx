@@ -23,7 +23,8 @@ const styles = StyleSheet.create({
       },
       tagText: {
         color: '#fff',
-        fontSize: 12,
+        fontSize: 16,
+        fontFamily: 'Jua',
       },
   
 })

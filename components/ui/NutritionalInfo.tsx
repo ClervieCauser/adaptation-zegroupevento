@@ -2,36 +2,15 @@ import { StyleSheet, Text, View } from 'react-native'
 import React from 'react'
 
 interface NutritionalInfoProps {
-  calories: number;
-  proteins: number;
-  carbs: number;
-  sugar: number;
-  fiber: number;
+  quantity: string;
+  text: string;
 }
 
-const NutritionalInfo: React.FC<NutritionalInfoProps> = ({ calories, proteins, carbs, sugar, fiber }) => {
+const NutritionalInfo: React.FC<NutritionalInfoProps> = ({ quantity, text }) => {
     return (
-    <View style={styles.nutritionalContainer}>
-      <View style={styles.nutritionalItem}>
-        <Text style={styles.nutritionalValue}>{calories}</Text>
-        <Text style={styles.nutritionalLabel}>kcal</Text>
-      </View>
-      <View style={styles.nutritionalItem}>
-        <Text style={styles.nutritionalValue}>{proteins}g</Text>
-        <Text style={styles.nutritionalLabel}>protéines</Text>
-      </View>
-      <View style={styles.nutritionalItem}>
-        <Text style={styles.nutritionalValue}>{carbs}g</Text>
-        <Text style={styles.nutritionalLabel}>glucides</Text>
-      </View>
-      <View style={styles.nutritionalItem}>
-        <Text style={styles.nutritionalValue}>{sugar}g</Text>
-        <Text style={styles.nutritionalLabel}>sucres</Text>
-      </View>
-      <View style={styles.nutritionalItem}>
-        <Text style={styles.nutritionalValue}>{fiber}g</Text>
-        <Text style={styles.nutritionalLabel}>fibres</Text>
-      </View>
+    <View style={styles.nutritionalInfo}>
+      <Text style={styles.nutritionalInfoQuantity}>{quantity}</Text>
+      <Text style={styles.nutritionalInfoText}>{text}</Text>
     </View>
   );
 } 
@@ -39,21 +18,31 @@ const NutritionalInfo: React.FC<NutritionalInfoProps> = ({ calories, proteins, c
 export default NutritionalInfo
 
 const styles = StyleSheet.create({
-    nutritionalContainer: {
-        flexDirection: 'row',
-        justifyContent: 'space-around',
-        padding: 16,
-        backgroundColor: '#f8f8f8',
-      },
-      nutritionalItem: {
-        alignItems: 'center',
-      },
-      nutritionalValue: {
-        fontSize: 16,
-        fontWeight: 'bold',
-      },
-      nutritionalLabel: {
-        fontSize: 12,
-        color: '#666',
-      },
+  nutritionalInfo: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginVertical: 5,
+    backgroundColor: '#ED9405',
+    borderRadius: 11,
+    padding: 10,
+    width: 70,
+  },
+  nutritionalInfoQuantity: {
+    fontSize: 16,
+    fontFamily: 'Jua',
+    backgroundColor: '#fff',
+    borderRadius: 30,
+    padding: 20,
+    width: 60,
+    height: 60,
+    textAlign: 'center',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  nutritionalInfoText: {
+    fontSize: 14,
+    fontFamily: 'Jua',
+    color: '#fff',
+  },
 })

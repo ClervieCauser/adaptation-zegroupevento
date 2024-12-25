@@ -53,7 +53,7 @@ const TabLayout = () => {
                             options={{ href: null }}
                         />
                         <Tabs.Screen
-                            name="pending-orders" // Correspond à votre fichier orders.tsx
+                            name="pending-orders"
                             options={{ href: PendingOrders }}
                         />
                         <Tabs.Screen
@@ -148,9 +148,9 @@ const styles = StyleSheet.create({
         height: '100%',
     },
     tabletSidebar: {
-        width: 80,
+        width: 65,
         backgroundColor: '#ffffff',
-        paddingVertical: 20,
+        paddingVertical: 15,
         alignItems: 'center',
         borderRightWidth: 1,
         borderRightColor: '#CDCDE0',
