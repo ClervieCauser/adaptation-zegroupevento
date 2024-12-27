@@ -5,7 +5,7 @@ import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import CustomButton from '@/components/ui/CustomButton';
 import CustomHeader from '@/components/ui/CustomHeader';
-import { useOrderSelection } from '@/hooks/UseOrderSelection';
+import { useOrderSelection } from '@/context/OrderContext';
 import {router} from "expo-router";
 
 
@@ -24,7 +24,7 @@ const DisplayOption = ({ mode, isSelected, onSelect }) => (
 );
 
 const RecipePrep = () => {
-    const { selectedIds,getOrdersToShow, resetSelection  } = useOrderSelection();
+    const { getOrdersToShow, resetSelection } = useOrderSelection();
     const [displayMode, setDisplayMode] = useState('4');
     const [showSettings, setShowSettings] = useState(true);
 

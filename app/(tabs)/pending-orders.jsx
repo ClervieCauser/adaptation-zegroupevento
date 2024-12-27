@@ -9,7 +9,7 @@ import { MOCK_ORDERS } from '@/types/order';
 import { MOCK_USER } from '@/types/user';
 import { router } from 'expo-router';
 import CustomHeader from "../../components/ui/CustomHeader";
-import {useOrderSelection} from "../../hooks/UseOrderSelection";
+import { useOrderSelection } from "@/context/OrderContext";
 
 const FilterButton = ({ label, active, onPress }) => (
     <TouchableOpacity
@@ -28,7 +28,14 @@ const PendingOrders = () => {
     const [searchText, setSearchText] = useState('');
     const [activeFilter, setActiveFilter] = useState('Meal');
     const [expandedCardId, setExpandedCardId] = useState(null);
-    const { isSelectMode, selectedIds, toggleSelectMode, toggleOrderSelection , handleCookSelected, getOrdersToShow, orderToCook, handleSingleCook} = useOrderSelection();
+    const {
+        isSelectMode,
+        selectedIds,
+        toggleSelectMode,
+        toggleOrderSelection,
+        handleCookSelected,
+        handleSingleCook
+    } = useOrderSelection();
 
 
 
