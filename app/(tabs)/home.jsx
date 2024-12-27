@@ -3,6 +3,8 @@ import React, { useState } from 'react'
 import CustomHeader from "../../components/ui/CustomHeader";
 import SearchBar from '@/components/ui/SearchBar';
 import { ThemedView } from '@/components/ThemedView';
+import { RecipeList, SAMPLE_RECIPES} from '@/components/ui/RecipeList';
+import { ThemedText } from '@/components/ThemedText';
 
 const Home = () => {
   const [searchText, setSearchText] = useState('');
@@ -15,7 +17,8 @@ const Home = () => {
           <SearchBar value={searchText} onChangeText={setSearchText} />
         </View>
       </View>
-      <View style={styles.containerRecipe}></View>
+      <ThemedText style={styles.title}>List of recipe</ThemedText>
+      <RecipeList recipes={SAMPLE_RECIPES}/>
     </ThemedView>
   )
 }
@@ -73,6 +76,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontFamily: 'Jua',
     color: '#1C0D45',
+    margin: 10,
   },
   selectButton: {
     backgroundColor: '#E8A85F',
