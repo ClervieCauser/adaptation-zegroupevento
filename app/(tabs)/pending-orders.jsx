@@ -28,13 +28,15 @@ const PendingOrders = () => {
     const [searchText, setSearchText] = useState('');
     const [activeFilter, setActiveFilter] = useState('Meal');
     const [expandedCardId, setExpandedCardId] = useState(null);
-    const { isSelectMode, selectedIds, toggleSelectMode, toggleOrderSelection } = useOrderSelection();
+    const { isSelectMode, selectedIds, toggleSelectMode, toggleOrderSelection , handleCookSelected, getOrdersToShow, orderToCook, handleSingleCook} = useOrderSelection();
 
 
 
-    const handleCookPress = (order) => {
-        router.push('/recipe');
-      };
+    const handleCookPress = (orderId) => {
+        const targetRoute = MOCK_USER.level === 'EXPERT' ? '/recipe-prep' : '/recipe';
+        setSelectionState(prev => ({...prev, orderToCook: orderId}));
+        router.push(targetRoute);
+    };
 
     return (
         <ThemedView style={styles.container}>
@@ -89,7 +91,7 @@ const PendingOrders = () => {
                                     order={order}
                                     expanded={expandedCardId === order.id}
                                     onToggleExpand={() => setExpandedCardId(expandedCardId === order.id ? null : order.id)}
-                                    onCook={() =>handleCookPress(order)}
+                                    onCook={() => handleSingleCook(order.id)}
                                     isSelectMode={isSelectMode}
                                     isSelected={selectedIds.includes(order.id)}
                                     onSelect={toggleOrderSelection}

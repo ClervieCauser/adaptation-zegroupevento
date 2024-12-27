@@ -7,7 +7,7 @@ import { Order } from '@/types/order';
 
 type OrderCardProps = {
     order: Order;
-    onCook: () => void;
+    onCook: (orderId: string) => void
     expanded: boolean;
     onToggleExpand: () => void;
     isSelectMode: boolean;
@@ -110,7 +110,7 @@ const OrderCard = ({
 
                 <TouchableOpacity
                     style={styles.cookButton}
-                    onPress={onCook}
+                    onPress={() => onCook(order.id)}
                 >
                     <ThemedText style={styles.cookButtonText}>Cook</ThemedText>
                 </TouchableOpacity>
