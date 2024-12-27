@@ -3,26 +3,34 @@ import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import CustomButton from '@/components/ui/CustomButton';
 
-export const DisplaySettings = ({ onValidate, selectedMode, onModeChange }) => (
-    <View style={styles.settingsModal}>
-        <ThemedText style={styles.modalTitle}>Choose your display setting</ThemedText>
-        <View style={styles.optionsGrid}>
-            {['1', '2', '3', '4'].map((mode) => (
-                <DisplayOption
-                    key={mode}
-                    mode={mode}
-                    isSelected={selectedMode === mode}
-                    onSelect={onModeChange}
-                />
-            ))}
+// Dans DisplaySettings.tsx
+export const DisplaySettings = ({ onValidate, selectedMode, onModeChange }) => {
+    console.log('DisplaySettings render, onValidate:', onValidate);
+    return (
+        <View style={styles.settingsModal}>
+            <ThemedText style={styles.modalTitle}>Choose your display setting</ThemedText>
+            <View style={styles.optionsGrid}>
+                {['1', '2', '3', '4'].map((mode) => (
+                    <DisplayOption
+                        key={mode}
+                        mode={mode}
+                        isSelected={selectedMode === mode}
+                        onSelect={onModeChange}
+                    />
+                ))}
+            </View>
+            <TouchableOpacity
+                style={styles.validateButton}
+                onPress={() => {
+                    console.log('Validate button pressed');
+                    onValidate();
+                }}
+            >
+                <ThemedText style={styles.validateText}>VALIDATE</ThemedText>
+            </TouchableOpacity>
         </View>
-        <CustomButton
-            title="VALIDATE"
-            containerStyles={styles.validateButton}
-            onPress={onValidate}
-        />
-    </View>
-);
+    );
+};
 
 const DisplayOption = ({ mode, isSelected, onSelect }) => (
     <TouchableOpacity

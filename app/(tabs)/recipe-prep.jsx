@@ -5,21 +5,23 @@ import { ThemedText } from '@/components/ThemedText';
 import CustomHeader from '@/components/ui/CustomHeader';
 import { useOrderSelection } from '@/context/OrderContext';
 import DisplaySettings from '@/components/ui/DisplaySettings';
+import DragAreaLayout from '@/components/ui/DragAreaLayout';
+
+
 
 const RecipePrep = () => {
     const { getOrdersToShow, resetSelection } = useOrderSelection();
     const [displayMode, setDisplayMode] = useState('4');
     const [showSettings, setShowSettings] = useState(true);
-
     const ordersToDisplay = getOrdersToShow();
 
     const handleValidate = () => {
+        console.log('Validate clicked, current showSettings:', showSettings);
         setShowSettings(false);
+        console.log('ShowSettings set to false');
     };
 
-    const handleBack = () => {
-        resetSelection();
-    };
+    console.log('Rendering RecipePrep, showSettings:', showSettings);
 
     return (
         <ThemedView style={styles.container}>
@@ -34,7 +36,7 @@ const RecipePrep = () => {
                     ))}
                 </View>
 
-                <View style={styles.mainArea}>
+                <View style={[styles.mainArea, showSettings && styles.mainAreaSettings]}>
                     {showSettings ? (
                         <DisplaySettings
                             selectedMode={displayMode}
@@ -42,15 +44,13 @@ const RecipePrep = () => {
                             onValidate={handleValidate}
                         />
                     ) : (
-                        <View style={styles.dragArea}>
-                            <ThemedText>DRAG AN ORDER +</ThemedText>
-                        </View>
+                        <DragAreaLayout mode={displayMode} />
                     )}
                 </View>
 
                 <View style={styles.footer}>
                     <TouchableOpacity
-                        onPress={handleBack}
+                        onPress={resetSelection}
                         style={[styles.backButton, { padding: 10, borderRadius: 8 }]}
                     >
                         <ThemedText style={{ color: '#FFF' }}>Back</ThemedText>
@@ -91,6 +91,8 @@ const styles = StyleSheet.create({
         borderColor: '#E8A85F',
         borderRadius: 12,
         padding: 24,
+    },
+    mainAreaSettings: {
         alignItems: 'center',
         justifyContent: 'center',
     },
@@ -103,16 +105,6 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 24,
     },
-    dragArea: {
-        width: '100%',
-        height: '100%',
-        borderWidth: 2,
-        borderStyle: 'dashed',
-        borderColor: '#E8A85F',
-        borderRadius: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
     ordersTitle: {
         fontSize: 18,
         color: '#1C0D45',
@@ -121,7 +113,7 @@ const styles = StyleSheet.create({
     tagText: {
         color: '#FFFFFF',
         fontFamily: 'Jua',
-    },
+    }
 });
 
 export default RecipePrep;
