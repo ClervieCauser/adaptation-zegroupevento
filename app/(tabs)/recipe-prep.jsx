@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
@@ -21,6 +21,13 @@ const RecipePrep = () => {
         console.log('ShowSettings set to false');
     };
 
+    useEffect(() => {
+        return () => {
+            setShowSettings(true);
+            setDisplayMode('4');
+        };
+    }, []);
+
     console.log('Rendering RecipePrep, showSettings:', showSettings);
 
     return (
@@ -36,7 +43,10 @@ const RecipePrep = () => {
                     ))}
                 </View>
 
-                <View style={[styles.mainArea, showSettings && styles.mainAreaSettings]}>
+                <View style={[
+                    styles.mainArea,
+                    showSettings ? styles.mainAreaWithSettings  : styles.mainAreaWithDrag
+                ]}>
                     {showSettings ? (
                         <DisplaySettings
                             selectedMode={displayMode}
@@ -51,12 +61,15 @@ const RecipePrep = () => {
                 <View style={styles.footer}>
                     <TouchableOpacity
                         onPress={resetSelection}
-                        style={[styles.backButton, { padding: 10, borderRadius: 8 }]}
+                        style={styles.footerButton}
                     >
-                        <ThemedText style={{ color: '#FFF' }}>Back</ThemedText>
+                        <ThemedText style={styles.buttonText}>Back</ThemedText>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setShowSettings(true)}>
-                        <ThemedText>Change display</ThemedText>
+                    <TouchableOpacity
+                        style={styles.footerButton}
+                        onPress={() => setShowSettings(true)}
+                    >
+                        <ThemedText style={styles.buttonText}>Settings</ThemedText>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -87,9 +100,6 @@ const styles = StyleSheet.create({
     },
     mainArea: {
         flex: 1,
-        borderWidth: 2,
-        borderColor: '#E8A85F',
-        borderRadius: 12,
         padding: 24,
     },
     mainAreaSettings: {
@@ -112,6 +122,26 @@ const styles = StyleSheet.create({
     },
     tagText: {
         color: '#FFFFFF',
+        fontFamily: 'Jua',
+    },
+    mainAreaWithSettings: {
+        borderWidth: 2,
+        borderColor: '#E8A85F',
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    mainAreaWithDrag: {
+        borderWidth: 0
+    },
+    footerButton: {
+        backgroundColor: '#E8A85F',
+        paddingHorizontal: 24,
+        paddingVertical: 10,
+        borderRadius: 8,
+    },
+    buttonText: {
+        color: '#FFF',
         fontFamily: 'Jua',
     }
 });
