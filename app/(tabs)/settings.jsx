@@ -9,6 +9,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import {changeUserLevel} from '../../types/user';
 
 const Badge = ({ type }) => {
   const isNovice = type === 'novice';
@@ -138,18 +139,18 @@ const Settings = () => {
             <View style={styles.trophyContainer}>
               <Ionicons name="trophy" size={24} color="#f90" />
             </View>
-            <Text style={styles.settingTitle}>Cook level</Text>
+            <Text style={styles.settingTitle}>Cook level ?</Text>
           </View>
           <View style={styles.levelContainer}>
             <TouchableOpacity
               style={[styles.levelButton, cookLevel === 'novice' && styles.levelButtonActive]}
-              onPress={() => setCookLevel('novice')}
+              onPress={() => {setCookLevel('novice'), changeUserLevel('NOVICE')}}
             >
               {renderBadge('novice')}
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.levelButton, cookLevel === 'expert' && styles.levelButtonActive]}
-              onPress={() => setCookLevel('expert')}
+              onPress={() => {setCookLevel('expert'), changeUserLevel('EXPERT')}}
             >
               {renderBadge('expert')}
             </TouchableOpacity>
