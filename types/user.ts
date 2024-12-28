@@ -7,6 +7,11 @@ export const changeUserLevel = (level: UserLevel) => {
     console.log(MOCK_USER.level);
 };
 
+export const changeUserMic = (micEnabled: boolean) => {
+    MOCK_USER.micEnabled = micEnabled;
+    console.log(MOCK_USER.micEnabled);
+}
+
 export type User = {
     id: string;
     name: string;

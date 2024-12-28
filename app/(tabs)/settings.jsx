@@ -9,7 +9,7 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import {changeUserLevel} from '../../types/user';
+import {changeUserLevel, changeUserMic} from '../../types/user';
 
 const Badge = ({ type }) => {
   const isNovice = type === 'novice';
@@ -126,7 +126,10 @@ const Settings = () => {
           </View>
           <Switch
             value={textToSpeech}
-            onValueChange={setTextToSpeech}
+            onValueChange={(newValue) => {
+              changeUserMic(newValue);
+              setTextToSpeech(newValue); 
+            }}
             trackColor={{ false: '#f4f3f4', true: '#f90' }}
             thumbColor={textToSpeech ? '#fff' : '#f4f3f4'}
             ios_backgroundColor="#f4f3f4"
