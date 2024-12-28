@@ -6,15 +6,48 @@ import CustomHeader from '@/components/ui/CustomHeader';
 import { useOrderSelection } from '@/context/OrderContext';
 import DisplaySettings from '@/components/ui/DisplaySettings';
 import DragAreaLayout from '@/components/ui/DragAreaLayout';
+import { PanGestureHandler } from 'react-native-gesture-handler';
+import {runOnJS, useAnimatedGestureHandler, useSharedValue} from "react-native-reanimated";
+import Animated from 'react-native-reanimated';
+import { useOrderProcessing } from '@/context/OrderProcessingContext';
+const OrderTag = ({id, onDrop}) => {
+    const translateX = useSharedValue(0);
+    const translateY = useSharedValue(0);
 
+    const gestureHandler = useAnimatedGestureHandler({
+        onStart: () => {},
+        onActive: (event) => {
+            translateX.value = event.translationX;
+            translateY.value = event.translationY;
+        },
+        onEnd: (event) => {
+            runOnJS(onDrop)(id);
+            translateX.value = 0;
+            translateY.value = 0;
+        },
+    });
 
-
+    return (
+        <PanGestureHandler onGestureEvent={gestureHandler}>
+            <Animated.View style={[styles.orderTag, {
+                transform: [
+                    { translateX: translateX },
+                    { translateY: translateY }
+                ],
+                zIndex: 1000, // Ajouter ceci pour le premier plan
+                elevation: 5,  // Pour Android
+            }]}>
+                <ThemedText style={styles.tagText}>#{id}</ThemedText>
+            </Animated.View>
+        </PanGestureHandler>
+    );
+};
 const RecipePrep = () => {
     const { getOrdersToShow, resetSelection } = useOrderSelection();
     const [displayMode, setDisplayMode] = useState('4');
     const [showSettings, setShowSettings] = useState(true);
     const ordersToDisplay = getOrdersToShow();
-
+    const { addOrderToZone } = useOrderProcessing();
     const handleValidate = () => {
         console.log('Validate clicked, current showSettings:', showSettings);
         setShowSettings(false);
@@ -37,9 +70,14 @@ const RecipePrep = () => {
                 <View style={styles.ordersList}>
                     <ThemedText style={styles.ordersTitle}>ORDERS:</ThemedText>
                     {ordersToDisplay.map(id => (
-                        <View key={id} style={styles.orderTag}>
-                            <ThemedText style={styles.tagText}>#{id}</ThemedText>
-                        </View>
+                        <OrderTag
+                            key={id}
+                            id={id}
+                            onDrop={(id) => {
+                                // Logique pour déterminer la zone et ajouter l'ordre
+                                addOrderToZone(id, 'zone1');
+                            }}
+                        />
                     ))}
                 </View>
 
