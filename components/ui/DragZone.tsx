@@ -1,6 +1,6 @@
 // components/ui/DragZone.tsx
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import {View, StyleSheet, TouchableOpacity} from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 

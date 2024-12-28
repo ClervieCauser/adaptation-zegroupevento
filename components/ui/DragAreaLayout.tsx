@@ -11,34 +11,34 @@ const DragAreaLayout: React.FC<DragAreaLayoutProps> = ({ mode }) => {
     const renderLayout = () => {
         switch (mode) {
             case '1':
-                return <DragZone />;
+                return <DragZone zoneId="zone1" />;
             case '2':
                 return (
                     <View style={styles.twoContainer}>
-                        <DragZone />
-                        <DragZone />
+                        <DragZone zoneId="zone1" />
+                        <DragZone zoneId="zone2" />
                     </View>
                 );
             case '3':
                 return (
                     <View style={styles.threeContainer}>
                         <View style={styles.topRow}>
-                            <DragZone />
-                            <DragZone />
+                            <DragZone zoneId="zone1" />
+                            <DragZone zoneId="zone2" />
                         </View>
-                        <DragZone />
+                        <DragZone zoneId="zone3" />
                     </View>
                 );
             case '4':
                 return (
                     <View style={styles.fourContainer}>
                         <View style={styles.row}>
-                            <DragZone />
-                            <DragZone />
+                            <DragZone zoneId="zone1" />
+                            <DragZone zoneId="zone2" />
                         </View>
                         <View style={styles.row}>
-                            <DragZone />
-                            <DragZone />
+                            <DragZone zoneId="zone3" />
+                            <DragZone zoneId="zone4" />
                         </View>
                     </View>
                 );

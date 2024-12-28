@@ -16,7 +16,8 @@ type OrderProcessingContextType = {
     toggleItemReady: (orderId: string, itemIndex: number) => void;
     isOrderInZone: (orderId: string) => boolean;
     getOrderByZone: (zoneId: string) => ProcessingOrder | null;
-    clearCompletedOrders: () => string[]; // Returns completed order IDs
+    clearCompletedOrders: () => string[];
+    getCompletedOrderIds: () => string[];
 };
 
 const OrderProcessingContext = createContext<OrderProcessingContextType | undefined>(undefined);
@@ -28,15 +29,16 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
         const orderData = MOCK_ORDERS.find(o => o.id === orderId);
         if (!orderData) return;
 
-        setProcessingOrders(prev => [
-            ...prev,
-            {
+        setProcessingOrders(prev => {
+            // Remove order from previous zone if it exists
+            const filtered = prev.filter(o => o.orderId !== orderId);
+            return [...filtered, {
                 orderId,
                 zoneId,
                 items: orderData.items.map(item => ({ ...item, isReady: false })),
                 isCompleted: false
-            }
-        ]);
+            }];
+        });
     }, []);
 
     const toggleItemReady = useCallback((orderId: string, itemIndex: number) => {
@@ -63,6 +65,12 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
         return processingOrders.find(order => order.zoneId === zoneId) || null;
     }, [processingOrders]);
 
+    const getCompletedOrderIds = useCallback(() => {
+        return processingOrders
+            .filter(order => order.isCompleted)
+            .map(order => order.orderId);
+    }, [processingOrders]);
+
     const clearCompletedOrders = useCallback(() => {
         const completedOrderIds: string[] = [];
         setProcessingOrders(prev => {
@@ -86,7 +94,8 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
             toggleItemReady,
             isOrderInZone,
             getOrderByZone,
-            clearCompletedOrders
+            clearCompletedOrders,
+            getCompletedOrderIds
         }}>
             {children}
         </OrderProcessingContext.Provider>

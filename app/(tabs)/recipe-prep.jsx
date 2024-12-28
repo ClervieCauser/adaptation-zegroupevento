@@ -7,37 +7,51 @@ import { useOrderSelection } from '@/context/OrderContext';
 import DisplaySettings from '@/components/ui/DisplaySettings';
 import DragAreaLayout from '@/components/ui/DragAreaLayout';
 import { PanGestureHandler } from 'react-native-gesture-handler';
-import {runOnJS, useAnimatedGestureHandler, useSharedValue} from "react-native-reanimated";
+import {
+    runOnJS,
+    useAnimatedGestureHandler,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring
+} from "react-native-reanimated";
 import Animated from 'react-native-reanimated';
 import { useOrderProcessing } from '@/context/OrderProcessingContext';
-const OrderTag = ({id, onDrop}) => {
+const OrderTag = ({ id, onDrop }) => {
     const translateX = useSharedValue(0);
     const translateY = useSharedValue(0);
+    const { getCompletedOrderIds } = useOrderProcessing();
+    const isCompleted = getCompletedOrderIds().includes(id);
 
     const gestureHandler = useAnimatedGestureHandler({
-        onStart: () => {},
+        onStart: () => {
+            'worklet';
+        },
         onActive: (event) => {
             translateX.value = event.translationX;
             translateY.value = event.translationY;
         },
-        onEnd: (event) => {
+        onEnd: () => {
             runOnJS(onDrop)(id);
-            translateX.value = 0;
-            translateY.value = 0;
+            translateX.value = withSpring(0);
+            translateY.value = withSpring(0);
         },
     });
 
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [
+            { translateX: translateX.value },
+            { translateY: translateY.value }
+        ],
+    }));
+
     return (
         <PanGestureHandler onGestureEvent={gestureHandler}>
-            <Animated.View style={[styles.orderTag, {
-                transform: [
-                    { translateX: translateX },
-                    { translateY: translateY }
-                ],
-                zIndex: 1000, // Ajouter ceci pour le premier plan
-                elevation: 5,  // Pour Android
-            }]}>
-                <ThemedText style={styles.tagText}>#{id}</ThemedText>
+            <Animated.View style={[
+                styles.tag,
+                isCompleted && styles.tagCompleted,
+                animatedStyle
+            ]}>
+                <ThemedText style={styles.text}>#{id}</ThemedText>
             </Animated.View>
         </PanGestureHandler>
     );
@@ -181,7 +195,22 @@ const styles = StyleSheet.create({
     buttonText: {
         color: '#FFF',
         fontFamily: 'Jua',
-    }
+    },
+    tag: {
+        backgroundColor: '#E8A85F',
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 16,
+        marginHorizontal: 4,
+    },
+    tagCompleted: {
+        backgroundColor: '#4CAF50',
+    },
+    text: {
+        color: '#FFFFFF',
+        fontFamily: 'Jua',
+        fontSize: 14,
+    },
 });
 
 export default RecipePrep;
