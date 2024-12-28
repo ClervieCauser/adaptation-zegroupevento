@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
@@ -19,8 +19,6 @@ import { useOrderProcessing } from '@/context/OrderProcessingContext';
 const OrderTag = ({ id, onDrop }) => {
     const translateX = useSharedValue(0);
     const translateY = useSharedValue(0);
-    const { getCompletedOrderIds } = useOrderProcessing();
-    const isCompleted = getCompletedOrderIds().includes(id);
 
     const gestureHandler = useAnimatedGestureHandler({
         onStart: () => {
@@ -30,8 +28,12 @@ const OrderTag = ({ id, onDrop }) => {
             translateX.value = event.translationX;
             translateY.value = event.translationY;
         },
-        onEnd: () => {
-            runOnJS(onDrop)(id);
+        onEnd: (event) => {
+            const position = {
+                x: event.absoluteX,
+                y: event.absoluteY
+            };
+            runOnJS(onDrop)(id, position);
             translateX.value = withSpring(0);
             translateY.value = withSpring(0);
         },
@@ -42,15 +44,13 @@ const OrderTag = ({ id, onDrop }) => {
             { translateX: translateX.value },
             { translateY: translateY.value }
         ],
+        position: 'relative',
+        zIndex: 1000,
     }));
 
     return (
         <PanGestureHandler onGestureEvent={gestureHandler}>
-            <Animated.View style={[
-                styles.tag,
-                isCompleted && styles.tagCompleted,
-                animatedStyle
-            ]}>
+            <Animated.View style={[styles.tag, animatedStyle]}>
                 <ThemedText style={styles.text}>#{id}</ThemedText>
             </Animated.View>
         </PanGestureHandler>
@@ -62,6 +62,53 @@ const RecipePrep = () => {
     const [showSettings, setShowSettings] = useState(true);
     const ordersToDisplay = getOrdersToShow();
     const { addOrderToZone } = useOrderProcessing();
+    const [zoneMeasures, setZoneMeasures] = useState({});
+    const mainAreaRef = useRef(null);
+    const handleDropInZone = (orderId, droppedPosition) => {
+        console.log('Drop position:', droppedPosition);
+
+        for (const [zoneId, measure] of Object.entries(zoneMeasures)) {
+            const isInZone =
+                droppedPosition.x >= measure.x &&
+                droppedPosition.x <= measure.x + measure.width &&
+                droppedPosition.y >= measure.y &&
+                droppedPosition.y <= measure.y + measure.height;
+
+            if (isInZone) {
+                console.log(`Adding order ${orderId} to zone ${zoneId}`);
+                addOrderToZone(orderId, zoneId);
+                return;
+            }
+        }
+    };
+
+    const measureZone = (zoneId, layout) => {
+        console.log(`Measuring zone ${zoneId}:`, layout);
+        setZoneMeasures(prev => ({
+            ...prev,
+            [zoneId]: layout
+        }));
+    };
+
+    const findClosestZone = (position) => {
+        console.log('Drop position:', position);
+        console.log('Zone measures:', zoneMeasures);
+
+        for (const [zoneId, measure] of Object.entries(zoneMeasures)) {
+            if (
+                position.x >= measure.x &&
+                position.x <= measure.x + measure.width &&
+                position.y >= measure.y &&
+                position.y <= measure.y + measure.height
+            ) {
+                console.log('Found zone:', zoneId);
+                return zoneId;
+            }
+        }
+        console.log('No zone found');
+        return null;
+    };
+
     const handleValidate = () => {
         console.log('Validate clicked, current showSettings:', showSettings);
         setShowSettings(false);
@@ -87,10 +134,7 @@ const RecipePrep = () => {
                         <OrderTag
                             key={id}
                             id={id}
-                            onDrop={(id) => {
-                                // Logique pour déterminer la zone et ajouter l'ordre
-                                addOrderToZone(id, 'zone1');
-                            }}
+                            onDrop={(id, position) => handleDropInZone(id, position)}
                         />
                     ))}
                 </View>
@@ -98,7 +142,7 @@ const RecipePrep = () => {
                 <View style={[
                     styles.mainArea,
                     showSettings ? styles.mainAreaWithSettings  : styles.mainAreaWithDrag
-                ]}>
+                ]} data-testid="main-area">
                     {showSettings ? (
                         <DisplaySettings
                             selectedMode={displayMode}
@@ -106,7 +150,7 @@ const RecipePrep = () => {
                             onValidate={handleValidate}
                         />
                     ) : (
-                        <DragAreaLayout mode={displayMode} />
+                        <DragAreaLayout mode={displayMode} onMeasure={measureZone} />
                     )}
                 </View>
 

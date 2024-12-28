@@ -34,10 +34,11 @@ const PendingOrders = () => {
         toggleSelectMode,
         toggleOrderSelection,
         handleCookSelected,
-        handleSingleCook
+        handleSingleCook,
+        resetOrders,
     } = useOrderSelection();
 
-
+    const { pendingOrders } = useOrderSelection();
 
     const handleCookPress = (orderId) => {
         const targetRoute = MOCK_USER.level === 'EXPERT' ? '/recipe-prep' : '/recipe';
@@ -58,6 +59,14 @@ const PendingOrders = () => {
                         <View style={styles.filtersContainer}>
                             {/* ... FilterButtons restent les mêmes ... */}
                         </View>
+
+
+                        <TouchableOpacity
+                            style={styles.resetButton}
+                            onPress={resetOrders}
+                        >
+                            <ThemedText style={styles.resetButtonText}>Reset Orders</ThemedText>
+                        </TouchableOpacity>
 
                         <View style={styles.titleContainer}>
                             <ThemedText style={styles.title}>Pending orders</ThemedText>
@@ -92,7 +101,7 @@ const PendingOrders = () => {
                     {/* Zone scrollable pour les cartes */}
                     <View style={styles.scrollableContent}>
                         <View style={styles.ordersGrid}>
-                            {MOCK_ORDERS.map((order) => (
+                            {pendingOrders.map((order) => (
                                 <OrderCard
                                     key={order.id}
                                     order={order}
@@ -287,7 +296,17 @@ const styles = StyleSheet.create({
     cookButtonText: {
         color: '#FFFFFF',
         fontFamily: 'Jua',
-    }
+    },
+    resetButton: {
+        backgroundColor: '#E8A85F',
+        padding: 8,
+        borderRadius: 8,
+        marginLeft: 24,
+    },
+    resetButtonText: {
+        color: '#FFFFFF',
+        fontFamily: 'Jua',
+    },
 
 
 });

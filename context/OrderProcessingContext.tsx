@@ -30,8 +30,8 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
         if (!orderData) return;
 
         setProcessingOrders(prev => {
-            // Remove order from previous zone if it exists
-            const filtered = prev.filter(o => o.orderId !== orderId);
+            // Remove any existing order in the target zone and the order from any other zone
+            const filtered = prev.filter(o => o.orderId !== orderId && o.zoneId !== zoneId);
             return [...filtered, {
                 orderId,
                 zoneId,

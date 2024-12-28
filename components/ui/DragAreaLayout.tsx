@@ -7,38 +7,38 @@ interface DragAreaLayoutProps {
     mode: DisplayMode;
 }
 
-const DragAreaLayout: React.FC<DragAreaLayoutProps> = ({ mode }) => {
+const DragAreaLayout = ({ mode, onMeasure }) => {
     const renderLayout = () => {
         switch (mode) {
             case '1':
-                return <DragZone zoneId="zone1" />;
+                return <DragZone zoneId="zone1" onMeasure={onMeasure} />;
             case '2':
                 return (
                     <View style={styles.twoContainer}>
-                        <DragZone zoneId="zone1" />
-                        <DragZone zoneId="zone2" />
+                        <DragZone zoneId="zone1" onMeasure={onMeasure} />
+                        <DragZone zoneId="zone2" onMeasure={onMeasure} />
                     </View>
                 );
             case '3':
                 return (
                     <View style={styles.threeContainer}>
                         <View style={styles.topRow}>
-                            <DragZone zoneId="zone1" />
-                            <DragZone zoneId="zone2" />
+                            <DragZone zoneId="zone1" onMeasure={onMeasure} />
+                            <DragZone zoneId="zone2" onMeasure={onMeasure} />
                         </View>
-                        <DragZone zoneId="zone3" />
+                        <DragZone zoneId="zone3" onMeasure={onMeasure} />
                     </View>
                 );
             case '4':
                 return (
                     <View style={styles.fourContainer}>
                         <View style={styles.row}>
-                            <DragZone zoneId="zone1" />
-                            <DragZone zoneId="zone2" />
+                            <DragZone zoneId="zone1" onMeasure={onMeasure} />
+                            <DragZone zoneId="zone2" onMeasure={onMeasure} />
                         </View>
                         <View style={styles.row}>
-                            <DragZone zoneId="zone3" />
-                            <DragZone zoneId="zone4" />
+                            <DragZone zoneId="zone3" onMeasure={onMeasure} />
+                            <DragZone zoneId="zone4" onMeasure={onMeasure} />
                         </View>
                     </View>
                 );
@@ -47,11 +47,7 @@ const DragAreaLayout: React.FC<DragAreaLayoutProps> = ({ mode }) => {
         }
     };
 
-    return (
-        <View style={styles.container}>
-            {renderLayout()}
-        </View>
-    );
+    return <View style={styles.container}>{renderLayout()}</View>;
 };
 
 const styles = StyleSheet.create({

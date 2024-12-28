@@ -1,6 +1,6 @@
 // components/ui/DragZone.tsx
-import React from 'react';
-import {View, StyleSheet, TouchableOpacity} from 'react-native';
+import React, {useEffect} from 'react';
+import {View, StyleSheet, TouchableOpacity, ScrollView} from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { GestureDetector, Gesture } from 'react-native-gesture-handler';
 
@@ -13,13 +13,19 @@ import Animated, {
     runOnJS
 } from 'react-native-reanimated';
 
-const DragZone = ({ zoneId }) => {
-    const { getOrderByZone, addOrderToZone, toggleItemReady } = useOrderProcessing();
+const DragZone = ({ zoneId, onMeasure }) => {
+    const { getOrderByZone, toggleItemReady } = useOrderProcessing();
     const order = getOrderByZone(zoneId);
     const orderData = order ? MOCK_ORDERS.find(o => o.id === order.orderId) : null;
 
     return (
-        <View style={[styles.dragZone, order?.isCompleted && styles.dragZoneCompleted]}>
+        <View
+            style={[styles.dragZone, order?.isCompleted && styles.dragZoneCompleted]}
+            onLayout={(event) => {
+                const layout = event.nativeEvent.layout;
+                onMeasure?.(zoneId, layout);
+            }}
+        >
             {!orderData ? (
                 <>
                     <View style={styles.plusIcon}>
@@ -30,8 +36,8 @@ const DragZone = ({ zoneId }) => {
             ) : (
                 <>
                     <ThemedText style={styles.orderTitle}>Order #{orderData.id}</ThemedText>
-                    <View style={styles.itemsContainer}>
-                        {order.items.map((item, index) => (
+                    <ScrollView style={styles.itemsContainer}>
+                        {order?.items?.map((item, index) => (
                             <TouchableOpacity
                                 key={index}
                                 style={[styles.item, item.isReady && styles.itemReady]}
@@ -41,7 +47,7 @@ const DragZone = ({ zoneId }) => {
                                 <ThemedText style={styles.itemQuantity}>x{item.quantity}</ThemedText>
                             </TouchableOpacity>
                         ))}
-                    </View>
+                    </ScrollView>
                 </>
             )}
         </View>
@@ -73,21 +79,6 @@ const styles = StyleSheet.create({
         color: '#1C0D45',
         fontFamily: 'Jua',
     },
-
-    itemsContainer: {
-        width: '100%',
-        padding: 8,
-        gap: 8,
-    },
-    item: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        padding: 12,
-        backgroundColor: '#FFF',
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#E8A85F',
-    },
     itemReady: {
         backgroundColor: '#E8F5E9',
         borderColor: '#4CAF50',
@@ -100,7 +91,20 @@ const styles = StyleSheet.create({
     dragZoneCompleted: {
         borderColor: '#4CAF50',
         backgroundColor: 'rgba(76, 175, 80, 0.1)',
-    }
+    },
+    itemsContainer: {
+        maxHeight: 300,
+    },
+    item: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        padding: 8,
+        marginBottom: 8,
+        backgroundColor: '#FFF',
+        borderRadius: 8,
+        borderWidth: 1,
+        borderColor: '#E8A85F',
+    },
 });
 
 export default DragZone;
