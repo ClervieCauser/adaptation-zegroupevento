@@ -6,6 +6,7 @@ import CustomHeader from '@/components/ui/CustomHeader';
 import { useOrderSelection } from '@/context/OrderContext';
 import DisplaySettings from '@/components/ui/DisplaySettings';
 import DragAreaLayout from '@/components/ui/DragAreaLayout';
+import { Alert } from 'react-native';
 import { PanGestureHandler } from 'react-native-gesture-handler';
 import {
     runOnJS,
@@ -16,7 +17,7 @@ import {
 } from "react-native-reanimated";
 import Animated from 'react-native-reanimated';
 import { useOrderProcessing } from '@/context/OrderProcessingContext';
-const OrderTag = ({ id, onDrop }) => {
+const OrderTag = ({ id, onDrop, isCompleted }) => {
     const translateX = useSharedValue(0);
     const translateY = useSharedValue(0);
 
@@ -50,21 +51,50 @@ const OrderTag = ({ id, onDrop }) => {
 
     return (
         <PanGestureHandler onGestureEvent={gestureHandler}>
-            <Animated.View style={[styles.tag, animatedStyle]}>
+            <Animated.View style={[
+                styles.tag,
+                isCompleted && styles.tagCompleted,
+                animatedStyle
+            ]}>
                 <ThemedText style={styles.text}>#{id}</ThemedText>
             </Animated.View>
         </PanGestureHandler>
     );
 };
+
+
 const RecipePrep = () => {
     const { getOrdersToShow, resetSelection } = useOrderSelection();
     const [displayMode, setDisplayMode] = useState('4');
     const [showSettings, setShowSettings] = useState(true);
     const ordersToDisplay = getOrdersToShow();
-    const { addOrderToZone } = useOrderProcessing();
+    const { addOrderToZone,getCompletedOrderIds } = useOrderProcessing();
     const [zoneMeasures, setZoneMeasures] = useState({});
     const mainAreaRef = useRef(null);
+    const completedOrderIds = getCompletedOrderIds();
+
+
+    const measureZone = (zoneId: string, layout: { x: number; y: number; width: number; height: number }) => {
+        setZoneMeasures(prev => ({
+            ...prev,
+            [zoneId]: layout
+        }));
+    };
+
     const handleDropInZone = (orderId: string, droppedPosition: { x: number; y: number }) => {
+        if (completedOrderIds.includes(orderId)) {
+            Alert.alert(
+                "Order Already Completed",
+                "This order is ready to be served and cannot be modified!",
+                [{ text: "OK" }],
+                {
+                    cancelable: false,
+                    userInterfacePriority: 'high'
+                }
+            );
+            return;
+        }
+
         for (const [zoneId, measure] of Object.entries(zoneMeasures)) {
             const isInZone =
                 droppedPosition.x >= measure.x &&
@@ -77,13 +107,6 @@ const RecipePrep = () => {
                 return;
             }
         }
-    };
-
-    const measureZone = (zoneId: string, layout: { x: number; y: number; width: number; height: number }) => {
-        setZoneMeasures(prev => ({
-            ...prev,
-            [zoneId]: layout
-        }));
     };
 
     const handleValidate = () => {
@@ -111,6 +134,7 @@ const RecipePrep = () => {
                         <OrderTag
                             key={id}
                             id={id}
+                            isCompleted={completedOrderIds.includes(id)}
                             onDrop={(id, position) => handleDropInZone(id, position)}
                         />
                     ))}
@@ -217,6 +241,7 @@ const styles = StyleSheet.create({
         color: '#FFF',
         fontFamily: 'Jua',
     },
+
     tag: {
         backgroundColor: '#E8A85F',
         paddingHorizontal: 12,
@@ -232,6 +257,33 @@ const styles = StyleSheet.create({
         fontFamily: 'Jua',
         fontSize: 14,
     },
+
+
+
+    dragZone: {
+        flex: 1,
+        borderWidth: 2,
+        borderStyle: 'dashed',
+        borderColor: '#E8A85F',
+        borderRadius: 8,
+        backgroundColor: 'white',
+        padding: 16,
+        gap: 8,
+    },
+    dragZoneWithOrder: {
+        borderStyle: 'solid',
+    },
+    dragZoneCompleted: {
+        borderColor: '#4CAF50',
+        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    },
+
+    itemCompleted: {
+        backgroundColor: '#E8F5E9',
+        borderColor: '#4CAF50',
+    },
+
+
 });
 
 export default RecipePrep;
