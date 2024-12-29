@@ -151,11 +151,9 @@ const RecipePage = () => {
             </View>
 
             <View style={styles.nutritionalInfoContainer}>
-              <NutritionalInfo quantity='380' text='kcal'/>
-              <NutritionalInfo quantity='42g' text='protéines'/>
-              <NutritionalInfo quantity='22g' text='glucides'/>
-              <NutritionalInfo quantity='4g' text='sucre'/>
-              <NutritionalInfo quantity='1g' text='fibres'/>
+              {recipe.nutrition.map((item, index) => (
+                <NutritionalInfo key={index} quantity={item.quantity} text={item.text}/>
+              ))}
             </View>
           </View>
 
