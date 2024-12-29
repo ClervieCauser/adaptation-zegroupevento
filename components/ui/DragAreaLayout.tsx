@@ -1,44 +1,58 @@
-import React from 'react';
+import React, {useRef} from 'react';
 import { View, StyleSheet } from 'react-native';
 import DragZone from './DragZone';
 import { DisplayMode } from '@/types/display';
 
 interface DragAreaLayoutProps {
     mode: DisplayMode;
+    onMeasure: (zoneId: string, layout: { x: number; y: number; width: number; height: number }) => void;
 }
+const DragAreaLayout = ({ mode, onMeasure }: DragAreaLayoutProps) => {
+    const containerRef = useRef<View>(null);
 
-const DragAreaLayout = ({ mode, onMeasure }) => {
+    const handleZoneMeasure = (zoneId: string, layout: any) => {
+        containerRef.current?.measure((x, y, width, height, pageX, pageY) => {
+            // Adjust coordinates relative to the container
+            const zoneLayout = {
+                x: pageX + layout.x,
+                y: pageY + layout.y,
+                width: layout.width,
+                height: layout.height
+            };
+            onMeasure(zoneId, zoneLayout);
+        });
+    };
     const renderLayout = () => {
         switch (mode) {
             case '1':
-                return <DragZone zoneId="zone1" onMeasure={onMeasure} />;
+                return <DragZone zoneId="zone1" onMeasure={handleZoneMeasure} />;
             case '2':
                 return (
                     <View style={styles.twoContainer}>
-                        <DragZone zoneId="zone1" onMeasure={onMeasure} />
-                        <DragZone zoneId="zone2" onMeasure={onMeasure} />
+                        <DragZone zoneId="zone1" onMeasure={handleZoneMeasure} />
+                        <DragZone zoneId="zone2" onMeasure={handleZoneMeasure} />
                     </View>
                 );
             case '3':
                 return (
                     <View style={styles.threeContainer}>
                         <View style={styles.topRow}>
-                            <DragZone zoneId="zone1" onMeasure={onMeasure} />
-                            <DragZone zoneId="zone2" onMeasure={onMeasure} />
+                            <DragZone zoneId="zone1" onMeasure={handleZoneMeasure} />
+                            <DragZone zoneId="zone2" onMeasure={handleZoneMeasure} />
                         </View>
-                        <DragZone zoneId="zone3" onMeasure={onMeasure} />
+                        <DragZone zoneId="zone3" onMeasure={handleZoneMeasure} />
                     </View>
                 );
             case '4':
                 return (
                     <View style={styles.fourContainer}>
                         <View style={styles.row}>
-                            <DragZone zoneId="zone1" onMeasure={onMeasure} />
-                            <DragZone zoneId="zone2" onMeasure={onMeasure} />
+                            <DragZone zoneId="zone1" onMeasure={handleZoneMeasure} />
+                            <DragZone zoneId="zone2" onMeasure={handleZoneMeasure} />
                         </View>
                         <View style={styles.row}>
-                            <DragZone zoneId="zone3" onMeasure={onMeasure} />
-                            <DragZone zoneId="zone4" onMeasure={onMeasure} />
+                            <DragZone zoneId="zone3" onMeasure={handleZoneMeasure} />
+                            <DragZone zoneId="zone4" onMeasure={handleZoneMeasure} />
                         </View>
                     </View>
                 );
@@ -47,13 +61,18 @@ const DragAreaLayout = ({ mode, onMeasure }) => {
         }
     };
 
-    return <View style={styles.container}>{renderLayout()}</View>;
+    return (
+        <View ref={containerRef} style={styles.container}>
+            {renderLayout()}
+        </View>
+    );
 };
 
 const styles = StyleSheet.create({
     container: {
         flex: 1,
         width: '100%',
+        position: 'relative',
     },
     twoContainer: {
         flex: 1,
