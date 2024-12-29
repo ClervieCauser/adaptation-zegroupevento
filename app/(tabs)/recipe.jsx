@@ -139,15 +139,15 @@ const RecipePage = () => {
 
             <View style={styles.timeContainer}>
               <Text style={styles.timeLabel}>Total:</Text>
-              <Text style={styles.timeValue}>1h</Text>
+              <Text style={styles.timeValue}>{recipe.totalTime}</Text>
             </View>
             <View style={styles.timeContainer}>
               <Text style={styles.timeLabel}>Cuisson au four:</Text>
-              <Text style={styles.timeValue}>50 min</Text>
+              <Text style={styles.timeValue}>{recipe.cookingTime}</Text>
             </View>
             <View style={styles.timeContainer}>
               <Text style={styles.timeLabel}>Préparation des ingrédients:</Text>
-              <Text style={styles.timeValue}>10 min</Text>
+              <Text style={styles.timeValue}>{recipe.prepTime}</Text>
             </View>
 
             <View style={styles.nutritionalInfoContainer}>
@@ -211,7 +211,7 @@ const RecipePage = () => {
     <ScrollView style={styles.containerPhone}>
       <CustomHeader/>
 
-      <Text style={styles.title}>Poulet Citron</Text>
+      <Text style={styles.title}>{recipe.name}</Text>
 
       <View style={styles.tagContainer}>
         <Tags text="Four" />
