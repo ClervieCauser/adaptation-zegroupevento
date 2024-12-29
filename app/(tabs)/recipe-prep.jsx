@@ -68,14 +68,32 @@ const OrderTag = ({ id, onDrop, isCompleted }) => {
 
 const RecipePrep = () => {
     const { getOrdersToShow, resetSelection } = useOrderSelection();
-    const [displayMode, setDisplayMode] = useState('4');
-    const [showSettings, setShowSettings] = useState(true);
     const ordersToDisplay = getOrdersToShow();
-    const { addOrderToZone,getCompletedOrderIds } = useOrderProcessing();
-    const [zoneMeasures, setZoneMeasures] = useState({});
-    const mainAreaRef = useRef(null);
+    const { addOrderToZone, getCompletedOrderIds, resetOrderProcessing } = useOrderProcessing();
+
+    // Store these in ref to avoid re-renders
+    const initialState = useRef({
+        displayMode: '4',
+        showSettings: true,
+        zoneMeasures: {}
+    });
+
+    const [displayMode, setDisplayMode] = useState(initialState.current.displayMode);
+    const [showSettings, setShowSettings] = useState(initialState.current.showSettings);
+    const [zoneMeasures, setZoneMeasures] = useState(initialState.current.zoneMeasures);
     const completedOrderIds = getCompletedOrderIds();
 
+    // Single useEffect for mounting/unmounting
+    useEffect(() => {
+        const reset = () => {
+            resetOrderProcessing();
+            setShowSettings(true);
+            setDisplayMode('4');
+            setZoneMeasures({});
+        };
+        reset();
+        return reset;
+    }, [ordersToDisplay.join(',')]);
 
     const measureZone = (zoneId: string, layout: { x: number; y: number; width: number; height: number }) => {
         setZoneMeasures(prev => ({

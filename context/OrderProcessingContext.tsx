@@ -42,6 +42,18 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
         });
     }, []);
 
+
+    const clearAllOrders = useCallback(() => {
+        setProcessingOrders([]);
+    }, []);
+
+    const resetOrderProcessing = useCallback(() => {
+        setProcessingOrders([]);
+        setCompletedOrders([]);
+    }, []);
+
+
+
     const toggleItemReady = useCallback((orderId: string, itemIndex: number) => {
         setProcessingOrders(prev => {
             return prev.map(order => {
@@ -103,7 +115,9 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
             isOrderInZone,
             getOrderByZone,
             clearCompletedOrders,
-            getCompletedOrderIds
+            getCompletedOrderIds,
+            clearAllOrders,
+            resetOrderProcessing
         }}>
             {children}
         </OrderProcessingContext.Provider>
