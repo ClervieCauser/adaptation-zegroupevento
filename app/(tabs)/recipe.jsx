@@ -16,6 +16,7 @@ const RecipePage = () => {
   const { isTablet } = useResponsiveLayout();
   const [activeTab, setActiveTab] = useState('ingredients');
   const [activePage, setActivePage] = useState(0);
+  const [isRecipeHome, setIsRecipeHome] = useState(true);
   const totalPages = 2;
 
   const id = 2;
@@ -24,6 +25,10 @@ const RecipePage = () => {
   const handlePageChange = (page) => {
     setActivePage(page);
     setActiveTab(page === 0 ? 'ingredients' : 'utensils');
+  };
+
+  const handleStartRecipe = () => {
+    setIsRecipeHome(false);
   };
 
   const renderContent = () => {
@@ -116,6 +121,18 @@ const RecipePage = () => {
     }
   };
 
+  // TODO: Créer un composant pour afficher les étapes de la recette
+  if (!isRecipeHome) {
+    return (
+      <View style={styles.container}>
+        <CustomHeader /> empty
+        {/* TODO: Ajouter le contenu des étapes de la recette */}
+        {/* TODO: Ajouter la navigation entre les étapes */}
+        {/* TODO: Ajouter un bouton pour revenir à la page d'accueil de la recette */}
+      </View>
+    );
+  }
+
   if(isTablet) {
     return (
       <View style={styles.container}>
@@ -200,6 +217,7 @@ const RecipePage = () => {
               textStyles={styles.startButtonText} 
               containerStyles={styles.startButton}
               style={styles.paginationDots}
+              onPress={handleStartRecipe}
             />
           </View>
         </View>
@@ -247,6 +265,7 @@ const RecipePage = () => {
         textStyles={styles.startButtonTextPhone} 
         containerStyles={styles.startButtonPhone}
         style={styles.paginationDots}
+        onPress={handleStartRecipe}
       />
     </ScrollView>
   );
