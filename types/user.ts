@@ -22,6 +22,6 @@ export type User = {
 export const MOCK_USER: User = {
     id: '1',
     name: 'John Doe',
-    level: 'EXPERT',
-    micEnabled: false
+    level: 'NOVICE',
+    micEnabled: true,
 };
