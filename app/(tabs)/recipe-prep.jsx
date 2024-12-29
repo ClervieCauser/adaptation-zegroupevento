@@ -64,9 +64,7 @@ const RecipePrep = () => {
     const { addOrderToZone } = useOrderProcessing();
     const [zoneMeasures, setZoneMeasures] = useState({});
     const mainAreaRef = useRef(null);
-    const handleDropInZone = (orderId, droppedPosition) => {
-        console.log('Drop position:', droppedPosition);
-
+    const handleDropInZone = (orderId: string, droppedPosition: { x: number; y: number }) => {
         for (const [zoneId, measure] of Object.entries(zoneMeasures)) {
             const isInZone =
                 droppedPosition.x >= measure.x &&
@@ -75,38 +73,17 @@ const RecipePrep = () => {
                 droppedPosition.y <= measure.y + measure.height;
 
             if (isInZone) {
-                console.log(`Adding order ${orderId} to zone ${zoneId}`);
                 addOrderToZone(orderId, zoneId);
                 return;
             }
         }
     };
 
-    const measureZone = (zoneId, layout) => {
-        console.log(`Measuring zone ${zoneId}:`, layout);
+    const measureZone = (zoneId: string, layout: { x: number; y: number; width: number; height: number }) => {
         setZoneMeasures(prev => ({
             ...prev,
             [zoneId]: layout
         }));
-    };
-
-    const findClosestZone = (position) => {
-        console.log('Drop position:', position);
-        console.log('Zone measures:', zoneMeasures);
-
-        for (const [zoneId, measure] of Object.entries(zoneMeasures)) {
-            if (
-                position.x >= measure.x &&
-                position.x <= measure.x + measure.width &&
-                position.y >= measure.y &&
-                position.y <= measure.y + measure.height
-            ) {
-                console.log('Found zone:', zoneId);
-                return zoneId;
-            }
-        }
-        console.log('No zone found');
-        return null;
     };
 
     const handleValidate = () => {
