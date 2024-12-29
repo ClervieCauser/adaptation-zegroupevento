@@ -24,6 +24,7 @@ const OrderProcessingContext = createContext<OrderProcessingContextType | undefi
 
 export const OrderProcessingProvider = ({ children }: { children: React.ReactNode }) => {
     const [processingOrders, setProcessingOrders] = useState<ProcessingOrder[]>([]);
+    const [completedOrders, setCompletedOrders] = useState<string[]>([]);
 
     const addOrderToZone = useCallback((orderId: string, zoneId: string) => {
         const orderData = MOCK_ORDERS.find(o => o.id === orderId);
@@ -41,6 +42,18 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
         });
     }, []);
 
+
+    const clearAllOrders = useCallback(() => {
+        setProcessingOrders([]);
+    }, []);
+
+    const resetOrderProcessing = useCallback(() => {
+        setProcessingOrders([]);
+        setCompletedOrders([]);
+    }, []);
+
+
+
     const toggleItemReady = useCallback((orderId: string, itemIndex: number) => {
         setProcessingOrders(prev => {
             return prev.map(order => {
@@ -54,7 +67,13 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
     }, []);
 
     const removeOrderFromZone = useCallback((orderId: string) => {
-        setProcessingOrders(prev => prev.filter(order => order.orderId !== orderId));
+        setProcessingOrders(prev => {
+            const orderToRemove = prev.find(order => order.orderId === orderId);
+            if (orderToRemove?.isCompleted) {
+                setCompletedOrders(prevCompleted => [...prevCompleted, orderId]);
+            }
+            return prev.filter(order => order.orderId !== orderId);
+        });
     }, []);
 
     const isOrderInZone = useCallback((orderId: string) => {
@@ -66,10 +85,11 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
     }, [processingOrders]);
 
     const getCompletedOrderIds = useCallback(() => {
-        return processingOrders
+        const activeCompleted = processingOrders
             .filter(order => order.isCompleted)
             .map(order => order.orderId);
-    }, [processingOrders]);
+        return [...new Set([...activeCompleted, ...completedOrders])];
+    }, [processingOrders, completedOrders]);
 
     const clearCompletedOrders = useCallback(() => {
         const completedOrderIds: string[] = [];
@@ -95,7 +115,9 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
             isOrderInZone,
             getOrderByZone,
             clearCompletedOrders,
-            getCompletedOrderIds
+            getCompletedOrderIds,
+            clearAllOrders,
+            resetOrderProcessing
         }}>
             {children}
         </OrderProcessingContext.Provider>

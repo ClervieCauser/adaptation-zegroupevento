@@ -12,10 +12,10 @@ const DragAreaLayout = ({ mode, onMeasure }: DragAreaLayoutProps) => {
 
     const handleZoneMeasure = (zoneId: string, layout: any) => {
         containerRef.current?.measure((x, y, width, height, pageX, pageY) => {
-            // Adjust coordinates relative to the container
+            const screenY = height - pageY;
             const zoneLayout = {
                 x: pageX + layout.x,
-                y: pageY + layout.y,
+                y: pageY + layout.y + (zoneId === 'zone3' ? screenY/3 : 0),
                 width: layout.width,
                 height: layout.height
             };
