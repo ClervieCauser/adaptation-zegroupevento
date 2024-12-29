@@ -1,34 +1,54 @@
 // components/ui/DragZone.tsx
-import React, {useEffect, useState} from 'react';
-import { View, StyleSheet, TouchableOpacity, ScrollView, Animated } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { useOrderProcessing } from '@/context/OrderProcessingContext';
 import { MOCK_ORDERS } from '@/types/order';
-import {useAnimatedStyle, withTiming} from "react-native-reanimated";
+import Animated, {
+    useAnimatedStyle,
+    withTiming,
+    withSequence,
+    withDelay
+} from "react-native-reanimated";
 
 const DragZone = ({ zoneId, onMeasure }) => {
     const { getOrderByZone, toggleItemReady, removeOrderFromZone } = useOrderProcessing();
     const order = getOrderByZone(zoneId);
     const orderData = order ? MOCK_ORDERS.find(o => o.id === order.orderId) : null;
     const [isCompleted, setIsCompleted] = useState(false);
+    const [isTransitioning, setIsTransitioning] = useState(false);
+
     const opacity = useAnimatedStyle(() => ({
-        opacity: withTiming(isCompleted ? 0 : 1, { duration: 2500 })
+        opacity: withTiming(isTransitioning ? 0 : 1, { duration: 500 })
+    }));
+
+    const borderColorStyle = useAnimatedStyle(() => ({
+        borderColor: withTiming(
+            isCompleted ? '#4CAF50' : '#E8A85F',
+            { duration: 300 }
+        )
     }));
 
     useEffect(() => {
         if (order?.isCompleted && !isCompleted) {
             setIsCompleted(true);
-            setTimeout(() => {
+            setIsTransitioning(true);
+
+            const timer = setTimeout(() => {
                 removeOrderFromZone(order.orderId);
                 setIsCompleted(false);
+                setIsTransitioning(false);
             }, 2000);
+
+            return () => clearTimeout(timer);
         }
     }, [order?.isCompleted]);
 
     return (
-        <View
+        <Animated.View
             style={[
                 styles.dragZone,
+                borderColorStyle,
                 !!orderData && styles.dragZoneWithOrder,
                 isCompleted && styles.dragZoneCompleted
             ]}
@@ -50,8 +70,7 @@ const DragZone = ({ zoneId, onMeasure }) => {
                                 key={index}
                                 style={[
                                     styles.item,
-                                    item.isReady && styles.itemReady,
-                                    isCompleted && styles.itemCompleted
+                                    item.isReady && styles.itemReady
                                 ]}
                                 onPress={() => !isCompleted && toggleItemReady(order.orderId, index)}
                             >
@@ -62,7 +81,7 @@ const DragZone = ({ zoneId, onMeasure }) => {
                     </ScrollView>
                 </Animated.View>
             )}
-        </View>
+        </Animated.View>
     );
 };
 

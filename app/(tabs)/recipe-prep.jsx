@@ -13,7 +13,7 @@ import {
     useAnimatedGestureHandler,
     useAnimatedStyle,
     useSharedValue,
-    withSpring
+    withSpring, withTiming
 } from "react-native-reanimated";
 import Animated from 'react-native-reanimated';
 import { useOrderProcessing } from '@/context/OrderProcessingContext';
@@ -23,13 +23,16 @@ const OrderTag = ({ id, onDrop, isCompleted }) => {
 
     const gestureHandler = useAnimatedGestureHandler({
         onStart: () => {
+            if (isCompleted) return;
             'worklet';
         },
         onActive: (event) => {
+            if (isCompleted) return;
             translateX.value = event.translationX;
             translateY.value = event.translationY;
         },
         onEnd: (event) => {
+            if (isCompleted) return;
             const position = {
                 x: event.absoluteX,
                 y: event.absoluteY
@@ -42,26 +45,26 @@ const OrderTag = ({ id, onDrop, isCompleted }) => {
 
     const animatedStyle = useAnimatedStyle(() => ({
         transform: [
-            { translateX: translateX.value },
-            { translateY: translateY.value }
+            { translateX: isCompleted ? 0 : translateX.value },
+            { translateY: isCompleted ? 0 : translateY.value }
         ],
+        backgroundColor: withTiming(
+            isCompleted ? '#4CAF50' : '#E8A85F',
+            { duration: 300 }
+        ),
+        opacity: withTiming(1, { duration: 300 }),
         position: 'relative',
         zIndex: 1000,
     }));
 
     return (
-        <PanGestureHandler onGestureEvent={gestureHandler}>
-            <Animated.View style={[
-                styles.tag,
-                isCompleted && styles.tagCompleted,
-                animatedStyle
-            ]}>
+        <PanGestureHandler enabled={!isCompleted} onGestureEvent={gestureHandler}>
+            <Animated.View style={[styles.tag, animatedStyle]}>
                 <ThemedText style={styles.text}>#{id}</ThemedText>
             </Animated.View>
         </PanGestureHandler>
     );
 };
-
 
 const RecipePrep = () => {
     const { getOrdersToShow, resetSelection } = useOrderSelection();
@@ -242,13 +245,6 @@ const styles = StyleSheet.create({
         fontFamily: 'Jua',
     },
 
-    tag: {
-        backgroundColor: '#E8A85F',
-        paddingHorizontal: 12,
-        paddingVertical: 6,
-        borderRadius: 16,
-        marginHorizontal: 4,
-    },
     tagCompleted: {
         backgroundColor: '#4CAF50',
     },
@@ -273,15 +269,23 @@ const styles = StyleSheet.create({
     dragZoneWithOrder: {
         borderStyle: 'solid',
     },
-    dragZoneCompleted: {
-        borderColor: '#4CAF50',
-        backgroundColor: 'rgba(76, 175, 80, 0.1)',
-    },
+
 
     itemCompleted: {
         backgroundColor: '#E8F5E9',
         borderColor: '#4CAF50',
     },
+
+    dragZoneCompleted: {
+        borderColor: '#4CAF50',
+        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    },
+    tag: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 16,
+        marginHorizontal: 4,
+    }
 
 
 });
