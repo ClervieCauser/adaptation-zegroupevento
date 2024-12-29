@@ -10,27 +10,7 @@ import Counter from '../../components/ui/Counter';
 import CustomButton from '../../components/ui/CustomButton';
 import Pagination from '../../components/ui/Pagination';
 import UtensilRow from '../../components/ui/UtensilRow';
-
-const ingredients = [
-  { ingredient: 'Poulet', quantity: '1.2', unit: 'kg' },
-  { ingredient: 'Citrons jaunes', quantity: '200', unit: 'g' },
-  { ingredient: 'Ails', quantity: '4', unit: 'gousses' },
-  { ingredient: 'Romarins', quantity: '2', unit: 'brins' },
-  { ingredient: 'Thym', quantity: '2', unit: 'brins' },
-  { ingredient: 'Huile d\'olive', quantity: '3', unit: 'c. à soupe' },
-  { ingredient: 'Beurre', quantity: '20', unit: 'g' },
-  { ingredient: 'Sel', quantity: '1', unit: 'c. à café' },
-  { ingredient: 'Poivre', quantity: '1/2', unit: 'c. à café' },
-];
-
-const utensils = [
-  { utensil: 'Planche à découper' },
-  { utensil: 'Cuillère à soupe' },
-  { utensil: 'Couteau de cuisine'},
-  { utensil: 'Cuillère à café' },
-  { utensil: 'Plat pour le four'},
-  { utensil: 'Four préchauffé'},
-];
+import {recipes} from '../../app/recipe';
 
 const RecipePage = () => {
   const { isTablet } = useResponsiveLayout();
@@ -38,6 +18,9 @@ const RecipePage = () => {
   const [activePage, setActivePage] = useState(0);
   const totalPages = 2;
 
+  const id = 1;
+  const recipe = recipes.find((recipe) => recipe.id === id);
+  
   const handlePageChange = (page) => {
     setActivePage(page);
     setActiveTab(page === 0 ? 'ingredients' : 'utensils');
@@ -60,7 +43,7 @@ const RecipePage = () => {
             </View>
 
             <ScrollView style={styles.scrollableContainerPhone} contentContainerStyle={styles.ingredientsContainer}>
-            {ingredients.map((item, index) => (
+            {recipe.ingredients.map((item, index) => (
                 <View key={index} style={styles.ingredientContainer}>
                   <IngredientRow 
                     ingredient={item.ingredient} 
@@ -87,7 +70,7 @@ const RecipePage = () => {
               </View>
             </View>
                 <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
-                  {utensils.map((item, index) => (
+                  {recipe.utensils.map((item, index) => (
                     <View key={index} style={styles.ingredientContainer}>
                       <UtensilRow utensil={item.utensil} styleText={styles.textPhone} styleContainer={styles.utensilRowPhone}/>
                     </View>
@@ -121,11 +104,9 @@ const RecipePage = () => {
                 <Text style={styles.timeValuePhone}>10 min</Text>
               </View>
               <View style={styles.nutritionalInfoContainer}>
-                <NutritionalInfo quantity='380' text='kcal'/>
-                <NutritionalInfo quantity='42g' text='protéines'/>
-                <NutritionalInfo quantity='22g' text='glucides'/>
-                <NutritionalInfo quantity='4g' text='sucre'/>
-                <NutritionalInfo quantity='1g' text='fibres'/>
+                {recipe.nutrition.map((item, index) => (
+                  <NutritionalInfo key={index} quantity={item.quantity} text={item.text}/>
+                ))}
               </View>
             </View>
           </>
@@ -140,8 +121,8 @@ const RecipePage = () => {
       <View style={styles.container}>
         <CustomHeader />
     
-        <Text style={styles.title}>Poulet Citron</Text>
-          
+        <Text style={styles.title}>{recipe.name}</Text>
+
         <View style={styles.tagContainer}>
           <Tags text="Four" />
           <Tags text="Simple" />
@@ -187,7 +168,7 @@ const RecipePage = () => {
                 </View>
                 
                 <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
-                  {ingredients.map((item, index) => (
+                  {recipe.ingredients.map((item, index) => (
                     <View key={index} style={styles.ingredientContainer}>
                       <IngredientRow ingredient={item.ingredient} quantity={item.quantity} unit={item.unit} />
                     </View>
@@ -202,7 +183,7 @@ const RecipePage = () => {
                 </View>
                 
                 <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
-                  {utensils.map((item, index) => (
+                  {recipe.utensils.map((item, index) => (
                     <View key={index} style={styles.ingredientContainer}>
                       <UtensilRow utensil={item.utensil} />
                     </View>
