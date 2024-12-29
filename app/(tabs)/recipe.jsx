@@ -18,7 +18,7 @@ const RecipePage = () => {
   const [activePage, setActivePage] = useState(0);
   const totalPages = 2;
 
-  const id = 1;
+  const id = 2;
   const recipe = recipes.find((recipe) => recipe.id === id);
   
   const handlePageChange = (page) => {
@@ -93,15 +93,15 @@ const RecipePage = () => {
             <View style={styles.contentContainer}>
               <View style={styles.timeContainer}>
                 <Text style={styles.timeLabelPhone}>Total:</Text>
-                <Text style={styles.timeValuePhone}>1h</Text>
+                <Text style={styles.timeValuePhone}>{recipe.totalTime}</Text>
               </View>
               <View style={styles.timeContainer}>
                 <Text style={styles.timeLabelPhone}>Cuisson au four:</Text>
-                <Text style={styles.timeValuePhone}>50 min</Text>
+                <Text style={styles.timeValuePhone}>{recipe.cookingTime}</Text>
               </View>
               <View style={styles.timeContainer}>
                 <Text style={styles.timeLabelPhone}>Préparation des ingrédients:</Text>
-                <Text style={styles.timeValuePhone}>10 min</Text>
+                <Text style={styles.timeValuePhone}>{recipe.prepTime}</Text>
               </View>
               <View style={styles.nutritionalInfoContainer}>
                 {recipe.nutrition.map((item, index) => (
@@ -279,7 +279,7 @@ const styles = StyleSheet.create({
   },
   mainImage: {
     width: '100%',
-    height: '100%',
+    height: '60%',
     borderRadius: 8,
     marginBottom: 24,
   },
