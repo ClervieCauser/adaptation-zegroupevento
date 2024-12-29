@@ -1,5 +1,9 @@
-import { StyleSheet, View, Text, FlatList, Image, Pressable } from 'react-native'
+import { StyleSheet, View, Text, FlatList, Image, Pressable, Dimensions } from 'react-native'
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import React from 'react'
+
+const { width, height } = Dimensions.get('window');
+const isTablet = width >= 600;
 
 export interface Recipe {
   id: string;
@@ -31,6 +35,13 @@ export const SAMPLE_RECIPES: Recipe[] = [
     difficulty: 'Moyen',
     imageUrl: 'https://example.com/poulet.jpg',
   },
+  {
+    id: '3',
+    title: 'Poulet Citron',
+    duration: '1h30',
+    difficulty: 'Moyen',
+    imageUrl: '../../assets/images/citron.jpg',
+  },
 ];
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, imageUrl }) => {
@@ -38,7 +49,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, im
     <Pressable style={styles.recipeCard}>
       <View style={styles.imageContainer}>
         <Image 
-          source={{ uri: imageUrl }} 
+          source={require('../../assets/images/citron.jpg')}
           style={styles.recipeImage}
           resizeMode="cover"
         />
@@ -76,35 +87,24 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
       style={styles.recipeList}
       contentContainerStyle={styles.recipeListContent}
       showsVerticalScrollIndicator={false}
+      horizontal={true}
     />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9F7FA',
-    paddingTop: 24,
-  },
-  topSection: {
-    paddingTop: 16,
-  },
-  searchContainer: {
-    marginLeft: 15,
-    marginRight: 15,
-  },
   recipeList: {
     flex: 1,
     marginTop: 20,
   },
   recipeListContent: {
-    paddingHorizontal: 15,
-    paddingBottom: 20,
+    paddingLeft: '2%',
+    paddingRight: '2%',
+    height: isTablet ? '70%': '70%',
   },
   recipeCard: {
     backgroundColor: 'white',
     borderRadius: 12,
-    marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -113,25 +113,28 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-  },
+    width: isTablet ? wp('25%') : wp('35%'),
+    marginRight: 15,
+    },
   imageContainer: {
     height: 200,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
-    overflow: 'hidden',
   },
   recipeImage: {
     width: '100%',
     height: '100%',
-  },
+    borderTopLeftRadius: 12,
+    borderTopRightRadius: 12,
+    },
   recipeInfo: {
-    padding: 16,
+    padding: 10,
   },
   recipeTitle: {
     fontSize: 18,
     fontFamily: 'Jua',
     color: '#1C0D45',
-    marginBottom: 8,
+    marginBottom: '6%',
   },
   recipeDetails: {
     flexDirection: 'row',

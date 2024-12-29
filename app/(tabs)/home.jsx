@@ -18,7 +18,7 @@ const Home = () => {
         </View>
       </View>
       <ThemedText style={styles.title}>List of recipe</ThemedText>
-      <RecipeList recipes={SAMPLE_RECIPES}/>
+      <RecipeList recipes={SAMPLE_RECIPES} style={styles.RecipeList}/>
     </ThemedView>
   )
 }
@@ -138,5 +138,9 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 5,
-  }
+  },
+  RecipeList: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
 })
