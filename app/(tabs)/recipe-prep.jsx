@@ -87,16 +87,21 @@ const RecipePrep = () => {
 
     // Single useEffect for mounting/unmounting
     useEffect(() => {
-        if (!ordersToDisplay || ordersToDisplay.length === 0) {
+        if (!ordersToDisplay?.length) {
             router.replace('/pending-orders');
             return;
         }
-        // Reset seulement au montage initial
-        resetOrderProcessing();
+
         setShowSettings(true);
         setDisplayMode('4');
         setZoneMeasures({});
-    }, []); // Dépendances vides pour exécuter uniquement au montage
+    }, []); // Retirez ordersToDisplay des dépendances
+
+    useEffect(() => {
+        if (!ordersToDisplay?.length) {
+            router.replace('/pending-orders');
+        }
+    }, [ordersToDisplay]);
 
     const allOrdersCompleted = ordersToDisplay.length > 0 &&
         ordersToDisplay.every(id => completedOrderIds.includes(id));
@@ -111,14 +116,11 @@ const RecipePrep = () => {
     const handleFinishOrders = async () => {
         setIsFinishing(true);
         setTimeout(() => {
-            markOrdersAsInProgress(ordersToDisplay);
-            resetOrderProcessing();
-            resetSelection();
-            setIsFinishing(false);  // Réinitialiser l'état d'animation
+            resetSelection(); // Reset la sélection active
+            setIsFinishing(false);
             router.push('/pending-orders');
         }, 1500);
     };
-
     const measureZone = (zoneId: string, layout: { x: number; y: number; width: number; height: number }) => {
         setZoneMeasures(prev => ({
             ...prev,

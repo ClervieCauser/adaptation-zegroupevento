@@ -18,6 +18,7 @@ type OrderProcessingContextType = {
     getOrderByZone: (zoneId: string) => ProcessingOrder | null;
     clearCompletedOrders: () => string[];
     getCompletedOrderIds: () => string[];
+    addOrderToProcessing: (order: Order) => void;
 };
 
 const OrderProcessingContext = createContext<OrderProcessingContextType | undefined>(undefined);
@@ -76,6 +77,19 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
         });
     }, []);
 
+    // context/OrderProcessingContext.tsx
+    const addOrderToProcessing = useCallback((order: Order) => {
+        setProcessingOrders(prev => {
+            if (prev.some(po => po.orderId === order.id)) return prev;
+            return [...prev, {
+                orderId: order.id,
+                zoneId: null,
+                items: order.items.map(item => ({ ...item, isReady: false })),
+                isCompleted: false
+            }];
+        });
+    }, []);
+
     const isOrderInZone = useCallback((orderId: string) => {
         return processingOrders.some(order => order.orderId === orderId);
     }, [processingOrders]);
@@ -117,7 +131,8 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
             clearCompletedOrders,
             getCompletedOrderIds,
             clearAllOrders,
-            resetOrderProcessing
+            resetOrderProcessing,
+            addOrderToProcessing
         }}>
             {children}
         </OrderProcessingContext.Provider>

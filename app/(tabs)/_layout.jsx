@@ -46,8 +46,8 @@ const TabLayout = () => {
     if (isTablet) {
         return (
 
-            <OrderSelectionProvider>
-                <OrderProcessingProvider>
+            <OrderProcessingProvider>
+                <OrderSelectionProvider>
                         <GestureHandlerRootView style={{ flex: 1 }}>
                             <DraxProvider>
                                 <ThemedView style={styles.container}>
@@ -78,8 +78,8 @@ const TabLayout = () => {
                                 </ThemedView>
                             </DraxProvider>
                         </GestureHandlerRootView>
-                </OrderProcessingProvider>
-            </OrderSelectionProvider>
+                </OrderSelectionProvider>
+            </OrderProcessingProvider>
         );
     }
 

@@ -1,31 +1,36 @@
-// components/ui/OrderCard.tsx
 import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
 import { Order } from '@/types/order';
+import { useRouter } from 'expo-router';
+import { useOrderSelection } from '@/context/OrderContext';
 
 type OrderCardProps = {
     order: Order;
-    onCook: (orderId: string) => void
+    onCook?: (orderId: string) => void;
     expanded: boolean;
     onToggleExpand: () => void;
     isSelectMode: boolean;
     isSelected: boolean;
     onSelect: (id: string) => void;
+    showContinue?: boolean;
 };
+
 const OrderCard = ({
                        order,
-                       onCook,
                        expanded,
                        onToggleExpand,
                        isSelectMode,
                        isSelected,
-                       onSelect
+                       onSelect,
+                       showContinue = false
                    }) => {
+    const router = useRouter();
+    const { handleSingleCook } = useOrderSelection();
     const GRID_COLUMNS = 2;
     const MAX_VISIBLE_ROWS = 2;
-    const EXPANDED_COLUMNS = 8; // Augmenté pour avoir plus de colonnes en mode étendu
+    const EXPANDED_COLUMNS = 8;
     const MAX_VISIBLE_ITEMS = GRID_COLUMNS * MAX_VISIBLE_ROWS;
     const hasMoreItems = order.items.length > MAX_VISIBLE_ITEMS;
 
@@ -65,8 +70,12 @@ const OrderCard = ({
             );
             rows.push(row);
         }
-
         return rows;
+    };
+
+    const handleContinue = () => {
+        handleSingleCook(order.id);
+        router.push('/recipe-prep');
     };
 
     return (
@@ -108,20 +117,25 @@ const OrderCard = ({
                     {renderMealGrid()}
                 </View>
 
-                <TouchableOpacity
-                    style={styles.cookButton}
-                    onPress={() => onCook(order.id)}
-                >
-                    <ThemedText style={styles.cookButtonText}>Cook</ThemedText>
-                </TouchableOpacity>
-
+                {!showContinue ? (
+                    <TouchableOpacity
+                        style={styles.cookButton}
+                        onPress={() => handleSingleCook(order.id)}
+                    >
+                        <ThemedText style={styles.cookButtonText}>Cook</ThemedText>
+                    </TouchableOpacity>
+                ) : (
+                    <TouchableOpacity
+                        style={[styles.cookButton, styles.continueButton]}
+                        onPress={handleContinue}
+                    >
+                        <ThemedText style={styles.cookButtonText}>Continue</ThemedText>
+                    </TouchableOpacity>
+                )}
             </View>
-
         </ThemedView>
     );
 };
-
-
 
 const styles = StyleSheet.create({
     card: {
@@ -183,11 +197,6 @@ const styles = StyleSheet.create({
         flex: 1,
         marginVertical: 16,
     },
-    mealsContainerExpanded: {
-        display: 'grid',
-        gridTemplateColumns: 'repeat(4, 1fr)',
-        gap: 8,
-    },
     gridRow: {
         flexDirection: 'row',
         marginBottom: 8,
@@ -223,9 +232,6 @@ const styles = StyleSheet.create({
         fontSize: 14,
         textAlign: 'center',
     },
-    cookButtonContainer: {
-        marginTop: 'auto',
-    },
     cookButton: {
         backgroundColor: '#E8A85F',
         borderRadius: 12,
@@ -238,7 +244,6 @@ const styles = StyleSheet.create({
         fontSize: 16,
         fontFamily: 'Jua',
     },
-
     selectCircle: {
         position: 'absolute',
         top: 12,
@@ -250,6 +255,7 @@ const styles = StyleSheet.create({
         borderColor: '#E8A85F',
         justifyContent: 'center',
         alignItems: 'center',
+        zIndex: 1,
     },
     selectCircleActive: {
         backgroundColor: '#E8A85F',
@@ -260,21 +266,9 @@ const styles = StyleSheet.create({
         borderRadius: 5,
         backgroundColor: 'white',
     },
-    actionButtons: {
-        flexDirection: 'row',
-        gap: 8,
+    continueButton: {
+        backgroundColor: '#4CAF50',
     },
-    cancelButton: {
-        borderWidth: 1,
-        borderColor: '#E8A85F',
-        paddingVertical: 8,
-        paddingHorizontal: 24,
-        borderRadius: 20,
-    },
-    cancelButtonText: {
-        color: '#E8A85F',
-        fontFamily: 'Jua',
-    }
 });
 
 export default OrderCard;

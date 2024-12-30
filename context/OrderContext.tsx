@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import { router } from 'expo-router';
 import { MOCK_USER } from '@/types/user';
 import { MOCK_ORDERS, Order } from '@/types/order';
+import {useOrderProcessing} from "@/context/OrderProcessingContext";
 
 type OrderSelectionContextType = {
     selectedIds: string[];
@@ -25,6 +26,7 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
     const [orderToCook, setOrderToCook] = useState<string | null>(null);
     const [isSelectMode, setIsSelectMode] = useState(false);
     const [pendingOrders, setPendingOrders] = useState<Order[]>(MOCK_ORDERS);
+    const { addOrderToProcessing } = useOrderProcessing();
 
     const markOrdersAsInProgress = useCallback((orderIds: string[]) => {
         setPendingOrders(prev => prev.filter(order => !orderIds.includes(order.id)));
@@ -48,16 +50,23 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
 
     const handleCookSelected = useCallback(() => {
         if (selectedIds.length > 0) {
+            // Ajouter les orders au processing
+            selectedIds.forEach(id => {
+                const order = pendingOrders.find(o => o.id === id);
+                if (order) addOrderToProcessing(order);
+            });
             markOrdersAsInProgress(selectedIds);
             router.push(MOCK_USER.level === 'EXPERT' ? '/recipe-prep' : '/recipe');
         }
-    }, [selectedIds, markOrdersAsInProgress]);
+    }, [selectedIds, markOrdersAsInProgress, pendingOrders]);
 
     const handleSingleCook = useCallback((orderId: string) => {
+        const order = pendingOrders.find(o => o.id === orderId);
+        if (order) addOrderToProcessing(order);
         setOrderToCook(orderId);
         markOrdersAsInProgress([orderId]);
         router.push(MOCK_USER.level === 'EXPERT' ? '/recipe-prep' : '/recipe');
-    }, [markOrdersAsInProgress]);
+    }, [markOrdersAsInProgress, pendingOrders]);
 
     const getOrdersToShow = useCallback(() => {
         return orderToCook ? [orderToCook] : selectedIds;
