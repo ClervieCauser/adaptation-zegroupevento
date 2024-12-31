@@ -10,33 +10,15 @@ import Counter from '../../components/ui/Counter';
 import CustomButton from '../../components/ui/CustomButton';
 import Pagination from '../../components/ui/Pagination';
 import UtensilRow from '../../components/ui/UtensilRow';
-
-const ingredients = [
-  { ingredient: 'Poulet', quantity: '1.2', unit: 'kg' },
-  { ingredient: 'Citrons jaunes', quantity: '200', unit: 'g' },
-  { ingredient: 'Ails', quantity: '4', unit: 'gousses' },
-  { ingredient: 'Romarins', quantity: '2', unit: 'brins' },
-  { ingredient: 'Thym', quantity: '2', unit: 'brins' },
-  { ingredient: 'Huile d\'olive', quantity: '3', unit: 'c. à soupe' },
-  { ingredient: 'Beurre', quantity: '20', unit: 'g' },
-  { ingredient: 'Sel', quantity: '1', unit: 'c. à café' },
-  { ingredient: 'Poivre', quantity: '1/2', unit: 'c. à café' },
-];
-
-const utensils = [
-  { utensil: 'Planche à découper' },
-  { utensil: 'Cuillère à soupe' },
-  { utensil: 'Couteau de cuisine'},
-  { utensil: 'Cuillère à café' },
-  { utensil: 'Plat pour le four'},
-  { utensil: 'Four préchauffé'},
-];
+import mockRecipe from '../../types/recipe';
 
 const RecipePage = () => {
   const { isTablet } = useResponsiveLayout();
   const [activeTab, setActiveTab] = useState('ingredients');
   const [activePage, setActivePage] = useState(0);
   const totalPages = 2;
+
+  const { title, tag, ingredients, utensils, steps, nutritionalInfo, totalTime, cookingTime, prepTime } = mockRecipe;
 
   const handlePageChange = (page) => {
     setActivePage(page);
@@ -110,22 +92,21 @@ const RecipePage = () => {
             <View style={styles.contentContainer}>
               <View style={styles.timeContainer}>
                 <Text style={styles.timeLabelPhone}>Total:</Text>
-                <Text style={styles.timeValuePhone}>1h</Text>
+                <Text style={styles.timeValuePhone}>{totalTime}</Text>
               </View>
               <View style={styles.timeContainer}>
                 <Text style={styles.timeLabelPhone}>Cuisson au four:</Text>
-                <Text style={styles.timeValuePhone}>50 min</Text>
+                <Text style={styles.timeValuePhone}>{cookingTime}</Text>
               </View>
               <View style={styles.timeContainer}>
                 <Text style={styles.timeLabelPhone}>Préparation des ingrédients:</Text>
-                <Text style={styles.timeValuePhone}>10 min</Text>
+                <Text style={styles.timeValuePhone}>{prepTime}</Text>
               </View>
+              
               <View style={styles.nutritionalInfoContainer}>
-                <NutritionalInfo quantity='380' text='kcal'/>
-                <NutritionalInfo quantity='42g' text='protéines'/>
-                <NutritionalInfo quantity='22g' text='glucides'/>
-                <NutritionalInfo quantity='4g' text='sucre'/>
-                <NutritionalInfo quantity='1g' text='fibres'/>
+                {nutritionalInfo.map((item, index) => (
+                  <NutritionalInfo key={index} quantity={item.quantity} text={item.text} styleText={styles.textPhone}/>
+                ))}
               </View>
             </View>
           </>
@@ -140,13 +121,12 @@ const RecipePage = () => {
       <View style={styles.container}>
         <CustomHeader />
     
-        <Text style={styles.title}>Poulet Citron</Text>
+        <Text style={styles.title}>{title}</Text>
           
         <View style={styles.tagContainer}>
-          <Tags text="Four" />
-          <Tags text="Simple" />
-          <Tags text="Poulet" />
-          <Tags text="Léger" />
+          {tag.map((item, index) => (
+            <Tags key={index} text={item.text} />
+          ))}
         </View>
 
         <View style={styles.imageAndText}>
@@ -158,23 +138,21 @@ const RecipePage = () => {
 
             <View style={styles.timeContainer}>
               <Text style={styles.timeLabel}>Total:</Text>
-              <Text style={styles.timeValue}>1h</Text>
+              <Text style={styles.timeValue}>{totalTime}</Text>
             </View>
             <View style={styles.timeContainer}>
               <Text style={styles.timeLabel}>Cuisson au four:</Text>
-              <Text style={styles.timeValue}>50 min</Text>
+              <Text style={styles.timeValue}>{cookingTime}</Text>
             </View>
             <View style={styles.timeContainer}>
               <Text style={styles.timeLabel}>Préparation des ingrédients:</Text>
-              <Text style={styles.timeValue}>10 min</Text>
+              <Text style={styles.timeValue}>{prepTime}</Text>
             </View>
 
             <View style={styles.nutritionalInfoContainer}>
-              <NutritionalInfo quantity='380' text='kcal'/>
-              <NutritionalInfo quantity='42g' text='protéines'/>
-              <NutritionalInfo quantity='22g' text='glucides'/>
-              <NutritionalInfo quantity='4g' text='sucre'/>
-              <NutritionalInfo quantity='1g' text='fibres'/>
+              {nutritionalInfo.map((item, index) => (
+                <NutritionalInfo key={index} quantity={item.quantity} text={item.text} styleText={styles.textPhone}/>
+              ))}
             </View>
           </View>
 
@@ -232,13 +210,12 @@ const RecipePage = () => {
     <ScrollView style={styles.containerPhone}>
       <CustomHeader/>
 
-      <Text style={styles.title}>Poulet Citron</Text>
+      <Text style={styles.title}>{title}</Text>
 
       <View style={styles.tagContainer}>
-        <Tags text="Four" />
-        <Tags text="Simple" />
-        <Tags text="Poulet" />
-        <Tags text="Léger" />
+        {tag.map((item, index) => (
+          <Tags key={index} text={item.text} />
+        ))}
       </View>
 
       <View style={styles.tabsContainer}>
@@ -359,6 +336,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     marginTop: 24,
+    flexWrap: 'wrap',
   },
   paginationDots: {
     alignSelf: 'center',
