@@ -7,13 +7,17 @@ import {ThemedText} from "@/components/ThemedText";
 
 type CustomHeaderProps = {
     user: User;
+    title: string;
 };
-const CustomHeader = ({ user }: CustomHeaderProps) => {
+const CustomHeader = ({ user, title }: CustomHeaderProps) => {
     const { isTablet } = useResponsiveLayout();
 
     if(isTablet) {
         return (
             <View style={styles.headerContainer}>
+                <View style={styles.leftContent}>
+                    <Text style={styles.titleText}>{title}</Text>
+                </View>
                 <View style={styles.rightContent}>
                     <TouchableOpacity>
                         <Feather
