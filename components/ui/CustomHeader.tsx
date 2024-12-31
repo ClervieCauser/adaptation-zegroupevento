@@ -52,7 +52,7 @@ const CustomHeader = ({ user, title }: CustomHeaderProps) => {
                 </View>
                 <View style={styles.appTitle}>
                         <Text style={styles.nomViolet}>Poly</Text>
-                        <Text style={styles.nom}>Recipe_</Text>
+                        <Text style={styles.nom}>Recipe</Text>
                     </View>
                 <View style={styles.headerRight}>
                     <View style={styles.levelBadge}>
