@@ -9,7 +9,7 @@ import { MOCK_ORDERS } from '@/types/order';
 import { MOCK_USER } from '@/types/user';
 import { router } from 'expo-router';
 import CustomHeader from "../../components/ui/CustomHeader";
-import {useOrderSelection} from "../../hooks/UseOrderSelection";
+import { useOrderSelection } from "@/context/OrderContext";
 
 const FilterButton = ({ label, active, onPress }) => (
     <TouchableOpacity
@@ -28,13 +28,33 @@ const PendingOrders = () => {
     const [searchText, setSearchText] = useState('');
     const [activeFilter, setActiveFilter] = useState('Meal');
     const [expandedCardId, setExpandedCardId] = useState(null);
-    const { isSelectMode, selectedIds, toggleSelectMode, toggleOrderSelection , handleCookSelected, getOrdersToShow, orderToCook, handleSingleCook} = useOrderSelection();
+    const {
+        isSelectMode,
+        selectedIds,
+        toggleSelectMode,
+        toggleOrderSelection,
+        handleCookSelected,
+        handleSingleCook,
+        resetOrders,
+    } = useOrderSelection();
 
+    const { pendingOrders } = useOrderSelection();
 
+    const filterOrdersByUserLevel = (orders) => {
+        if (MOCK_USER.level === 'NOVICE') {
+            return orders.filter((order) => {
+                const uniqueMealNames = new Set(order.items.map(item => item.name));
+                return uniqueMealNames.size <= 3; 
+            });
+        }
+        return orders;
+    };
+
+    const filteredOrders = filterOrdersByUserLevel(pendingOrders);
 
     const handleCookPress = (orderId) => {
         const targetRoute = MOCK_USER.level === 'EXPERT' ? '/recipe-prep' : '/recipe';
-        setSelectionState(prev => ({...prev, orderToCook: orderId}));
+        setSelectionState(prev => ({ ...prev, orderToCook: orderId }));
         router.push(targetRoute);
     };
 
@@ -47,82 +67,92 @@ const PendingOrders = () => {
                 </View>
             </View>
             <ScrollView style={styles.mainContent}>
-                    <View style={styles.headerSection}>
-                        <View style={styles.filtersContainer}>
-                            {/* ... FilterButtons restent les mêmes ... */}
-                        </View>
+                <View style={styles.headerSection}>
+                    <View style={styles.filtersContainer}>
+                        {/* Les FilterButtons restent les mêmes */}
+                    </View>
 
-                        <View style={styles.titleContainer}>
-                            <ThemedText style={styles.title}>Pending orders</ThemedText>
-                            {!isSelectMode ? (
+                    <TouchableOpacity
+                        style={styles.resetButton}
+                        onPress={resetOrders}
+                    >
+                        <ThemedText style={styles.resetButtonText}>Reset Orders</ThemedText>
+                    </TouchableOpacity>
+
+                    <View style={styles.titleContainer}>
+                        <ThemedText style={styles.title}>Pending orders</ThemedText>
+                        {!isSelectMode ? (
+                            <TouchableOpacity
+                                style={styles.selectButton}
+                                onPress={toggleSelectMode}
+                            >
+                                <ThemedText style={styles.selectButtonText}>Select</ThemedText>
+                            </TouchableOpacity>
+                        ) : (
+                            <View style={styles.actionButtons}>
                                 <TouchableOpacity
-                                    style={styles.selectButton}
+                                    style={styles.cookButton}
+                                    onPress={() => handleCookSelected()}
+                                >
+                                    <ThemedText style={styles.cookButtonText}>
+                                        Cook({selectedIds.length})
+                                    </ThemedText>
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                    style={styles.cancelButton}
                                     onPress={toggleSelectMode}
                                 >
-                                    <ThemedText style={styles.selectButtonText}>Select</ThemedText>
+                                    <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
                                 </TouchableOpacity>
-                            ) : (
-                                <View style={styles.actionButtons}>
-                                    <TouchableOpacity
-                                        style={styles.cookButton}
-                                        onPress={() => handleCookSelected()}
-                                    >
-                                        <ThemedText style={styles.cookButtonText}>
-                                            Cook({selectedIds.length})
-                                        </ThemedText>
-                                    </TouchableOpacity>
-                                    <TouchableOpacity
-                                        style={styles.cancelButton}
-                                        onPress={toggleSelectMode}
-                                    >
-                                        <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
-                                    </TouchableOpacity>
-                                </View>
-                            )}
-                        </View>
+                            </View>
+                        )}
                     </View>
+                </View>
 
-                    {/* Zone scrollable pour les cartes */}
-                    <View style={styles.scrollableContent}>
-                        <View style={styles.ordersGrid}>
-                            {MOCK_ORDERS.map((order) => (
-                                <OrderCard
-                                    key={order.id}
-                                    order={order}
-                                    expanded={expandedCardId === order.id}
-                                    onToggleExpand={() => setExpandedCardId(expandedCardId === order.id ? null : order.id)}
-                                    onCook={() => handleSingleCook(order.id)}
-                                    isSelectMode={isSelectMode}
-                                    isSelected={selectedIds.includes(order.id)}
-                                    onSelect={toggleOrderSelection}
-                                />
-                            ))}
-                        </View>
+                {/* Zone scrollable pour les cartes */}
+                <View style={styles.scrollableContent}>
+                    <View style={styles.ordersGrid}>
+                        {filteredOrders.map((order) => (
+                            <OrderCard
+                                key={order.id}
+                                order={order}
+                                expanded={expandedCardId === order.id}
+                                onToggleExpand={() =>
+                                    setExpandedCardId(expandedCardId === order.id ? null : order.id)
+                                }
+                                onCook={() => handleSingleCook(order.id)}
+                                isSelectMode={isSelectMode}
+                                isSelected={selectedIds.includes(order.id)}
+                                onSelect={toggleOrderSelection}
+                            />
+                        ))}
                     </View>
+                </View>
             </ScrollView>
 
-                    {/* Pagination en bas fixe */}
-                    <View style={styles.paginationContainer}>
-                        <View style={styles.pagination}>
-                            {[1, 2, '...', 4, 5].map((page, index) => (
-                                <TouchableOpacity
-                                    key={index}
-                                    style={[
-                                        styles.pageButton,
-                                        typeof page === 'number' && page === 1 && styles.pageButtonActive,
-                                    ]}
-                                >
-                                    <ThemedText style={styles.pageButtonText}>{page}</ThemedText>
-                                </TouchableOpacity>
-                            ))}
-                            <TouchableOpacity style={styles.nextButton}>
-                                <ThemedText style={styles.nextButtonText}>Next</ThemedText>
-                            </TouchableOpacity>
-                        </View>
-                    </View>
+            {/* Pagination en bas fixe */}
+            <View style={styles.paginationContainer}>
+                <View style={styles.pagination}>
+                    {[1, 2, '...', 4, 5].map((page, index) => (
+                        <TouchableOpacity
+                            key={index}
+                            style={[
+                                styles.pageButton,
+                                typeof page === 'number' && page === 1 && styles.pageButtonActive,
+                            ]}
+                        >
+                            <ThemedText style={styles.pageButtonText}>{page}</ThemedText>
+                        </TouchableOpacity>
+                    ))}
+                    <TouchableOpacity style={styles.nextButton}>
+                        <ThemedText style={styles.nextButtonText}>Next</ThemedText>
+                    </TouchableOpacity>
+                </View>
+            </View>
         </ThemedView>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {
@@ -280,7 +310,17 @@ const styles = StyleSheet.create({
     cookButtonText: {
         color: '#FFFFFF',
         fontFamily: 'Jua',
-    }
+    },
+    resetButton: {
+        backgroundColor: '#E8A85F',
+        padding: 8,
+        borderRadius: 8,
+        marginLeft: 24,
+    },
+    resetButtonText: {
+        color: '#FFFFFF',
+        fontFamily: 'Jua',
+    },
 
 
 });

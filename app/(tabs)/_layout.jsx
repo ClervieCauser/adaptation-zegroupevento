@@ -1,3 +1,4 @@
+// app/(tabs)/_layout.tsx
 import { StyleSheet, View, Image, Text } from 'react-native';
 import { Tabs } from 'expo-router';
 import { ThemedView } from '../../components/ThemedView';
@@ -5,7 +6,10 @@ import { icons } from '../../constants/icons';
 import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
 import TabletNavigation from "../../components/ui/TabletNavigation";
 import PendingOrders from './pending-orders';
-
+import { OrderSelectionProvider } from '@/context/OrderContext';
+import { OrderProcessingProvider } from '@/context/OrderProcessingContext';
+import { DraxProvider } from 'react-native-drax';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 const TabIcon = ({ icon, color, name, focused }) => {
     const { isTablet, isDesktop } = useResponsiveLayout();
 
@@ -41,91 +45,108 @@ const TabLayout = () => {
 
     if (isTablet) {
         return (
-            <ThemedView style={styles.container}>
-                <TabletNavigation />
-                <View style={styles.content}>
-                    <Tabs screenOptions={{
-                        headerShown: false,
-                        tabBarStyle: { display: 'none' },
-                    }}>
-                        <Tabs.Screen
-                            name="index" // Renommé de "home" à "index"
-                            options={{ href: null }}
-                        />
-                        <Tabs.Screen
-                            name="pending-orders"
-                            options={{ href: PendingOrders }}
-                        />
-                        <Tabs.Screen
-                            name="create"
-                            options={{ href: null }}
-                        />
-                        <Tabs.Screen
-                            name="settings"
-                            options={{ href: null }}
-                        />
-                    </Tabs>
-                </View>
-            </ThemedView>
+
+            <OrderSelectionProvider>
+                <OrderProcessingProvider>
+                        <GestureHandlerRootView style={{ flex: 1 }}>
+                            <DraxProvider>
+                                <ThemedView style={styles.container}>
+                                    <TabletNavigation />
+                                    <View style={styles.content}>
+                                        <Tabs screenOptions={{
+                                            headerShown: false,
+                                            tabBarStyle: { display: 'none' },
+                                        }}>
+                                            <Tabs.Screen
+                                                name="index"
+                                                options={{ href: null }}
+                                            />
+                                            <Tabs.Screen
+                                                name="pending-orders"
+                                                options={{ href: PendingOrders }}
+                                            />
+                                            <Tabs.Screen
+                                                name="create"
+                                                options={{ href: null }}
+                                            />
+                                            <Tabs.Screen
+                                                name="settings"
+                                                options={{ href: null }}
+                                            />
+                                        </Tabs>
+                                    </View>
+                                </ThemedView>
+                            </DraxProvider>
+                        </GestureHandlerRootView>
+                </OrderProcessingProvider>
+            </OrderSelectionProvider>
         );
     }
 
-    // Version mobile (téléphone)
     return (
-        <Tabs
-            screenOptions={{
-                tabBarShowLabel: false,
-                tabBarActiveTintColor: '#ED9405',
-                tabBarInactiveTintColor: '#CDCDE0',
-                headerShown: false,
-            }}
-        >
-            <Tabs.Screen
-                name="home"
-                options={{
-                    title: 'Home',
-                    headerShown: false,
-                    tabBarIcon: ({ color, focused }) => (
-                        <TabIcon icon={icons.home} color={color} name="Home" focused={focused} />
-                    ),
-                }}
-            />
-            <Tabs.Screen
-                name="pending-orders"
-                options={{
-                    title: 'Pending Orders',
-                    headerShown: false,
-                    tabBarIcon: ({ color, focused }) => (
-                        <TabIcon icon={icons.bookmark} color={color} name="Pending Orders" focused={focused} />
-                    ),
-                }}
-            />
-            <Tabs.Screen
-                name="create"
-                options={{
-                    title: 'Create',
-                    headerShown: false,
-                    tabBarIcon: ({ color, focused }) => (
-                        <TabIcon icon={icons.plus} color={color} name="Create" focused={focused} />
-                    ),
-                }}
-            />
-            <Tabs.Screen
-                name="settings"
-                options={{
-                    title: 'Settings',
-                    headerShown: false,
-                    tabBarIcon: ({ color, focused }) => (
-                        <TabIcon icon={icons.profile} color={color} name="Settings" focused={focused} />
-                    ),
-                }}
-            />
-        </Tabs>
+        <OrderSelectionProvider>
+            <OrderProcessingProvider>
+                <GestureHandlerRootView style={{ flex: 1 }}>
+                    <DraxProvider>
+
+                        <Tabs
+                            screenOptions={{
+                                tabBarShowLabel: false,
+                                tabBarActiveTintColor: '#ED9405',
+                                tabBarInactiveTintColor: '#CDCDE0',
+                                headerShown: false,
+                            }}
+                        >
+                            <Tabs.Screen
+                                name="home"
+                                options={{
+                                    title: 'Home',
+                                    headerShown: false,
+                                    tabBarIcon: ({ color, focused }) => (
+                                        <TabIcon icon={icons.home} color={color} name="Home" focused={focused} />
+                                    ),
+                                }}
+                            />
+                            <Tabs.Screen
+                                name="pending-orders"
+                                options={{
+                                    title: 'Pending Orders',
+                                    headerShown: false,
+                                    tabBarIcon: ({ color, focused }) => (
+                                        <TabIcon icon={icons.bookmark} color={color} name="Pending Orders" focused={focused} />
+                                    ),
+                                }}
+                            />
+                            <Tabs.Screen
+                                name="create"
+                                options={{
+                                    title: 'Create',
+                                    headerShown: false,
+                                    tabBarIcon: ({ color, focused }) => (
+                                        <TabIcon icon={icons.plus} color={color} name="Create" focused={focused} />
+                                    ),
+                                }}
+                            />
+                            <Tabs.Screen
+                                name="settings"
+                                options={{
+                                    title: 'Settings',
+                                    headerShown: false,
+                                    tabBarIcon: ({ color, focused }) => (
+                                        <TabIcon icon={icons.profile} color={color} name="Settings" focused={focused} />
+                                    ),
+                                }}
+                            />
+                        </Tabs>
+                    </DraxProvider>
+                </GestureHandlerRootView>
+            </OrderProcessingProvider>
+
+        </OrderSelectionProvider>
     );
 };
 
 const styles = StyleSheet.create({
-    // Styles de base (mobile)
     iconContainer: {
         flexDirection: 'column',
         alignItems: 'center',
@@ -142,8 +163,6 @@ const styles = StyleSheet.create({
         width: 100,
         marginTop: 4,
     },
-
-    // Styles tablette
     tabletContainer: {
         flexDirection: 'row',
         height: '100%',
@@ -169,8 +188,6 @@ const styles = StyleSheet.create({
     tabletIconText: {
         fontSize: 14,
     },
-
-    // Styles desktop
     desktopContainer: {
         flexDirection: 'row',
         height: '100%',

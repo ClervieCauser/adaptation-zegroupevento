@@ -1,96 +1,193 @@
-// app/(tabs)/recipe-prep.tsx
-import React, { useState } from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
-import CustomButton from '@/components/ui/CustomButton';
 import CustomHeader from '@/components/ui/CustomHeader';
-import { useOrderSelection } from '@/hooks/UseOrderSelection';
-import {router} from "expo-router";
+import { useOrderSelection } from '@/context/OrderContext';
+import DisplaySettings from '@/components/ui/DisplaySettings';
+import DragAreaLayout from '@/components/ui/DragAreaLayout';
+import { Alert } from 'react-native';
+import { PanGestureHandler } from 'react-native-gesture-handler';
+import {
+    runOnJS,
+    useAnimatedGestureHandler,
+    useAnimatedStyle,
+    useSharedValue,
+    withSpring, withTiming
+} from "react-native-reanimated";
+import Animated from 'react-native-reanimated';
+import { useOrderProcessing } from '@/context/OrderProcessingContext';
+const OrderTag = ({ id, onDrop, isCompleted }) => {
+    const translateX = useSharedValue(0);
+    const translateY = useSharedValue(0);
 
+    const gestureHandler = useAnimatedGestureHandler({
+        onStart: () => {
+            if (isCompleted) return;
+            'worklet';
+        },
+        onActive: (event) => {
+            if (isCompleted) return;
+            translateX.value = event.translationX;
+            translateY.value = event.translationY;
+        },
+        onEnd: (event) => {
+            if (isCompleted) return;
+            const position = {
+                x: event.absoluteX,
+                y: event.absoluteY
+            };
+            runOnJS(onDrop)(id, position);
+            translateX.value = withSpring(0);
+            translateY.value = withSpring(0);
+        },
+    });
 
+    const animatedStyle = useAnimatedStyle(() => ({
+        transform: [
+            { translateX: isCompleted ? 0 : translateX.value },
+            { translateY: isCompleted ? 0 : translateY.value }
+        ],
+        backgroundColor: withTiming(
+            isCompleted ? '#4CAF50' : '#E8A85F',
+            { duration: 300 }
+        ),
+        opacity: withTiming(1, { duration: 300 }),
+        position: 'relative',
+        zIndex: 1000,
+    }));
 
-const DisplayOption = ({ mode, isSelected, onSelect }) => (
-    <TouchableOpacity
-        style={[styles.displayOption, isSelected && styles.selectedOption]}
-        onPress={() => onSelect(mode)}
-    >
-        <View style={[styles.preview, styles[`preview${mode}`]]}>
-            {Array(parseInt(mode)).fill(0).map((_, i) => (
-                <View key={i} style={styles.previewCell} />
-            ))}
-        </View>
-    </TouchableOpacity>
-);
+    return (
+        <PanGestureHandler enabled={!isCompleted} onGestureEvent={gestureHandler}>
+            <Animated.View style={[styles.tag, animatedStyle]}>
+                <ThemedText style={styles.text}>#{id}</ThemedText>
+            </Animated.View>
+        </PanGestureHandler>
+    );
+};
 
 const RecipePrep = () => {
-    const { selectedIds,getOrdersToShow, resetSelection  } = useOrderSelection();
-    const [displayMode, setDisplayMode] = useState('4');
-    const [showSettings, setShowSettings] = useState(true);
-
+    const { getOrdersToShow, resetSelection } = useOrderSelection();
     const ordersToDisplay = getOrdersToShow();
+    const { addOrderToZone, getCompletedOrderIds, resetOrderProcessing } = useOrderProcessing();
+
+    // Store these in ref to avoid re-renders
+    const initialState = useRef({
+        displayMode: '4',
+        showSettings: true,
+        zoneMeasures: {}
+    });
+
+    const [displayMode, setDisplayMode] = useState(initialState.current.displayMode);
+    const [showSettings, setShowSettings] = useState(initialState.current.showSettings);
+    const [zoneMeasures, setZoneMeasures] = useState(initialState.current.zoneMeasures);
+    const completedOrderIds = getCompletedOrderIds();
+
+    // Single useEffect for mounting/unmounting
+    useEffect(() => {
+        const reset = () => {
+            resetOrderProcessing();
+            setShowSettings(true);
+            setDisplayMode('4');
+            setZoneMeasures({});
+        };
+        reset();
+        return reset;
+    }, [ordersToDisplay.join(',')]);
+
+    const measureZone = (zoneId: string, layout: { x: number; y: number; width: number; height: number }) => {
+        setZoneMeasures(prev => ({
+            ...prev,
+            [zoneId]: layout
+        }));
+    };
+
+    const handleDropInZone = (orderId: string, droppedPosition: { x: number; y: number }) => {
+        if (completedOrderIds.includes(orderId)) {
+            Alert.alert(
+                "Order Already Completed",
+                "This order is ready to be served and cannot be modified!",
+                [{ text: "OK" }],
+                {
+                    cancelable: false,
+                    userInterfacePriority: 'high'
+                }
+            );
+            return;
+        }
+
+        for (const [zoneId, measure] of Object.entries(zoneMeasures)) {
+            const isInZone =
+                droppedPosition.x >= measure.x &&
+                droppedPosition.x <= measure.x + measure.width &&
+                droppedPosition.y >= measure.y &&
+                droppedPosition.y <= measure.y + measure.height;
+
+            if (isInZone) {
+                addOrderToZone(orderId, zoneId);
+                return;
+            }
+        }
+    };
 
     const handleValidate = () => {
+        console.log('Validate clicked, current showSettings:', showSettings);
         setShowSettings(false);
+        console.log('ShowSettings set to false');
     };
 
-    const handleBack = () => {
-        resetSelection();
-        console.log("je go back");
-    };
+    useEffect(() => {
+        return () => {
+            setShowSettings(true);
+            setDisplayMode('4');
+        };
+    }, []);
 
-    console.log(ordersToDisplay);
+    console.log('Rendering RecipePrep, showSettings:', showSettings);
 
     return (
         <ThemedView style={styles.container}>
             <CustomHeader />
-
             <View style={styles.content}>
                 <View style={styles.ordersList}>
                     <ThemedText style={styles.ordersTitle}>ORDERS:</ThemedText>
                     {ordersToDisplay.map(id => (
-                        <View key={id} style={styles.orderTag}>
-                            <ThemedText style={styles.tagText}>#{id}</ThemedText>
-                        </View>
+                        <OrderTag
+                            key={id}
+                            id={id}
+                            isCompleted={completedOrderIds.includes(id)}
+                            onDrop={(id, position) => handleDropInZone(id, position)}
+                        />
                     ))}
                 </View>
 
-                <View style={styles.mainArea}>
+                <View style={[
+                    styles.mainArea,
+                    showSettings ? styles.mainAreaWithSettings  : styles.mainAreaWithDrag
+                ]} data-testid="main-area">
                     {showSettings ? (
-                        <View style={styles.settingsModal}>
-                            <ThemedText style={styles.modalTitle}>Choose your display setting</ThemedText>
-                            <View style={styles.optionsGrid}>
-                                {['1', '2', '3', '4'].map(mode => (
-                                    <DisplayOption
-                                        key={mode}
-                                        mode={mode}
-                                        isSelected={displayMode === mode}
-                                        onSelect={setDisplayMode}
-                                    />
-                                ))}
-                            </View>
-                            <CustomButton
-                                title="VALIDATE"
-                                containerStyles={styles.validateButton}
-                                onPress={handleValidate}
-                            />
-                        </View>
+                        <DisplaySettings
+                            selectedMode={displayMode}
+                            onModeChange={setDisplayMode}
+                            onValidate={handleValidate}
+                        />
                     ) : (
-                        <View style={styles.dragArea}>
-                            <ThemedText>DRAG AN ORDER +</ThemedText>
-                        </View>
+                        <DragAreaLayout mode={displayMode} onMeasure={measureZone} />
                     )}
                 </View>
 
                 <View style={styles.footer}>
                     <TouchableOpacity
-                        onPress={handleBack}
-                        style={[styles.backButton, { padding: 10, borderRadius: 8 }]}
+                        onPress={resetSelection}
+                        style={styles.footerButton}
                     >
-                        <ThemedText style={{ color: '#FFF' }}>Back</ThemedText>
+                        <ThemedText style={styles.buttonText}>Back</ThemedText>
                     </TouchableOpacity>
-                    <TouchableOpacity onPress={() => setShowSettings(true)}>
-                        <ThemedText>Change display</ThemedText>
+                    <TouchableOpacity
+                        style={styles.footerButton}
+                        onPress={() => setShowSettings(true)}
+                    >
+                        <ThemedText style={styles.buttonText}>Settings</ThemedText>
                     </TouchableOpacity>
                 </View>
             </View>
@@ -113,7 +210,6 @@ const styles = StyleSheet.create({
         gap: 8,
         marginBottom: 24,
     },
-
     orderTag: {
         backgroundColor: '#E8A85F',
         paddingHorizontal: 12,
@@ -122,47 +218,14 @@ const styles = StyleSheet.create({
     },
     mainArea: {
         flex: 1,
-        borderWidth: 2,
-        borderColor: '#E8A85F',
-        borderRadius: 12,
         padding: 24,
+    },
+    mainAreaSettings: {
         alignItems: 'center',
         justifyContent: 'center',
     },
-    backButton:{
-        backgroundColor:'#E8A85F',
-    },
-    settingsModal: {
-        width: '100%',
-        maxWidth: 500,
-        backgroundColor: '#F8F9FE',
-        padding: 24,
-        borderRadius: 12,
-    },
-    optionsGrid: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        marginVertical: 24,
-    },
-    displayOption: {
-        padding: 12,
-        borderWidth: 1,
-        borderColor: '#E8A85F',
-        borderRadius: 8,
-    },
-    selectedOption: {
-        borderColor: '#E8A85F',
-        backgroundColor: '#FDF4E7',
-    },
-    preview: {
-        width: 60,
-        height: 60,
-        borderWidth: 1,
-        borderColor: '#E8A85F',
-    },
-    validateButton: {
+    backButton: {
         backgroundColor: '#E8A85F',
-        marginTop: 24,
     },
     footer: {
         flexDirection: 'row',
@@ -170,31 +233,79 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         marginTop: 24,
     },
-    dragArea: {
-        width: '100%',
-        height: '100%',
-        borderWidth: 2,
-        borderStyle: 'dashed',
-        borderColor: '#E8A85F',
-        borderRadius: 8,
-        alignItems: 'center',
-        justifyContent: 'center',
-    },
     ordersTitle: {
         fontSize: 18,
-        color: '#1C0D45', // Changed to dark color
+        color: '#1C0D45',
         fontFamily: 'Jua',
-    },
-    modalTitle: {
-        fontSize: 20,
-        color: '#1C0D45', // Changed to dark color
-        fontFamily: 'Jua',
-        textAlign: 'center',
     },
     tagText: {
         color: '#FFFFFF',
         fontFamily: 'Jua',
     },
+    mainAreaWithSettings: {
+        borderWidth: 2,
+        borderColor: '#E8A85F',
+        borderRadius: 12,
+        alignItems: 'center',
+        justifyContent: 'center'
+    },
+    mainAreaWithDrag: {
+        borderWidth: 0
+    },
+    footerButton: {
+        backgroundColor: '#E8A85F',
+        paddingHorizontal: 24,
+        paddingVertical: 10,
+        borderRadius: 8,
+    },
+    buttonText: {
+        color: '#FFF',
+        fontFamily: 'Jua',
+    },
+
+    tagCompleted: {
+        backgroundColor: '#4CAF50',
+    },
+    text: {
+        color: '#FFFFFF',
+        fontFamily: 'Jua',
+        fontSize: 14,
+    },
+
+
+
+    dragZone: {
+        flex: 1,
+        borderWidth: 2,
+        borderStyle: 'dashed',
+        borderColor: '#E8A85F',
+        borderRadius: 8,
+        backgroundColor: 'white',
+        padding: 16,
+        gap: 8,
+    },
+    dragZoneWithOrder: {
+        borderStyle: 'solid',
+    },
+
+
+    itemCompleted: {
+        backgroundColor: '#E8F5E9',
+        borderColor: '#4CAF50',
+    },
+
+    dragZoneCompleted: {
+        borderColor: '#4CAF50',
+        backgroundColor: 'rgba(76, 175, 80, 0.1)',
+    },
+    tag: {
+        paddingHorizontal: 12,
+        paddingVertical: 6,
+        borderRadius: 16,
+        marginHorizontal: 4,
+    }
+
+
 });
 
 export default RecipePrep;
