@@ -17,7 +17,7 @@ const Home = () => {
           <SearchBar value={searchText} onChangeText={setSearchText} />
         </View>
       </View>
-      <ThemedText style={styles.title}>List of recipe</ThemedText>
+      <ThemedText style={styles.title}>Liste des recettes</ThemedText>
       <RecipeList recipes={SAMPLE_RECIPES} style={styles.RecipeList}/>
     </ThemedView>
   )

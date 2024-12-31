@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text, FlatList, Image, Pressable, Dimensions } from 'react-native'
+import { StyleSheet, View, Text, FlatList, Image, Pressable, Dimensions, TouchableOpacity } from 'react-native'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import React from 'react'
 
@@ -11,6 +11,7 @@ export interface Recipe {
   duration: string;
   difficulty: string;
   imageUrl: string;
+  ingredients?: string[];
 }
 
 interface RecipeCardProps {
@@ -18,6 +19,7 @@ interface RecipeCardProps {
   duration: string;
   difficulty: string;
   imageUrl: string;
+  ingredients?: string[];
 }
 
 export const SAMPLE_RECIPES: Recipe[] = [
@@ -27,6 +29,7 @@ export const SAMPLE_RECIPES: Recipe[] = [
     duration: '30 min',
     difficulty: 'Facile',
     imageUrl: 'https://example.com/carbonara.jpg',
+    ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
   },
   {
     id: '2',
@@ -34,22 +37,25 @@ export const SAMPLE_RECIPES: Recipe[] = [
     duration: '1h30',
     difficulty: 'Moyen',
     imageUrl: 'https://example.com/poulet.jpg',
+    ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
   },
   {
     id: '3',
     title: 'Poulet Citron',
     duration: '1h30',
     difficulty: 'Moyen',
-    imageUrl: '../../assets/images/citron.jpg',
+    imageUrl: require('../../assets/images/citron.jpg'),
+    ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
   },
 ];
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, imageUrl }) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, imageUrl, ingredients}) => {
+  const imageSource = typeof imageUrl === 'string' ? { uri: imageUrl } : imageUrl;
   return (
     <Pressable style={styles.recipeCard}>
       <View style={styles.imageContainer}>
         <Image 
-          source={require('../../assets/images/citron.jpg')}
+          source={imageSource}
           style={styles.recipeImage}
           resizeMode="cover"
         />
@@ -60,7 +66,22 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, im
           <Text style={styles.recipeText}>{duration}</Text>
           <Text style={styles.recipeText}>{difficulty}</Text>
         </View>
+        {isTablet && (
+          <View>
+            <Text style={styles.recipeText}>Ingrédients (4 personnes) :</Text>
+            <View style={styles.ingredients}>
+              {ingredients && ingredients.map((ingredient, index) => (
+                <View key={index} style={styles.ingredientContainer}>
+                  <Text style={styles.ingredientText}>{ingredient}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
       </View>
+      <TouchableOpacity style={styles.button} onPress={() => console.log('Voir la recette')}>
+      <Text style={styles.buttonText}>Voir la recette</Text>
+    </TouchableOpacity>
     </Pressable>
   );
 };
@@ -76,6 +97,7 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
       duration={item.duration}
       difficulty={item.difficulty}
       imageUrl={item.imageUrl}
+      ingredients={item.ingredients}
     />
   );
 
@@ -100,7 +122,7 @@ const styles = StyleSheet.create({
   recipeListContent: {
     paddingLeft: '2%',
     paddingRight: '2%',
-    height: isTablet ? '70%': '70%',
+    height: isTablet ? '80%': '70%',
   },
   recipeCard: {
     backgroundColor: 'white',
@@ -117,15 +139,16 @@ const styles = StyleSheet.create({
     marginRight: 15,
     },
   imageContainer: {
-    height: 200,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   recipeImage: {
-    width: '100%',
-    height: '100%',
-    borderTopLeftRadius: 12,
-    borderTopRightRadius: 12,
+    margin: isTablet ? wp('1%') : wp('0%'),
+    height: isTablet ? wp('9%') : wp('100%'),
+    width: isTablet ? wp('18%') : wp('100%'),
+    borderRadius: 12,
     },
   recipeInfo: {
     padding: 10,
@@ -142,6 +165,40 @@ const styles = StyleSheet.create({
   },
   recipeText: {
     fontSize: 14,
+    color: '#666',
+  },
+  button: {
+    backgroundColor: '#E8A85F',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    alignSelf: 'center',
+    width: '50%',
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontFamily: 'Jua',
+    fontSize: 16,
+  },
+  ingredientsContainer: {
+    marginTop: 10,
+  },
+  ingredients: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  ingredientContainer: {
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    padding: 10,
+    margin: 5,
+    width: '30%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ingredientText: {
+    fontSize: 14,
+    fontFamily: 'Jua',
     color: '#666',
   },
 });
