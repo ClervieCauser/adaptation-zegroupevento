@@ -1,6 +1,7 @@
 import { StyleSheet, View, Text, FlatList, Image, Pressable, Dimensions, TouchableOpacity } from 'react-native'
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import React from 'react'
+import { router } from 'expo-router';
 
 const { width, height } = Dimensions.get('window');
 const isTablet = width >= 600;
@@ -79,9 +80,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, im
           </View>
         )}
       </View>
-      <TouchableOpacity style={styles.button} onPress={() => console.log('Voir la recette')}>
-      <Text style={styles.buttonText}>Voir la recette</Text>
-    </TouchableOpacity>
+      <TouchableOpacity style={styles.button} onPress={() => router.push('/recipe')}>
+        <Text style={styles.buttonText}>Voir la recette</Text>
+      </TouchableOpacity>
     </Pressable>
   );
 };
@@ -145,9 +146,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   recipeImage: {
-    margin: isTablet ? wp('1%') : wp('0%'),
-    height: isTablet ? wp('9%') : wp('100%'),
-    width: isTablet ? wp('18%') : wp('100%'),
+    margin: isTablet ? wp('1%') : wp('2%'),
+    height: isTablet ? wp('9%') : wp('25%'),
+    width: isTablet ? wp('18%') : wp('30%'),
     borderRadius: 12,
     },
   recipeInfo: {
@@ -173,7 +174,8 @@ const styles = StyleSheet.create({
     padding: 16,
     alignItems: 'center',
     alignSelf: 'center',
-    width: '50%',
+    width: isTablet? '50%' : '80%',
+    margin: isTablet ? '5%' : '10%',
   },
   buttonText: {
     color: '#FFFFFF',
