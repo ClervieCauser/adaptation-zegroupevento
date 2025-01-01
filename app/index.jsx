@@ -24,7 +24,7 @@ export default function App() {
 
           <CustomButton
             title="Continue with email"
-            handlePress={() => router.push('/sign-in')}
+            onPress={() => router.push('/sign-in')}
             containerStyles={{width: '100%', marginTop: 20}}
           />
           <Link href="/home">Go to home</Link>
