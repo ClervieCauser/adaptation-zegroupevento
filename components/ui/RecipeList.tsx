@@ -13,6 +13,7 @@ export interface Recipe {
   difficulty: string;
   imageUrl: string;
   ingredients?: string[];
+  calories: string;
 }
 
 interface RecipeCardProps {
@@ -21,6 +22,7 @@ interface RecipeCardProps {
   difficulty: string;
   imageUrl: string;
   ingredients?: string[];
+  calories: string;
 }
 
 export const SAMPLE_RECIPES: Recipe[] = [
@@ -29,16 +31,18 @@ export const SAMPLE_RECIPES: Recipe[] = [
     title: 'Spaghetti Carbonara',
     duration: '30 min',
     difficulty: 'Facile',
-    imageUrl: 'https://example.com/carbonara.jpg',
+    imageUrl: require('../../assets/images/citron.jpg'),
     ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
+    calories: '500 kcal',
   },
   {
     id: '2',
     title: 'Poulet Rôti',
     duration: '1h30',
     difficulty: 'Moyen',
-    imageUrl: 'https://example.com/poulet.jpg',
+    imageUrl: require('../../assets/images/citron.jpg'),
     ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
+    calories: '800 kcal',
   },
   {
     id: '3',
@@ -47,18 +51,20 @@ export const SAMPLE_RECIPES: Recipe[] = [
     difficulty: 'Moyen',
     imageUrl: require('../../assets/images/citron.jpg'),
     ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
+    calories: '700 kcal',
   },
   {
     id: '4',
     title: 'Spaghetti Carbonara',
     duration: '30 min',
     difficulty: 'Facile',
-    imageUrl: 'https://example.com/carbonara.jpg',
+    imageUrl: require('../../assets/images/citron.jpg'),
     ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
+    calories: '500 kcal',
   },
 ];
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, imageUrl, ingredients}) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, imageUrl, ingredients, calories}) => {
   const imageSource = typeof imageUrl === 'string' ? { uri: imageUrl } : imageUrl;
   return (
     <Pressable style={styles.recipeCard}>
@@ -71,13 +77,14 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, im
       </View>
       <View style={styles.recipeInfo}>
         <Text style={styles.recipeTitle}>{title}</Text>
+        <Text style={styles.recipeText}>{calories}</Text>
         <View style={styles.recipeDetails}>
           <Text style={styles.recipeText}>{duration}</Text>
           <Text style={styles.recipeText}>{difficulty}</Text>
         </View>
         {isTablet && (
           <View>
-            <Text style={styles.recipeText}>Ingrédients (4 personnes) :</Text>
+            <Text style={styles.recipeTitle}>Ingrédients (4 personnes) :</Text>
             <View style={styles.ingredients}>
               {ingredients && ingredients.map((ingredient, index) => (
                 <View key={index} style={styles.ingredientContainer}>
@@ -109,6 +116,7 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
       difficulty={item.difficulty}
       imageUrl={item.imageUrl}
       ingredients={item.ingredients}
+      calories={item.calories}
     />
   );
 
