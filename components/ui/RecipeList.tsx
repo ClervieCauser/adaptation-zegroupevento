@@ -48,6 +48,14 @@ export const SAMPLE_RECIPES: Recipe[] = [
     imageUrl: require('../../assets/images/citron.jpg'),
     ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
   },
+  {
+    id: '4',
+    title: 'Spaghetti Carbonara',
+    duration: '30 min',
+    difficulty: 'Facile',
+    imageUrl: 'https://example.com/carbonara.jpg',
+    ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
+  },
 ];
 
 const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, imageUrl, ingredients}) => {
@@ -92,6 +100,8 @@ interface RecipeListProps {
 }
 
 export const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
+  const numColumns = isTablet ? 3 : 1;
+
   const renderRecipe = ({ item }: { item: Recipe }) => (
     <RecipeCard
       title={item.title}
@@ -110,7 +120,8 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
       style={styles.recipeList}
       contentContainerStyle={styles.recipeListContent}
       showsVerticalScrollIndicator={false}
-      horizontal={true}
+      horizontal={isTablet? false: true}
+      numColumns={numColumns}
     />
   );
 };
@@ -138,6 +149,7 @@ const styles = StyleSheet.create({
     elevation: 3,
     width: isTablet ? wp('25%') : wp('35%'),
     marginRight: 15,
+    marginTop: 8,
     },
   imageContainer: {
     borderTopLeftRadius: 12,
