@@ -232,8 +232,8 @@ const RecipePage = () => {
         <Text style={styles.title}>{recipe.name}</Text>
 
         <View style={styles.tagContainer}>
-          {tag.map((item, index) => (
-            <Tags key={index} text={item.text} />
+          {recipe.tags.map((item, index) => (
+            <Tags key={index} text={item} />
           ))}
         </View>
 
@@ -322,8 +322,8 @@ const RecipePage = () => {
       <Text style={styles.title}>{recipe.name}</Text>
 
       <View style={styles.tagContainer}>
-        {tag.map((item, index) => (
-          <Tags key={index} text={item.text} />
+        {recipe.tags.map((item, index) => (
+          <Tags key={index} text={item} />
         ))}
       </View>
 
