@@ -40,19 +40,11 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Pressez les citrons pour extraire le jus',
+            gif: require('../assets/gifs/lemon.gif'),
             important: false
-          },
-          {
-            instruction: 'Mélangez le jus de citron avec l\'huile d\'olive',
-            important: false
-          },
-          {
-            instruction: 'Hachez l\'ail et le romarin',
-            tip: 'Un hachage fin permet une meilleure diffusion des saveurs',
-            important: true
           }
         ]
-      },
+      },      
       {
         id: 4,
         title: 'Assaisonner le poulet',

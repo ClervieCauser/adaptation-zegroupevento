@@ -164,24 +164,31 @@ const RecipePage = () => {
           </View>
 
           <ScrollView style={styles.substepsContainer}>
-            {currentStepData.substeps.map((substep, index) => (
-              <View key={index} style={styles.substepBox}>
-                {substep.important && (
-                  <View style={styles.importantIndicator}>
-                    <Text style={styles.warningText}>{substep.instruction}</Text>
-                  </View>
-                )}
-                {!substep.important && (
-                  <Text style={styles.substepText}>{substep.instruction}</Text>
-                )}
-                {substep.tip && (
-                  <View style={styles.tipContainer}>
-                    <Lightbulb size={20} color="#FFB800" />
-                    <Text style={styles.tipText}>{substep.tip}</Text>
-                  </View>
-                )}
-              </View>
-            ))}
+          {currentStepData.substeps.map((substep, index) => (
+            <View key={index} style={styles.substepBox}>
+              {substep.gif && (
+                <Image 
+                  source={substep.gif}
+                  style={styles.stepGif}
+                  resizeMode="cover"
+                />
+              )}
+              {substep.important && (
+                <View style={styles.importantIndicator}>
+                  <Text style={styles.warningText}>{substep.instruction}</Text>
+                </View>
+              )}
+              {!substep.important && (
+                <Text style={styles.substepText}>{substep.instruction}</Text>
+              )}
+              {substep.tip && (
+                <View style={styles.tipContainer}>
+                  <Lightbulb size={20} color="#FFB800" />
+                  <Text style={styles.tipText}>{substep.tip}</Text>
+                </View>
+              )}
+            </View>
+          ))}
           </ScrollView>
 
           <View style={styles.navigationContainer}>
@@ -674,6 +681,12 @@ const styles = StyleSheet.create({
   progressDotCompleted: {
     backgroundColor: '#ED9405',
   },
+  stepGif: {
+    width: '100%',
+    height: 200,
+    borderRadius: 8,
+    marginBottom: 8,
+  }
 });
 
 export default RecipePage;
