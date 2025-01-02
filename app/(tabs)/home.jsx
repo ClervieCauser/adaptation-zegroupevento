@@ -1,4 +1,4 @@
-import { StyleSheet, View, Text } from 'react-native'
+import { StyleSheet, View, FlatList, Dimensions, ScrollView } from 'react-native'
 import React, { useState } from 'react'
 import CustomHeader from "../../components/ui/CustomHeader";
 import SearchBar from '@/components/ui/SearchBar';
@@ -6,22 +6,40 @@ import { ThemedView } from '@/components/ThemedView';
 import { RecipeList, SAMPLE_RECIPES} from '@/components/ui/RecipeList';
 import { ThemedText } from '@/components/ThemedText';
 
+
 const Home = () => {
   const [searchText, setSearchText] = useState('');
+  const { width } = Dimensions.get('window');
+  const isTablet = width >= 600;
 
-  return (
-    <ThemedView style={styles.container}>
+  const renderContent = () => (
+    <>
       <View style={styles.topSection}>
         <CustomHeader />
         <View style={styles.searchContainer}>
           <SearchBar value={searchText} onChangeText={setSearchText} />
         </View>
       </View>
-      <ThemedText style={styles.title}>List of recipe</ThemedText>
-      <RecipeList recipes={SAMPLE_RECIPES}/>
+      <ThemedText style={styles.title}>Liste des recettes</ThemedText>
+      <RecipeList recipes={SAMPLE_RECIPES} style={styles.recipeList} />
+    </>
+  );
+
+  return (
+    <ThemedView style={styles.container}>
+      {isTablet ? (
+        <FlatList
+          data={[{ key: 'content' }]}
+          renderItem={renderContent}
+          keyExtractor={item => item.key}
+          contentContainerStyle={styles.scrollViewContent}
+        />
+      ) : (
+        renderContent()
+      )}
     </ThemedView>
-  )
-}
+  );
+};
 
 export default Home
 
@@ -138,5 +156,12 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 5,
-  }
+  },
+  RecipeList: {
+    display: 'flex',
+    flexDirection: 'row',
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+  },
 })
