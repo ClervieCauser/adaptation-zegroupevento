@@ -11,6 +11,7 @@ import CustomButton from '../../components/ui/CustomButton';
 import Pagination from '../../components/ui/Pagination';
 import UtensilRow from '../../components/ui/UtensilRow';
 import {recipes} from '../../app/recipe';
+import { Lightbulb, Bell, MessageSquare, ChevronRight } from 'lucide-react';
 
 const RecipePage = () => {
   const { isTablet } = useResponsiveLayout();
@@ -18,10 +19,11 @@ const RecipePage = () => {
   const [activePage, setActivePage] = useState(0);
   const [isRecipeHome, setIsRecipeHome] = useState(true);
   const totalPages = 2;
-
-  const id = 2;
+  const [currentStep, setCurrentStep] = useState(0);
+  const [completedSteps, setCompletedSteps] = useState(new Set());
+  const id = 1;
   const recipe = recipes.find((recipe) => recipe.id === id);
-  
+  console.log(recipe);
   const handlePageChange = (page) => {
     setActivePage(page);
     setActiveTab(page === 0 ? 'ingredients' : 'utensils');
@@ -29,6 +31,19 @@ const RecipePage = () => {
 
   const handleStartRecipe = () => {
     setIsRecipeHome(false);
+  };
+
+  const handleNextStep = () => {
+    if (currentStep < recipe.steps.length - 1) {
+      setCurrentStep(currentStep + 1);
+      setCompletedSteps(new Set([...completedSteps, currentStep]));
+    }
+  };
+
+  const handleBackToHome = () => {
+    setIsRecipeHome(true);
+    setCurrentStep(0);
+    setCompletedSteps(new Set());
   };
 
   const renderContent = () => {
@@ -123,12 +138,80 @@ const RecipePage = () => {
 
   // TODO: Créer un composant pour afficher les étapes de la recette
   if (!isRecipeHome) {
+    const currentStepData = recipe.steps[currentStep];
     return (
-      <View style={styles.container}>
-        <CustomHeader /> empty
-        {/* TODO: Ajouter le contenu des étapes de la recette */}
-        {/* TODO: Ajouter la navigation entre les étapes */}
-        {/* TODO: Ajouter un bouton pour revenir à la page d'accueil de la recette */}
+      <View style={isTablet ? styles.container : styles.containerPhone}>
+        <CustomHeader onBack={handleBackToHome} />
+        
+        <View style={styles.recipeHeader}>
+          <Text style={styles.recipeName}>{recipe.name}</Text>
+          <Text style={styles.recipeNumber}>#{recipe.recipeNumber}</Text>
+          <View style={styles.headerIcons}>
+            <MessageSquare size={24} />
+            <Bell size={24} />
+            <View style={styles.difficultyBadge}>
+              <Text style={styles.difficultyText}>{recipe.difficulty}</Text>
+            </View>
+          </View>
+        </View>
+
+        <View style={styles.stepContent}>
+          <View style={styles.stepHeader}>
+            <View style={styles.stepNumberCircle}>
+              <Text style={styles.stepNumber}>{currentStepData.id}</Text>
+            </View>
+            <Text style={styles.stepTitle}>{currentStepData.title}: {currentStepData.duration}</Text>
+          </View>
+
+          <ScrollView style={styles.substepsContainer}>
+            {currentStepData.substeps.map((substep, index) => (
+              <View key={index} style={styles.substepBox}>
+                {substep.important && (
+                  <View style={styles.importantIndicator}>
+                    <Text style={styles.warningText}>{substep.instruction}</Text>
+                  </View>
+                )}
+                {!substep.important && (
+                  <Text style={styles.substepText}>{substep.instruction}</Text>
+                )}
+                {substep.tip && (
+                  <View style={styles.tipContainer}>
+                    <Lightbulb size={20} color="#FFB800" />
+                    <Text style={styles.tipText}>{substep.tip}</Text>
+                  </View>
+                )}
+              </View>
+            ))}
+          </ScrollView>
+
+          <View style={styles.navigationContainer}>
+            <CustomButton
+              title="Prochaine étape"
+              onPress={handleNextStep}
+              containerStyles={styles.nextButton}
+              textStyles={styles.nextButtonText}
+              Icon={ChevronRight}
+            />
+          </View>
+
+          <View style={styles.progressContainer}>
+            <Text style={styles.progressText}>
+              Étape {currentStep + 1} sur {recipe.steps.length}
+            </Text>
+            <View style={styles.progressBar}>
+              {recipe.steps.map((_, index) => (
+                <View
+                  key={index}
+                  style={[
+                    styles.progressDot,
+                    index === currentStep && styles.progressDotActive,
+                    completedSteps.has(index) && styles.progressDotCompleted
+                  ]}
+                />
+              ))}
+            </View>
+          </View>
+        </View>
       </View>
     );
   }
@@ -450,7 +533,147 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     marginHorizontal: 3,
     height: 40,
-  }
+  },
+
+  // RECIPE PREP
+
+  recipeHeader: {
+    padding: 16,
+    backgroundColor: '#FFF',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  recipeName: {
+    fontSize: 24,
+    fontFamily: 'Jua',
+    fontWeight: 'bold',
+  },
+  recipeNumber: {
+    color: '#666',
+    fontSize: 16,
+  },
+  headerIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  difficultyBadge: {
+    backgroundColor: '#E5F6FF',
+    padding: 8,
+    borderRadius: 16,
+  },
+  difficultyText: {
+    color: '#0085FF',
+    fontSize: 14,
+  },
+  stepContent: {
+    padding: 16,
+  },
+  stepHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 24,
+  },
+  stepNumberCircle: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#ED9405',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 16,
+  },
+  stepNumber: {
+    color: '#FFF',
+    fontSize: 24,
+    fontWeight: 'bold',
+  },
+  stepTitle: {
+    fontSize: 20,
+    fontFamily: 'Jua',
+    flex: 1,
+  },
+  substepsContainer: {
+    maxHeight: 400,
+  },
+  substepBox: {
+    marginBottom: 16,
+  },
+  importantIndicator: {
+    borderLeftWidth: 4,
+    borderLeftColor: '#ED9405',
+    paddingLeft: 12,
+    backgroundColor: '#FFF',
+    padding: 16,
+    borderRadius: 8,
+  },
+  warningText: {
+    color: '#ED9405',
+    fontWeight: 'bold',
+  },
+  substepText: {
+    fontSize: 16,
+    backgroundColor: '#FFF',
+    padding: 16,
+    borderRadius: 8,
+  },
+  tipContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFEFDF',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 8,
+  },
+  tipText: {
+    marginLeft: 8,
+    color: '#666',
+  },
+  navigationContainer: {
+    marginTop: 24,
+    alignItems: 'center',
+  },
+  nextButton: {
+    backgroundColor: '#ED9405',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 24,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  nextButtonText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
+    marginRight: 8,
+  },
+  progressContainer: {
+    marginTop: 24,
+    alignItems: 'center',
+  },
+  progressText: {
+    fontSize: 14,
+    color: '#666',
+    marginBottom: 8,
+  },
+  progressBar: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  progressDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#DDD',
+  },
+  progressDotActive: {
+    backgroundColor: '#ED9405',
+    width: 24,
+  },
+  progressDotCompleted: {
+    backgroundColor: '#ED9405',
+  },
 });
 
 export default RecipePage;

@@ -1,7 +1,95 @@
 export const recipes = [
     {
       id: 1,
-      name: 'Poulet citron',
+    name: 'Poulet citron',
+    difficulty: 'Novice',
+    recipeNumber: '#1234',
+    steps: [
+      {
+        id: 1,
+        title: 'Préparer son environnement de cuisine',
+        duration: '1 min',
+        substeps: [
+          {
+            instruction: 'Préchauffez votre four à 200 degrés',
+            tip: 'En prechauffant son four avant, on optimise son temps !',
+            important: true
+          }
+        ]
+      },
+      {
+        id: 2,
+        title: 'Préparer le poulet',
+        duration: '5 min',
+        substeps: [
+          {
+            instruction: 'Rincez et séchez le poulet',
+            important: false
+          },
+          {
+            instruction: 'Placez le poulet dans un plat allant au four',
+            tip: 'Utilisez un plat suffisamment grand pour que le poulet ne soit pas trop serré',
+            important: true
+          }
+        ]
+      },
+      {
+        id: 3,
+        title: 'Préparer la marinade',
+        duration: '4 min',
+        substeps: [
+          {
+            instruction: 'Pressez les citrons pour extraire le jus',
+            important: false
+          },
+          {
+            instruction: 'Mélangez le jus de citron avec l\'huile d\'olive',
+            important: false
+          },
+          {
+            instruction: 'Hachez l\'ail et le romarin',
+            tip: 'Un hachage fin permet une meilleure diffusion des saveurs',
+            important: true
+          }
+        ]
+      },
+      {
+        id: 4,
+        title: 'Assaisonner le poulet',
+        duration: '2 min',
+        substeps: [
+          {
+            instruction: 'Badigeonnez le poulet avec le mélange citron-huile',
+            important: false
+          },
+          {
+            instruction: 'Saupoudrez d\'ail et de romarin',
+            important: false
+          },
+          {
+            instruction: 'Salez et poivrez généreusement',
+            tip: 'N\'hésitez pas sur l\'assaisonnement, une partie s\'évaporera à la cuisson',
+            important: true
+          }
+        ]
+      },
+      {
+        id: 5,
+        title: 'Cuisson',
+        duration: '50 min',
+        substeps: [
+          {
+            instruction: 'Enfournez le plat à 200°C',
+            important: true
+          },
+          {
+            instruction: 'Arrosez le poulet avec son jus toutes les 15 minutes',
+            tip: 'Cela permet de garder le poulet bien moelleux',
+            important: true
+          }
+        ]
+      }
+    ],
       ingredients: [
         { ingredient: 'Poulet', quantity: '1.2', unit: 'kg' },
         { ingredient: 'Citrons jaunes', quantity: '200', unit: 'g' },
