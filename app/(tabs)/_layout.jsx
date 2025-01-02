@@ -6,6 +6,7 @@ import { icons } from '../../constants/icons';
 import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
 import TabletNavigation from "../../components/ui/TabletNavigation";
 import PendingOrders from './pending-orders';
+import Home from './home';
 import { OrderSelectionProvider } from '@/context/OrderContext';
 import { OrderProcessingProvider } from '@/context/OrderProcessingContext';
 import { DraxProvider } from 'react-native-drax';
@@ -59,15 +60,11 @@ const TabLayout = () => {
                                         }}>
                                             <Tabs.Screen
                                                 name="index"
-                                                options={{ href: null }}
+                                                options={{ href: Home }}
                                             />
                                             <Tabs.Screen
                                                 name="pending-orders"
                                                 options={{ href: PendingOrders }}
-                                            />
-                                            <Tabs.Screen
-                                                name="create"
-                                                options={{ href: null }}
                                             />
                                             <Tabs.Screen
                                                 name="settings"

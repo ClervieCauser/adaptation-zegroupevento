@@ -2,20 +2,25 @@ import React from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import CustomButton from '@/components/ui/CustomButton';
+import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
+
 
 // Dans DisplaySettings.tsx
 export const DisplaySettings = ({ onValidate, selectedMode, onModeChange }) => {
+    const { isTablet } = useResponsiveLayout();
+
     console.log('DisplaySettings render, onValidate:', onValidate);
     return (
         <View style={styles.settingsModal}>
             <ThemedText style={styles.modalTitle}>Choose your display setting</ThemedText>
-            <View style={styles.optionsGrid}>
+            <View style={[styles.optionsGrid , !isTablet && styles.optionsGridPhone]}>
                 {['1', '2', '3', '4'].map((mode) => (
                     <DisplayOption
                         key={mode}
                         mode={mode}
                         isSelected={selectedMode === mode}
                         onSelect={onModeChange}
+                        isTablet={isTablet}
                     />
                 ))}
             </View>
@@ -32,9 +37,9 @@ export const DisplaySettings = ({ onValidate, selectedMode, onModeChange }) => {
     );
 };
 
-const DisplayOption = ({ mode, isSelected, onSelect }) => (
+const DisplayOption = ({ mode, isSelected, onSelect, isTablet }) => (
     <TouchableOpacity
-        style={[styles.displayOption, isSelected && styles.selectedOption]}
+        style={[styles.displayOption, isSelected && styles.selectedOption, !isTablet && styles.displayOptionPhone]}
         onPress={() => onSelect(mode)}
     >
         <View style={[styles.checkMarkContainer, isSelected && styles.checkMarkContainerSelected]}>
@@ -100,6 +105,11 @@ const styles = StyleSheet.create({
         gap: 20,
         marginBottom: 32,
     },
+    optionsGridPhone: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+    },
     displayOption: {
         width: 100,
         height: 100,
@@ -108,6 +118,11 @@ const styles = StyleSheet.create({
         borderColor: '#E8A85F',
         padding: 10,
         position: 'relative',
+    },
+    displayOptionPhone:{
+        width: 70,
+        height: 70,
+        padding: 2,
     },
     selectedOption: {
         borderWidth: 2,
@@ -185,6 +200,10 @@ const styles = StyleSheet.create({
         paddingHorizontal: 48,
         paddingVertical: 12,
         borderRadius: 24,
+    },
+    validateText: {
+        color: 'white',
+        fontFamily: 'Jua',
     },
 });
 

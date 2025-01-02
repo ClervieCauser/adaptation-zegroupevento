@@ -123,6 +123,7 @@ const RecipePage = () => {
                 <Text style={styles.timeLabelPhone}>Préparation des ingrédients:</Text>
                 <Text style={styles.timeValuePhone}>{recipe.prepTime}</Text>
               </View>
+              
               <View style={styles.nutritionalInfoContainer}>
                 {recipe.nutrition.map((item, index) => (
                   <NutritionalInfo key={index} quantity={item.quantity} text={item.text}/>
@@ -231,10 +232,9 @@ const RecipePage = () => {
         <Text style={styles.title}>{recipe.name}</Text>
 
         <View style={styles.tagContainer}>
-          <Tags text="Four" />
-          <Tags text="Simple" />
-          <Tags text="Poulet" />
-          <Tags text="Léger" />
+          {tag.map((item, index) => (
+            <Tags key={index} text={item.text} />
+          ))}
         </View>
 
         <View style={styles.imageAndText}>
@@ -259,7 +259,7 @@ const RecipePage = () => {
 
             <View style={styles.nutritionalInfoContainer}>
               {recipe.nutrition.map((item, index) => (
-                <NutritionalInfo key={index} quantity={item.quantity} text={item.text}/>
+                <NutritionalInfo key={index} quantity={item.quantity} text={item.text} styleText={styles.textPhone}/>
               ))}
             </View>
           </View>
@@ -322,10 +322,9 @@ const RecipePage = () => {
       <Text style={styles.title}>{recipe.name}</Text>
 
       <View style={styles.tagContainer}>
-        <Tags text="Four" />
-        <Tags text="Simple" />
-        <Tags text="Poulet" />
-        <Tags text="Léger" />
+        {tag.map((item, index) => (
+          <Tags key={index} text={item.text} />
+        ))}
       </View>
 
       <View style={styles.tabsContainer}>
@@ -447,6 +446,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-evenly',
     marginTop: 24,
+    flexWrap: 'wrap',
   },
   paginationDots: {
     alignSelf: 'center',
