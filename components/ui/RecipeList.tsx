@@ -77,7 +77,9 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, im
       </View>
       <View style={styles.recipeInfo}>
         <Text style={styles.recipeTitle}>{title}</Text>
-        <Text style={styles.recipeText}>{calories}</Text>
+        {isTablet && (
+          <Text style={styles.recipeText}>{calories}</Text>
+        )}
         <View style={styles.recipeDetails}>
           <Text style={styles.recipeText}>{duration}</Text>
           <Text style={styles.recipeText}>{difficulty}</Text>
@@ -210,7 +212,7 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
   },
   ingredientContainer: {
-    backgroundColor: '#F5F5F5',
+    backgroundColor: '#FFEFDF',
     borderRadius: 12,
     padding: 10,
     margin: 5,
