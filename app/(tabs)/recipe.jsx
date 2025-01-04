@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
 import NutritionalInfo from '../../components/ui/NutritionalInfo';
 import Tags from '../../components/ui/Tags';
 import TabButton from '../../components/ui/TabButton';
@@ -10,7 +11,7 @@ import Counter from '../../components/ui/Counter';
 import CustomButton from '../../components/ui/CustomButton';
 import Pagination from '../../components/ui/Pagination';
 import UtensilRow from '../../components/ui/UtensilRow';
-import {recipes} from '../../app/recipe';
+import { recipes } from '../../app/recipe';
 import { Lightbulb, Bell, MessageSquare, ChevronRight } from 'lucide-react';
 
 const RecipePage = () => {
@@ -21,9 +22,17 @@ const RecipePage = () => {
   const totalPages = 2;
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState(new Set());
-  const id = 1;
-  const recipe = recipes.find((recipe) => recipe.id === id);
-  console.log(recipe);
+  
+  const { id } = useLocalSearchParams();
+  const recipeId = parseInt(id, 10) || 0;
+  
+  const recipe = recipes.find((recipe) => recipe.id === recipeId);
+  
+  if(!recipe) {
+    return <Text>Recette introuvable</Text>;
+  }
+
+
   const handlePageChange = (page) => {
     setActivePage(page);
     setActiveTab(page === 0 ? 'ingredients' : 'utensils');
