@@ -70,6 +70,8 @@ const OrderTag = ({ id, onDrop, isCompleted }) => {
 const RecipePrep = () => {
     const { getOrdersToShow, resetSelection } = useOrderSelection();
     const { addOrderToZone, getCompletedOrderIds, resetZonesAndItems } = useOrderProcessing();
+    const { processingOrders } = useOrderProcessing();
+
 
     const [displayMode, setDisplayMode] = useState('4');
     const [showSettings, setShowSettings] = useState(true);
@@ -92,24 +94,37 @@ const RecipePrep = () => {
         transform: [{ scale: withSpring(isFinishing ? 1.2 : 1) }]
     }));
 
-    // Gestion initiale des commandes à l'entrée dans la page
+    const prevOrdersRef = useRef();
+
     useEffect(() => {
         if (!ordersToDisplay?.length) {
             router.replace('/pending-orders');
             return;
         }
 
-        setDisplayMode('4'); // Réinitialisation du mode d'affichage
-        setShowSettings(true);
-        setZoneMeasures({}); // Réinitialisation des zones de drag
-        resetZonesAndItems(); // Réinitialisation des zones et items
-    }, [ordersToDisplay, resetZonesAndItems]);
+        if (prevOrdersRef.current !== ordersToDisplay.join(',')) {
+            setDisplayMode('4');
+            setShowSettings(true);
+            resetZonesAndItems();
+            prevOrdersRef.current = ordersToDisplay.join(',');
+        }
+    }, [ordersToDisplay]);
 
-    // Gestion de la validation des paramètres
+    const measureZone = useCallback((zoneId, layout) => {
+        requestAnimationFrame(() => {
+            setZoneMeasures(prev => ({
+                ...prev,
+                [zoneId]: layout
+            }));
+        });
+    }, []);
+
     const handleValidate = useCallback(() => {
         console.log('Validate clicked, current showSettings:', showSettings);
         setShowSettings(false);
     }, [showSettings]);
+
+
 
     // Gestion du drop d'une commande dans une zone
     const handleDropInZone = useCallback((orderId, droppedPosition) => {
@@ -148,12 +163,7 @@ const RecipePrep = () => {
     }, [resetSelection, resetZonesAndItems]);
 
     // Gestion de la mesure des zones de drag
-    const measureZone = useCallback((zoneId, layout) => {
-        setZoneMeasures(prev => ({
-            ...prev,
-            [zoneId]: layout
-        }));
-    }, []);
+
 
 
     console.log('Rendering RecipePrep, showSettings:', showSettings);

@@ -61,13 +61,17 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
     }, [selectedIds, pendingOrders, markOrdersAsInProgress]);
 
     const handleSingleCook = useCallback((orderId: string) => {
-        const order = pendingOrders.find(o => o.id === orderId) ||
-            processingOrders.find(o => o.orderId === orderId);
-        if (order) {
-            addOrderToProcessing(order);
-            setOrderToCook(orderId); // Assurons-nous que orderToCook est défini
-            setSelectedIds([]);
+        const existingOrder = processingOrders.find(o => o.orderId === orderId);
+        setOrderToCook(orderId);
+        setSelectedIds([]);
+
+        if (!existingOrder) {
+            const order = pendingOrders.find(o => o.id === orderId);
+            if (order) {
+                addOrderToProcessing(order);
+            }
         }
+
         router.push('/recipe-prep');
     }, [pendingOrders, processingOrders]);
 

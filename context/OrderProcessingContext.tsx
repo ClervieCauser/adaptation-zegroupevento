@@ -129,14 +129,15 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
     }, []);
 
     const resetZonesAndItems = useCallback(() => {
-        setProcessingOrders(prev =>
-            prev.map(order => ({
-                ...order,
-                zoneId: null,
-                items: order.items.map(item => ({ ...item, isReady: false })),
-                isCompleted: false
-            }))
-        );
+        setProcessingOrders(prev => prev.map(order => ({
+            ...order,
+            zoneId: null, // Réinitialise explicitement la zone
+            items: order.items.map(item => ({
+                ...item,
+                isReady: false
+            })),
+            isCompleted: false
+        })));
     }, []);
 
     return (
