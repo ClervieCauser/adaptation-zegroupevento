@@ -1,6 +1,6 @@
-import { StyleSheet, View, Text, FlatList, Image, Pressable, Dimensions, TouchableOpacity } from 'react-native'
+import { StyleSheet, View, Text, FlatList, Image, Pressable, Dimensions, TouchableOpacity } from 'react-native';
 import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
-import React from 'react'
+import React from 'react';
 import { router } from 'expo-router';
 
 const { width, height } = Dimensions.get('window');
@@ -17,6 +17,7 @@ export interface Recipe {
 }
 
 interface RecipeCardProps {
+  id: string;
   title: string;
   duration: string;
   difficulty: string;
@@ -25,51 +26,13 @@ interface RecipeCardProps {
   calories: string;
 }
 
-export const SAMPLE_RECIPES: Recipe[] = [
-  {
-    id: '1',
-    title: 'Spaghetti Carbonara',
-    duration: '30 min',
-    difficulty: 'Facile',
-    imageUrl: require('../../assets/images/citron.jpg'),
-    ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
-    calories: '500 kcal',
-  },
-  {
-    id: '2',
-    title: 'Poulet Rôti',
-    duration: '1h30',
-    difficulty: 'Moyen',
-    imageUrl: require('../../assets/images/citron.jpg'),
-    ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
-    calories: '800 kcal',
-  },
-  {
-    id: '3',
-    title: 'Poulet Citron',
-    duration: '1h30',
-    difficulty: 'Moyen',
-    imageUrl: require('../../assets/images/citron.jpg'),
-    ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
-    calories: '700 kcal',
-  },
-  {
-    id: '4',
-    title: 'Spaghetti Carbonara',
-    duration: '30 min',
-    difficulty: 'Facile',
-    imageUrl: require('../../assets/images/citron.jpg'),
-    ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
-    calories: '500 kcal',
-  },
-];
-
-const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, imageUrl, ingredients, calories}) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ id, title, duration, difficulty, imageUrl, ingredients, calories}) => {
   const imageSource = typeof imageUrl === 'string' ? { uri: imageUrl } : imageUrl;
+  
   return (
     <Pressable style={styles.recipeCard}>
       <View style={styles.imageContainer}>
-        <Image 
+        <Image
           source={imageSource}
           style={styles.recipeImage}
           resizeMode="cover"
@@ -86,7 +49,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, im
         </View>
         {isTablet && (
           <View>
-            <Text style={styles.recipeTitle}>Ingrédients (4 personnes) :</Text>
+            <Text style={styles.recipeTitle}>Ingredients (4 personnes) :</Text>
             <View style={styles.ingredients}>
               {ingredients && ingredients.map((ingredient, index) => (
                 <View key={index} style={styles.ingredientContainer}>
@@ -97,7 +60,13 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, im
           </View>
         )}
       </View>
-      <TouchableOpacity style={styles.button} onPress={() => router.push('/recipe')}>
+      <TouchableOpacity 
+        style={styles.button} 
+        onPress={() => router.push({
+          pathname: '/recipe',
+          params: { id }
+        })}
+      >
         <Text style={styles.buttonText}>Voir la recette</Text>
       </TouchableOpacity>
     </Pressable>
@@ -110,9 +79,10 @@ interface RecipeListProps {
 
 export const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
   const numColumns = isTablet ? 3 : 1;
-
+  
   const renderRecipe = ({ item }: { item: Recipe }) => (
     <RecipeCard
+      id={item.id}
       title={item.title}
       duration={item.duration}
       difficulty={item.difficulty}
@@ -130,7 +100,7 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
       style={styles.recipeList}
       contentContainerStyle={styles.recipeListContent}
       showsVerticalScrollIndicator={false}
-      horizontal={isTablet? false: true}
+      horizontal={isTablet ? false : true}
       numColumns={numColumns}
     />
   );

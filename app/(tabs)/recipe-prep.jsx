@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useCallback, useMemo} from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
@@ -17,6 +17,7 @@ import {
 } from "react-native-reanimated";
 import Animated from 'react-native-reanimated';
 import { useOrderProcessing } from '@/context/OrderProcessingContext';
+import {router} from "expo-router";
 const OrderTag = ({ id, onDrop, isCompleted }) => {
     const translateX = useSharedValue(0);
     const translateY = useSharedValue(0);
@@ -68,50 +69,70 @@ const OrderTag = ({ id, onDrop, isCompleted }) => {
 
 const RecipePrep = () => {
     const { getOrdersToShow, resetSelection } = useOrderSelection();
+    const { addOrderToZone, getCompletedOrderIds, resetZonesAndItems } = useOrderProcessing();
+    const { processingOrders } = useOrderProcessing();
+
+
+    const [displayMode, setDisplayMode] = useState('4');
+    const [showSettings, setShowSettings] = useState(true);
+    const [zoneMeasures, setZoneMeasures] = useState({});
+    const [isFinishing, setIsFinishing] = useState(false);
+    const [hasRedirected, setHasRedirected] = useState(false); // Nouveau drapeau
+
+    // Mémoriser les commandes à afficher et les commandes terminées
     const ordersToDisplay = getOrdersToShow();
-    const { addOrderToZone, getCompletedOrderIds, resetOrderProcessing } = useOrderProcessing();
+    const completedOrderIds = useMemo(() => getCompletedOrderIds(), [getCompletedOrderIds]);
 
-    // Store these in ref to avoid re-renders
-    const initialState = useRef({
-        displayMode: '4',
-        showSettings: true,
-        zoneMeasures: {}
-    });
+    // Vérifie si toutes les commandes sont terminées
+    const allOrdersCompleted = useMemo(() => {
+        return ordersToDisplay.length > 0 && ordersToDisplay.every(id => completedOrderIds.includes(id));
+    }, [ordersToDisplay, completedOrderIds]);
 
-    const [displayMode, setDisplayMode] = useState(initialState.current.displayMode);
-    const [showSettings, setShowSettings] = useState(initialState.current.showSettings);
-    const [zoneMeasures, setZoneMeasures] = useState(initialState.current.zoneMeasures);
-    const completedOrderIds = getCompletedOrderIds();
+    // Animation d'opacité et de transformation
+    const fadeAnim = useAnimatedStyle(() => ({
+        opacity: withTiming(isFinishing ? 0 : 1, { duration: 1000 }),
+        transform: [{ scale: withSpring(isFinishing ? 1.2 : 1) }]
+    }));
 
-    // Single useEffect for mounting/unmounting
+    const prevOrdersRef = useRef();
+
     useEffect(() => {
-        const reset = () => {
-            resetOrderProcessing();
-            setShowSettings(true);
+        if (!ordersToDisplay?.length) {
+            router.replace('/pending-orders');
+            return;
+        }
+
+        if (prevOrdersRef.current !== ordersToDisplay.join(',')) {
             setDisplayMode('4');
-            setZoneMeasures({});
-        };
-        reset();
-        return reset;
-    }, [ordersToDisplay.join(',')]);
+            setShowSettings(true);
+            resetZonesAndItems();
+            prevOrdersRef.current = ordersToDisplay.join(',');
+        }
+    }, [ordersToDisplay]);
 
-    const measureZone = (zoneId: string, layout: { x: number; y: number; width: number; height: number }) => {
-        setZoneMeasures(prev => ({
-            ...prev,
-            [zoneId]: layout
-        }));
-    };
+    const measureZone = useCallback((zoneId, layout) => {
+        requestAnimationFrame(() => {
+            setZoneMeasures(prev => ({
+                ...prev,
+                [zoneId]: layout
+            }));
+        });
+    }, []);
 
-    const handleDropInZone = (orderId: string, droppedPosition: { x: number; y: number }) => {
+    const handleValidate = useCallback(() => {
+        console.log('Validate clicked, current showSettings:', showSettings);
+        setShowSettings(false);
+    }, [showSettings]);
+
+
+
+    // Gestion du drop d'une commande dans une zone
+    const handleDropInZone = useCallback((orderId, droppedPosition) => {
         if (completedOrderIds.includes(orderId)) {
             Alert.alert(
                 "Order Already Completed",
                 "This order is ready to be served and cannot be modified!",
-                [{ text: "OK" }],
-                {
-                    cancelable: false,
-                    userInterfacePriority: 'high'
-                }
+                [{ text: "OK" }]
             );
             return;
         }
@@ -128,69 +149,85 @@ const RecipePrep = () => {
                 return;
             }
         }
-    };
+    }, [zoneMeasures, completedOrderIds, addOrderToZone]);
 
-    const handleValidate = () => {
-        console.log('Validate clicked, current showSettings:', showSettings);
-        setShowSettings(false);
-        console.log('ShowSettings set to false');
-    };
+    // Gestion de la fin des commandes
+    const handleFinishOrders = useCallback(() => {
+        setIsFinishing(true);
+        setTimeout(() => {
+            resetSelection();
+            resetZonesAndItems();
+            setIsFinishing(false);
+            router.push('/pending-orders');
+        }, 1500);
+    }, [resetSelection, resetZonesAndItems]);
 
-    useEffect(() => {
-        return () => {
-            setShowSettings(true);
-            setDisplayMode('4');
-        };
-    }, []);
+    // Gestion de la mesure des zones de drag
+
+
 
     console.log('Rendering RecipePrep, showSettings:', showSettings);
 
     return (
         <ThemedView style={styles.container}>
-            <CustomHeader />
-            <View style={styles.content}>
-                <View style={styles.ordersList}>
-                    <ThemedText style={styles.ordersTitle}>ORDERS:</ThemedText>
-                    {ordersToDisplay.map(id => (
-                        <OrderTag
-                            key={id}
-                            id={id}
-                            isCompleted={completedOrderIds.includes(id)}
-                            onDrop={(id, position) => handleDropInZone(id, position)}
-                        />
-                    ))}
-                </View>
+            <Animated.View style={[styles.content, fadeAnim]}>
+                <CustomHeader />
+                <View style={styles.content}>
+                    <View style={styles.ordersList}>
+                        <ThemedText style={styles.ordersTitle}>ORDERS:</ThemedText>
+                        {ordersToDisplay.map(id => {
+                            const order = processingOrders.find(o => o.orderId === id);
+                            return (
+                                <OrderTag
+                                    key={id}
+                                    id={id}
+                                    isCompleted={completedOrderIds.includes(id)}
+                                    onDrop={(id, position) => handleDropInZone(id, position)}
+                                />
+                            );
+                        })}
+                    </View>
 
-                <View style={[
-                    styles.mainArea,
-                    showSettings ? styles.mainAreaWithSettings  : styles.mainAreaWithDrag
-                ]} data-testid="main-area">
-                    {showSettings ? (
-                        <DisplaySettings
-                            selectedMode={displayMode}
-                            onModeChange={setDisplayMode}
-                            onValidate={handleValidate}
-                        />
-                    ) : (
-                        <DragAreaLayout mode={displayMode} onMeasure={measureZone} />
-                    )}
-                </View>
+                    <View style={[
+                        styles.mainArea,
+                        showSettings ? styles.mainAreaWithSettings  : styles.mainAreaWithDrag
+                    ]} data-testid="main-area">
+                        {showSettings ? (
+                            <DisplaySettings
+                                selectedMode={displayMode}
+                                onModeChange={setDisplayMode}
+                                onValidate={handleValidate}
+                            />
+                        ) : (
+                            <DragAreaLayout mode={displayMode} onMeasure={measureZone} />
+                        )}
+                    </View>
 
-                <View style={styles.footer}>
-                    <TouchableOpacity
-                        onPress={resetSelection}
-                        style={styles.footerButton}
-                    >
-                        <ThemedText style={styles.buttonText}>Back</ThemedText>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                        style={styles.footerButton}
-                        onPress={() => setShowSettings(true)}
-                    >
-                        <ThemedText style={styles.buttonText}>Settings</ThemedText>
-                    </TouchableOpacity>
+                    <View style={styles.footer}>
+                        <TouchableOpacity
+                            onPress={resetSelection}
+                            style={styles.footerButton}
+                        >
+                            <ThemedText style={styles.buttonText}>Back</ThemedText>
+                        </TouchableOpacity>
+                        {allOrdersCompleted ? (
+                            <TouchableOpacity
+                                style={[styles.footerButton, styles.finishButton]}
+                                onPress={handleFinishOrders}
+                            >
+                                <ThemedText style={styles.buttonText}>Finish Orders</ThemedText>
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity
+                                style={styles.footerButton}
+                                onPress={() => setShowSettings(true)}
+                            >
+                                <ThemedText style={styles.buttonText}>Settings</ThemedText>
+                            </TouchableOpacity>
+                        )}
+                    </View>
                 </View>
-            </View>
+            </Animated.View>
         </ThemedView>
     );
 };
@@ -231,7 +268,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        marginTop: 24,
+        marginTop: 16,
     },
     ordersTitle: {
         fontSize: 18,
@@ -272,7 +309,9 @@ const styles = StyleSheet.create({
         fontSize: 14,
     },
 
-
+    finishButton: {
+        backgroundColor: '#4CAF50',
+    },
 
     dragZone: {
         flex: 1,

@@ -6,6 +6,7 @@ import { icons } from '../../constants/icons';
 import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
 import TabletNavigation from "../../components/ui/TabletNavigation";
 import PendingOrders from './pending-orders';
+import Home from './home';
 import { OrderSelectionProvider } from '@/context/OrderContext';
 import { OrderProcessingProvider } from '@/context/OrderProcessingContext';
 import { DraxProvider } from 'react-native-drax';
@@ -46,8 +47,8 @@ const TabLayout = () => {
     if (isTablet) {
         return (
 
-            <OrderSelectionProvider>
-                <OrderProcessingProvider>
+            <OrderProcessingProvider>
+                <OrderSelectionProvider>
                         <GestureHandlerRootView style={{ flex: 1 }}>
                             <DraxProvider>
                                 <ThemedView style={styles.container}>
@@ -59,15 +60,11 @@ const TabLayout = () => {
                                         }}>
                                             <Tabs.Screen
                                                 name="index"
-                                                options={{ href: null }}
+                                                options={{ href: Home }}
                                             />
                                             <Tabs.Screen
                                                 name="pending-orders"
                                                 options={{ href: PendingOrders }}
-                                            />
-                                            <Tabs.Screen
-                                                name="create"
-                                                options={{ href: null }}
                                             />
                                             <Tabs.Screen
                                                 name="settings"
@@ -78,8 +75,8 @@ const TabLayout = () => {
                                 </ThemedView>
                             </DraxProvider>
                         </GestureHandlerRootView>
-                </OrderProcessingProvider>
-            </OrderSelectionProvider>
+                </OrderSelectionProvider>
+            </OrderProcessingProvider>
         );
     }
 
@@ -110,10 +107,10 @@ const TabLayout = () => {
                             <Tabs.Screen
                                 name="pending-orders"
                                 options={{
-                                    title: 'Pending Orders',
+                                    title: 'Commandes en attente',
                                     headerShown: false,
                                     tabBarIcon: ({ color, focused }) => (
-                                        <TabIcon icon={icons.bookmark} color={color} name="Pending Orders" focused={focused} />
+                                        <TabIcon icon={icons.bookmark} color={color} name="Commandes en attente" focused={focused} />
                                     ),
                                 }}
                             />

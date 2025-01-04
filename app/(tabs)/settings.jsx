@@ -10,6 +10,11 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import {changeUserLevel, changeUserMic} from '../../types/user';
+import CustomHeader from '../../components/ui/CustomHeader';
+import { Feather } from '@expo/vector-icons';
+import { MOCK_USER } from '../../types/user';
+import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
+
 
 const Badge = ({ type }) => {
   const isNovice = type === 'novice';
@@ -45,6 +50,8 @@ const Settings = () => {
   const [textToSpeech, setTextToSpeech] = React.useState(true);
   const [cookLevel, setCookLevel] = React.useState('novice');
   const [notifications, setNotifications] = React.useState(true);
+  const { isTablet } = useResponsiveLayout();
+  
 
   const renderBadge = (level) => (
     <View style={styles.badgeContainer}>
@@ -58,41 +65,14 @@ const Settings = () => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>Settings</Text>
-        <View style={styles.headerIcons}>
-          <View style={styles.speechIcon}>
-            <Ionicons name="mic-outline" size={24} color="#666" />
-            <View style={styles.soundWave}>
-              <View style={[styles.wave, textToSpeech && styles.waveAnimated]} />
-              <View style={[styles.wave, textToSpeech && styles.waveAnimated]} />
-              <View style={[styles.wave, textToSpeech && styles.waveAnimated]} />
-            </View>
-          </View>
-          <TouchableOpacity 
-            style={styles.bellContainer}
-            onPress={() => setNotifications(!notifications)}
-          >
-            <Ionicons 
-              name={notifications ? "notifications" : "notifications-off"} 
-              size={24} 
-              color="#666" 
-            />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.menuButton}>
-            <View style={styles.menuIcon} />
-            <View style={styles.menuIcon} />
-            <View style={styles.menuIcon} />
-          </TouchableOpacity>
-        </View>
-      </View>
+      <CustomHeader title="Paramètres" /> 
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search by settings name"
+          placeholder="Rechercher par nom de paramètre"
           placeholderTextColor="#999"
           value={searchText}
           onChangeText={setSearchText}
@@ -109,19 +89,18 @@ const Settings = () => {
 
       {/* Settings Section */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Assistance preferences</Text>
+        <Text style={styles.sectionTitle}>Préférences d'assistance</Text>
 
         {/* Text to Speech Setting */}
         <View style={styles.settingCard}>
           <View style={styles.settingHeader}>
-            <View style={styles.iconWithWaves}>
-              <Ionicons name="mic-outline" size={24} color="#666" />
-              <View style={styles.miniSoundWave}>
-                <View style={[styles.miniWave, textToSpeech && styles.waveAnimated]} />
-                <View style={[styles.miniWave, textToSpeech && styles.waveAnimated]} />
-                <View style={[styles.miniWave, textToSpeech && styles.waveAnimated]} />
-              </View>
-            </View>
+            <TouchableOpacity>
+              <Feather
+                name={MOCK_USER.micEnabled ? 'mic' : 'mic-off'}
+                size={24}
+                color="#666"
+              />                        
+            </TouchableOpacity>
             <Text style={styles.settingTitle}>Text to speech</Text>
           </View>
           <Switch
@@ -137,12 +116,12 @@ const Settings = () => {
         </View>
 
         {/* Cook Level Setting */}
-        <View style={styles.settingCard}>
+        <View style={[styles.settingCard, !isTablet && styles.settingCardPhone]}>
           <View style={styles.settingHeader}>
             <View style={styles.trophyContainer}>
               <Ionicons name="trophy" size={24} color="#f90" />
             </View>
-            <Text style={styles.settingTitle}>Cook level ?</Text>
+            <Text style={styles.settingTitle}>Niveau de cuisinier ?</Text>
           </View>
           <View style={styles.levelContainer}>
             <TouchableOpacity
@@ -167,22 +146,7 @@ const Settings = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 16,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: 'bold',
-  },
-  headerIcons: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 16,
+    backgroundColor: '#F9F7FA',
   },
   searchContainer: {
     flexDirection: 'row',
@@ -204,6 +168,7 @@ const styles = StyleSheet.create({
     paddingRight: 36,
     borderRadius: 8,
     fontSize: 16,
+    fontFamily: 'Jua'
   },
   clearButton: {
     position: 'absolute',
@@ -216,6 +181,7 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: '600',
     marginBottom: 16,
+    fontFamily: 'Jua'
   },
   settingCard: {
     backgroundColor: '#fff',
@@ -239,10 +205,15 @@ const styles = StyleSheet.create({
   settingTitle: {
     fontSize: 16,
     fontWeight: '500',
+    fontFamily: 'Jua'
   },
   levelContainer: {
     flexDirection: 'row',
     gap: 12,
+  },
+  settingCardPhone: {
+    flexDirection: 'column',
+    gap: 8,
   },
   levelButton: {
     padding: 8,
@@ -258,33 +229,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-  },
-  soundWave: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 2,
-    height: 16,
-  },
-  wave: {
-    width: 2,
-    height: '60%',
-    backgroundColor: '#666',
-    borderRadius: 1,
-  },
-  waveAnimated: {
-    height: '100%',
-  },
-  miniSoundWave: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 1,
-    height: 12,
-  },
-  miniWave: {
-    width: 1,
-    height: '60%',
-    backgroundColor: '#666',
-    borderRadius: 0.5,
   },
   // Menu button styles
   menuButton: {
@@ -388,6 +332,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '500',
     color: '#666',
+    fontFamily: 'Jua'
   },
   levelTextActive: {
     color: '#f90',

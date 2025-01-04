@@ -12,12 +12,11 @@ const TabletNavigation = () => {
 
     const navigationItems = [
         // Notez que nous utilisons "(tabs)" dans les routes pour correspondre à la structure
-        { label: 'Home', route: '/(tabs)/home' },
-        { label: 'Pending orders', route: '/(tabs)/pending-orders' },
-        { label: 'Orders in progress', route: '/(tabs)/orders-progress' },
-        { label: 'Recipe', route: '/(tabs)/recipe' },
-        { label: 'Add recipe', route: '/(tabs)/create' },
-        { label: 'Settings', route: '/(tabs)/settings' },
+        { label: 'Accueil', route: '/(tabs)/home' },
+        { label: 'Commandes en attente', route: '/(tabs)/pending-orders' },
+        { label: 'Commandes en cours', route: '/(tabs)/orders-progress' },
+        { label: 'Recettes', route: '/(tabs)/recipe' },
+        { label: 'Paramètres', route: '/(tabs)/settings' },
     ];
 
     const handleNavigation = (route: string) => {
@@ -44,10 +43,10 @@ const TabletNavigation = () => {
 
             <View style={styles.bottomSection}>
                 <ThemedText style={styles.shareText}>
-                    Share your recipes with your friends here !
+                    Partagez vos recettes avec vos amis ici !
                 </ThemedText>
                 <TouchableOpacity style={styles.shareButton}>
-                    <ThemedText style={styles.shareButtonText}>Share</ThemedText>
+                    <ThemedText style={styles.shareButtonText}>Partager</ThemedText>
                 </TouchableOpacity>
             </View>
         </ThemedView>

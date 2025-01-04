@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import { router } from 'expo-router';
 import { MOCK_USER } from '@/types/user';
 import { MOCK_ORDERS, Order } from '@/types/order';
+import {useOrderProcessing} from "@/context/OrderProcessingContext";
 
 type OrderSelectionContextType = {
     selectedIds: string[];
@@ -25,6 +26,7 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
     const [orderToCook, setOrderToCook] = useState<string | null>(null);
     const [isSelectMode, setIsSelectMode] = useState(false);
     const [pendingOrders, setPendingOrders] = useState<Order[]>(MOCK_ORDERS);
+    const { addOrderToProcessing, processingOrders } = useOrderProcessing();
 
     const markOrdersAsInProgress = useCallback((orderIds: string[]) => {
         setPendingOrders(prev => prev.filter(order => !orderIds.includes(order.id)));
@@ -48,16 +50,25 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
 
     const handleCookSelected = useCallback(() => {
         if (selectedIds.length > 0) {
-            markOrdersAsInProgress(selectedIds);
-            router.push(MOCK_USER.level === 'EXPERT' ? '/recipe-prep' : '/recipe');
+            const groupId = Date.now().toString();
+            selectedIds.forEach(id => {
+                const order = pendingOrders.find(o => o.id === id);
+                if (order) addOrderToProcessing(order, groupId);
+            });
+            router.push('/recipe-prep');
         }
-    }, [selectedIds, markOrdersAsInProgress]);
+    }, [selectedIds, pendingOrders]);
 
-    const handleSingleCook = useCallback((orderId: string) => {
-        setOrderToCook(orderId);
-        markOrdersAsInProgress([orderId]);
-        router.push(MOCK_USER.level === 'EXPERT' ? '/recipe-prep' : '/recipe');
-    }, [markOrdersAsInProgress]);
+    const handleSingleCook = useCallback((orderId: string, groupId?: string) => {
+        const order = processingOrders.find(o => o.groupId === groupId);
+        if (order) {
+            setSelectedIds(processingOrders
+                .filter(o => o.groupId === groupId)
+                .map(o => o.orderId)
+            );
+        }
+        router.push('/recipe-prep');
+    }, [processingOrders]);
 
     const getOrdersToShow = useCallback(() => {
         return orderToCook ? [orderToCook] : selectedIds;
@@ -67,11 +78,16 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
         setIsSelectMode(false);
         setSelectedIds([]);
         setOrderToCook(null);
-        router.push('/pending-orders');
     }, []);
 
     const resetOrders = useCallback(() => {
         setPendingOrders(MOCK_ORDERS);
+    }, []);
+
+    const cleanupOrderState = useCallback(() => {
+        setOrderToCook(null);
+        setSelectedIds([]);
+        setIsSelectMode(false);
     }, []);
 
 
@@ -100,7 +116,8 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
             getOrdersToShow,
             resetSelection,
             markOrdersAsInProgress,
-            resetOrders
+            resetOrders,
+            cleanupOrderState
         }}>
             {children}
         </OrderSelectionContext.Provider>

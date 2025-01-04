@@ -1,4 +1,3 @@
-// app/(tabs)/orders.tsx
 import React, { useState } from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
@@ -22,12 +21,12 @@ const FilterButton = ({ label, active, onPress }) => (
     </TouchableOpacity>
 );
 
-
-
 const PendingOrders = () => {
     const [searchText, setSearchText] = useState('');
     const [activeFilter, setActiveFilter] = useState('Meal');
     const [expandedCardId, setExpandedCardId] = useState(null);
+    const [currentPage, setCurrentPage] = useState(1);
+
     const {
         isSelectMode,
         selectedIds,
@@ -40,17 +39,40 @@ const PendingOrders = () => {
 
     const { pendingOrders } = useOrderSelection();
 
+    const isNoviceUser = MOCK_USER.level === 'NOVICE';
+    const ORDERS_PER_PAGE = isNoviceUser ? 4 : 2;
+
     const filterOrdersByUserLevel = (orders) => {
-        if (MOCK_USER.level === 'NOVICE') {
-            return orders.filter((order) => {
-                const uniqueMealNames = new Set(order.items.map(item => item.name));
-                return uniqueMealNames.size <= 3; 
-            });
+        if (isNoviceUser) {
+            return orders.filter((order) => order.items.length <= 4);
         }
         return orders;
     };
 
     const filteredOrders = filterOrdersByUserLevel(pendingOrders);
+
+    const totalPages = Math.ceil(filteredOrders.length / ORDERS_PER_PAGE);
+
+    const handleNextPage = () => {
+        if (currentPage < totalPages) {
+            setCurrentPage(currentPage + 1);
+        }
+    };
+
+    const handlePreviousPage = () => {
+        if (currentPage > 1) {
+            setCurrentPage(currentPage - 1);
+        }
+    };
+
+    const handlePageChange = (page) => {
+        setCurrentPage(page);
+    };
+
+    const paginatedOrders = filteredOrders.slice(
+        (currentPage - 1) * ORDERS_PER_PAGE,
+        currentPage * ORDERS_PER_PAGE
+    );
 
     const handleCookPress = (orderId) => {
         const targetRoute = MOCK_USER.level === 'EXPERT' ? '/recipe-prep' : '/recipe';
@@ -63,7 +85,7 @@ const PendingOrders = () => {
             <View style={styles.topSection}>
                 <CustomHeader />
                 <View style={styles.searchContainer}>
-                    <SearchBar value={searchText} onChangeText={setSearchText} />
+                    <SearchBar value={searchText} onChangeText={setSearchText} placeholder="Rechercher par commande" />
                 </View>
             </View>
             <ScrollView style={styles.mainContent}>
@@ -76,35 +98,37 @@ const PendingOrders = () => {
                         style={styles.resetButton}
                         onPress={resetOrders}
                     >
-                        <ThemedText style={styles.resetButtonText}>Reset Orders</ThemedText>
+                        <ThemedText style={styles.resetButtonText}>   Rafraichir</ThemedText>
                     </TouchableOpacity>
 
                     <View style={styles.titleContainer}>
-                        <ThemedText style={styles.title}>Pending orders</ThemedText>
-                        {!isSelectMode ? (
+                        <ThemedText style={styles.title}>Commandes en attente</ThemedText>
+                        {!isSelectMode && !isNoviceUser ? (
                             <TouchableOpacity
                                 style={styles.selectButton}
                                 onPress={toggleSelectMode}
                             >
-                                <ThemedText style={styles.selectButtonText}>Select</ThemedText>
+                                <ThemedText style={styles.selectButtonText}>Selectionner</ThemedText>
                             </TouchableOpacity>
                         ) : (
-                            <View style={styles.actionButtons}>
-                                <TouchableOpacity
-                                    style={styles.cookButton}
-                                    onPress={() => handleCookSelected()}
-                                >
-                                    <ThemedText style={styles.cookButtonText}>
-                                        Cook({selectedIds.length})
-                                    </ThemedText>
-                                </TouchableOpacity>
-                                <TouchableOpacity
-                                    style={styles.cancelButton}
-                                    onPress={toggleSelectMode}
-                                >
-                                    <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
-                                </TouchableOpacity>
-                            </View>
+                            isSelectMode && (
+                                <View style={styles.actionButtons}>
+                                    <TouchableOpacity
+                                        style={styles.cookButton}
+                                        onPress={() => handleCookSelected()}
+                                    >
+                                        <ThemedText style={styles.cookButtonText}>
+                                            Cook({selectedIds.length})
+                                        </ThemedText>
+                                    </TouchableOpacity>
+                                    <TouchableOpacity
+                                        style={styles.cancelButton}
+                                        onPress={toggleSelectMode}
+                                    >
+                                        <ThemedText style={styles.cancelButtonText}>Annuler</ThemedText>
+                                    </TouchableOpacity>
+                                </View>
+                            )
                         )}
                     </View>
                 </View>
@@ -112,7 +136,7 @@ const PendingOrders = () => {
                 {/* Zone scrollable pour les cartes */}
                 <View style={styles.scrollableContent}>
                     <View style={styles.ordersGrid}>
-                        {filteredOrders.map((order) => (
+                        {paginatedOrders.map((order) => (
                             <OrderCard
                                 key={order.id}
                                 order={order}
@@ -133,26 +157,40 @@ const PendingOrders = () => {
             {/* Pagination en bas fixe */}
             <View style={styles.paginationContainer}>
                 <View style={styles.pagination}>
-                    {[1, 2, '...', 4, 5].map((page, index) => (
+                    {currentPage > 1 && (
+                        <TouchableOpacity style={styles.prevButton} onPress={handlePreviousPage}>
+                            <ThemedText style={styles.prevButtonText}>Precedent</ThemedText>
+                        </TouchableOpacity>
+                    )}
+                    {[...Array(totalPages)].map((_, index) => (
                         <TouchableOpacity
                             key={index}
                             style={[
                                 styles.pageButton,
-                                typeof page === 'number' && page === 1 && styles.pageButtonActive,
+                                currentPage === index + 1 && styles.pageButtonActive,
                             ]}
+                            onPress={() => handlePageChange(index + 1)}
                         >
-                            <ThemedText style={styles.pageButtonText}>{page}</ThemedText>
+                            <ThemedText
+                                style={[
+                                    styles.pageButtonText,
+                                    currentPage === index + 1 && styles.pageButtonTextActive,
+                                ]}
+                            >
+                                {index + 1}
+                            </ThemedText>
                         </TouchableOpacity>
                     ))}
-                    <TouchableOpacity style={styles.nextButton}>
-                        <ThemedText style={styles.nextButtonText}>Next</ThemedText>
-                    </TouchableOpacity>
+                    {currentPage < totalPages && (
+                        <TouchableOpacity style={styles.nextButton} onPress={handleNextPage}>
+                            <ThemedText style={styles.nextButtonText}>Suivant</ThemedText>
+                        </TouchableOpacity>
+                    )}
                 </View>
             </View>
         </ThemedView>
     );
 };
-
 
 const styles = StyleSheet.create({
     container: {
@@ -163,11 +201,12 @@ const styles = StyleSheet.create({
     header: {
         paddingHorizontal: 32,
         paddingTop: 32,
-        paddingBottom: 16,
         backgroundColor: '#F9F7FA',
     },
     headerSection: {
-        padding: 24,
+        paddingLeft: 24,
+        paddingRight: 24,
+        paddingTop: 6,
         backgroundColor: '#F9F7FA',
         zIndex: 1,
     },
@@ -200,6 +239,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        paddingBottom:16,
     },
     title: {
         fontSize: 24,
@@ -264,6 +304,17 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontFamily: 'Jua',
     },
+    prevButton: {
+        backgroundColor: '#E8A85F',
+        paddingVertical: 8,
+        paddingHorizontal: 24,
+        borderRadius: 20,
+        marginRight: 8,
+    },
+    prevButtonText: {
+        color: '#FFFFFF',
+        fontFamily: 'Jua',
+    },
     scrollableContent: {
         flex: 1,
         paddingHorizontal: 24,
@@ -272,18 +323,16 @@ const styles = StyleSheet.create({
         scrollbarWidth: 'thin',
         scrollbarColor: '#E8A85F #F9F7FA',
     },
-
     ordersGrid: {
         display: 'flex',
         flexDirection: 'row',
         flexWrap: 'wrap',
         gap: 16,
         paddingBottom: 80,
-        alignItems: 'flex-start', // Important pour que les cartes s'alignent correctement
     },
     paginationContainer: {
         position: 'sticky',
-        bottom: 0,
+        bottom: 10,
         backgroundColor: '#F9F7FA',
         borderTop: '1px solid #EAEAEA',
     },
@@ -313,16 +362,15 @@ const styles = StyleSheet.create({
     },
     resetButton: {
         backgroundColor: '#E8A85F',
-        padding: 8,
+        padding: 4,
         borderRadius: 8,
-        marginLeft: 24,
+        marginBottom: 5,
+        width: 100,
     },
     resetButtonText: {
         color: '#FFFFFF',
         fontFamily: 'Jua',
     },
-
-
 });
 
 export default PendingOrders;
