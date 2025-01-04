@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useCallback} from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -73,10 +73,10 @@ const OrderCard = ({
         return rows;
     };
 
-    const handleContinue = () => {
+    const handleContinue = useCallback(() => {
+        // Protection contre les redirections multiples
         handleSingleCook(order.id);
-        router.push('/recipe-prep');
-    };
+    }, [order.id, handleSingleCook]);
 
     return (
         <ThemedView style={[

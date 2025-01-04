@@ -1,5 +1,5 @@
 // app/(tabs)/orders-progress.tsx
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
@@ -7,12 +7,19 @@ import SearchBar from '@/components/ui/SearchBar';
 import OrderCard from '@/components/ui/OrderCard';
 import CustomHeader from "@/components/ui/CustomHeader";
 import { useOrderProcessing } from "@/context/OrderProcessingContext";
+import {useOrderSelection} from "../../context/OrderContext";
 
 const OrdersInProgress = () => {
     const [searchText, setSearchText] = useState('');
     const [expandedCardId, setExpandedCardId] = useState(null);
     const { processingOrders } = useOrderProcessing();
+    const { cleanupOrderState } = useOrderSelection();
 
+    useEffect(() => {
+        // Cleanup une seule fois
+        console.log("CleanupOrderState appelé depuis OrdersInProgress");
+        cleanupOrderState();
+    }, [cleanupOrderState]);
     return (
         <ThemedView style={styles.container}>
             <View style={styles.topSection}>
@@ -37,7 +44,7 @@ const OrdersInProgress = () => {
 
                             return (
                                 <OrderCard
-                                    key={processingOrder.orderId}
+                                    key={`order-${processingOrder.orderId}`}
                                     order={{
                                         id: processingOrder.orderId,
                                         items: processingOrder.items,
@@ -61,6 +68,7 @@ const OrdersInProgress = () => {
         </ThemedView>
     );
 };
+
 
 const styles = StyleSheet.create({
     container: {

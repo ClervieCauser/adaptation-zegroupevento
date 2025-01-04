@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef, useCallback} from 'react';
+import React, {useState, useEffect, useRef, useCallback, useMemo} from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
@@ -68,71 +68,56 @@ const OrderTag = ({ id, onDrop, isCompleted }) => {
 };
 
 const RecipePrep = () => {
-    const { getOrdersToShow, resetSelection,markOrdersAsInProgress  } = useOrderSelection();
-    const ordersToDisplay = getOrdersToShow();
-    const { addOrderToZone, getCompletedOrderIds,
-        resetOrderProcessing,setProcessingOrders,resetZonesAndItems  } = useOrderProcessing();
+    const { getOrdersToShow, resetSelection } = useOrderSelection();
+    const { addOrderToZone, getCompletedOrderIds, resetZonesAndItems } = useOrderProcessing();
 
-    // Store these in ref to avoid re-renders
-    const initialState = useRef({
-        displayMode: '4',
-        showSettings: true,
-        zoneMeasures: {}
-    });
-
-    const [displayMode, setDisplayMode] = useState(initialState.current.displayMode);
-    const [showSettings, setShowSettings] = useState(initialState.current.showSettings);
-    const [zoneMeasures, setZoneMeasures] = useState(initialState.current.zoneMeasures);
-    const completedOrderIds = getCompletedOrderIds();
+    const [displayMode, setDisplayMode] = useState('4');
+    const [showSettings, setShowSettings] = useState(true);
+    const [zoneMeasures, setZoneMeasures] = useState({});
     const [isFinishing, setIsFinishing] = useState(false);
+    const [hasRedirected, setHasRedirected] = useState(false); // Nouveau drapeau
 
-    // Single useEffect for mounting/unmounting
+    // Mémoriser les commandes à afficher et les commandes terminées
+    const ordersToDisplay = getOrdersToShow();
+    const completedOrderIds = useMemo(() => getCompletedOrderIds(), [getCompletedOrderIds]);
+
+    // Vérifie si toutes les commandes sont terminées
+    const allOrdersCompleted = useMemo(() => {
+        return ordersToDisplay.length > 0 && ordersToDisplay.every(id => completedOrderIds.includes(id));
+    }, [ordersToDisplay, completedOrderIds]);
+
+    // Animation d'opacité et de transformation
+    const fadeAnim = useAnimatedStyle(() => ({
+        opacity: withTiming(isFinishing ? 0 : 1, { duration: 1000 }),
+        transform: [{ scale: withSpring(isFinishing ? 1.2 : 1) }]
+    }));
+
+    // Gestion initiale des commandes à l'entrée dans la page
     useEffect(() => {
         if (!ordersToDisplay?.length) {
             router.replace('/pending-orders');
+            return;
         }
-    }, [ordersToDisplay]);
 
-    const allOrdersCompleted = ordersToDisplay.length > 0 &&
-        ordersToDisplay.every(id => completedOrderIds.includes(id));
+        setDisplayMode('4'); // Réinitialisation du mode d'affichage
+        setShowSettings(true);
+        setZoneMeasures({}); // Réinitialisation des zones de drag
+        resetZonesAndItems(); // Réinitialisation des zones et items
+    }, [ordersToDisplay, resetZonesAndItems]);
 
-    const fadeAnim = useAnimatedStyle(() => ({
-        opacity: withTiming(isFinishing ? 0 : 1, { duration: 1000 }),
-        transform: [{
-            scale: withSpring(isFinishing ? 1.2 : 1)
-        }]
-    }));
+    // Gestion de la validation des paramètres
+    const handleValidate = useCallback(() => {
+        console.log('Validate clicked, current showSettings:', showSettings);
+        setShowSettings(false);
+    }, [showSettings]);
 
-    // Dans OrderProcessingContext, ajoutez une méthode
-
-
-// Puis utilisez-la dans handleFinishOrders
-    const handleFinishOrders = async () => {
-        setIsFinishing(true);
-        setTimeout(() => {
-            resetSelection();
-            resetZonesAndItems();
-            setIsFinishing(false);
-            router.push('/pending-orders');
-        }, 1500);
-    };
-    const measureZone = (zoneId: string, layout: { x: number; y: number; width: number; height: number }) => {
-        setZoneMeasures(prev => ({
-            ...prev,
-            [zoneId]: layout
-        }));
-    };
-
-    const handleDropInZone = (orderId: string, droppedPosition: { x: number; y: number }) => {
+    // Gestion du drop d'une commande dans une zone
+    const handleDropInZone = useCallback((orderId, droppedPosition) => {
         if (completedOrderIds.includes(orderId)) {
             Alert.alert(
                 "Order Already Completed",
                 "This order is ready to be served and cannot be modified!",
-                [{ text: "OK" }],
-                {
-                    cancelable: false,
-                    userInterfacePriority: 'high'
-                }
+                [{ text: "OK" }]
             );
             return;
         }
@@ -149,14 +134,26 @@ const RecipePrep = () => {
                 return;
             }
         }
-    };
+    }, [zoneMeasures, completedOrderIds, addOrderToZone]);
 
-    const handleValidate = () => {
-        console.log('Validate clicked, current showSettings:', showSettings);
-        setShowSettings(false);
-        console.log('ShowSettings set to false');
-    };
+    // Gestion de la fin des commandes
+    const handleFinishOrders = useCallback(() => {
+        setIsFinishing(true);
+        setTimeout(() => {
+            resetSelection();
+            resetZonesAndItems();
+            setIsFinishing(false);
+            router.push('/pending-orders');
+        }, 1500);
+    }, [resetSelection, resetZonesAndItems]);
 
+    // Gestion de la mesure des zones de drag
+    const measureZone = useCallback((zoneId, layout) => {
+        setZoneMeasures(prev => ({
+            ...prev,
+            [zoneId]: layout
+        }));
+    }, []);
 
 
     console.log('Rendering RecipePrep, showSettings:', showSettings);
