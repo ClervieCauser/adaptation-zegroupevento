@@ -19,6 +19,7 @@ type OrderProcessingContextType = {
     clearCompletedOrders: () => string[];
     getCompletedOrderIds: () => string[];
     addOrderToProcessing: (order: Order) => void;
+    resetZonesAndItems: () => void;
 };
 
 const OrderProcessingContext = createContext<OrderProcessingContextType | undefined>(undefined);
@@ -80,13 +81,15 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
     // context/OrderProcessingContext.tsx
     const addOrderToProcessing = useCallback((order: Order) => {
         setProcessingOrders(prev => {
-            if (prev.some(po => po.orderId === order.id)) return prev;
-            return [...prev, {
-                orderId: order.id,
-                zoneId: null,
-                items: order.items.map(item => ({ ...item, isReady: false })),
-                isCompleted: false
-            }];
+            if (!prev.some(po => po.orderId === order.id)) {
+                return [...prev, {
+                    orderId: order.id,
+                    zoneId: null,
+                    items: order.items.map(item => ({ ...item, isReady: false })),
+                    isCompleted: false
+                }];
+            }
+            return prev;
         });
     }, []);
 
@@ -120,6 +123,17 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
         return completedOrderIds;
     }, []);
 
+    const resetZonesAndItems = useCallback(() => {
+        setProcessingOrders(prev =>
+            prev.map(order => ({
+                ...order,
+                zoneId: null,
+                items: order.items.map(item => ({ ...item, isReady: false })),
+                isCompleted: false
+            }))
+        );
+    }, []);
+
     return (
         <OrderProcessingContext.Provider value={{
             processingOrders,
@@ -132,7 +146,8 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
             getCompletedOrderIds,
             clearAllOrders,
             resetOrderProcessing,
-            addOrderToProcessing
+            addOrderToProcessing,
+            resetZonesAndItems
         }}>
             {children}
         </OrderProcessingContext.Provider>

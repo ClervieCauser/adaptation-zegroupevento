@@ -50,15 +50,14 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
 
     const handleCookSelected = useCallback(() => {
         if (selectedIds.length > 0) {
-            // Ajouter les orders au processing
             selectedIds.forEach(id => {
                 const order = pendingOrders.find(o => o.id === id);
                 if (order) addOrderToProcessing(order);
             });
             markOrdersAsInProgress(selectedIds);
-            router.push(MOCK_USER.level === 'EXPERT' ? '/recipe-prep' : '/recipe');
+            router.push('/recipe-prep');
         }
-    }, [selectedIds, markOrdersAsInProgress, pendingOrders]);
+    }, [selectedIds, pendingOrders, markOrdersAsInProgress]);
 
     const handleSingleCook = useCallback((orderId: string) => {
         const order = pendingOrders.find(o => o.id === orderId);

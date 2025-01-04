@@ -1,4 +1,4 @@
-import React, {useState, useEffect, useRef} from 'react';
+import React, {useState, useEffect, useRef, useCallback} from 'react';
 import { View, TouchableOpacity, StyleSheet } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
@@ -70,7 +70,8 @@ const OrderTag = ({ id, onDrop, isCompleted }) => {
 const RecipePrep = () => {
     const { getOrdersToShow, resetSelection,markOrdersAsInProgress  } = useOrderSelection();
     const ordersToDisplay = getOrdersToShow();
-    const { addOrderToZone, getCompletedOrderIds, resetOrderProcessing } = useOrderProcessing();
+    const { addOrderToZone, getCompletedOrderIds,
+        resetOrderProcessing,setProcessingOrders,resetZonesAndItems  } = useOrderProcessing();
 
     // Store these in ref to avoid re-renders
     const initialState = useRef({
@@ -89,17 +90,6 @@ const RecipePrep = () => {
     useEffect(() => {
         if (!ordersToDisplay?.length) {
             router.replace('/pending-orders');
-            return;
-        }
-
-        setShowSettings(true);
-        setDisplayMode('4');
-        setZoneMeasures({});
-    }, []); // Retirez ordersToDisplay des dépendances
-
-    useEffect(() => {
-        if (!ordersToDisplay?.length) {
-            router.replace('/pending-orders');
         }
     }, [ordersToDisplay]);
 
@@ -113,10 +103,15 @@ const RecipePrep = () => {
         }]
     }));
 
+    // Dans OrderProcessingContext, ajoutez une méthode
+
+
+// Puis utilisez-la dans handleFinishOrders
     const handleFinishOrders = async () => {
         setIsFinishing(true);
         setTimeout(() => {
-            resetSelection(); // Reset la sélection active
+            resetSelection();
+            resetZonesAndItems();
             setIsFinishing(false);
             router.push('/pending-orders');
         }, 1500);
