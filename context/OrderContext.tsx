@@ -55,20 +55,33 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
                 const order = pendingOrders.find(o => o.id === id);
                 if (order) addOrderToProcessing(order, groupId);
             });
+            // Retire les commandes sélectionnées
+            setPendingOrders(prev => prev.filter(order => !selectedIds.includes(order.id)));
             router.push('/recipe-prep');
         }
-    }, [selectedIds, pendingOrders]);
+    }, [selectedIds, pendingOrders, addOrderToProcessing]);
 
     const handleSingleCook = useCallback((orderId: string, groupId?: string) => {
-        const order = processingOrders.find(o => o.groupId === groupId);
-        if (order) {
-            setSelectedIds(processingOrders
-                .filter(o => o.groupId === groupId)
-                .map(o => o.orderId)
-            );
+        if (groupId) {
+            // Logique existante pour les commandes déjà en processing
+            const order = processingOrders.find(o => o.groupId === groupId);
+            if (order) {
+                setSelectedIds(processingOrders
+                    .filter(o => o.groupId === groupId)
+                    .map(o => o.orderId)
+                );
+            }
+        } else {
+            // Nouvelle commande à mettre en processing
+            const order = pendingOrders.find(o => o.id === orderId);
+            if (order) {
+                addOrderToProcessing(order, orderId);
+                setPendingOrders(prev => prev.filter(o => o.id !== orderId));
+                setSelectedIds([orderId]);
+            }
         }
         router.push('/recipe-prep');
-    }, [processingOrders]);
+    }, [processingOrders, pendingOrders, addOrderToProcessing]);
 
     const getOrdersToShow = useCallback(() => {
         return orderToCook ? [orderToCook] : selectedIds;
