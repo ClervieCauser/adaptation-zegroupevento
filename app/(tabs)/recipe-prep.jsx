@@ -175,14 +175,17 @@ const RecipePrep = () => {
                 <View style={styles.content}>
                     <View style={styles.ordersList}>
                         <ThemedText style={styles.ordersTitle}>ORDERS:</ThemedText>
-                        {ordersToDisplay.map(id => (
-                            <OrderTag
-                                key={id}
-                                id={id}
-                                isCompleted={completedOrderIds.includes(id)}
-                                onDrop={(id, position) => handleDropInZone(id, position)}
-                            />
-                        ))}
+                        {ordersToDisplay.map(id => {
+                            const order = processingOrders.find(o => o.orderId === id);
+                            return (
+                                <OrderTag
+                                    key={id}
+                                    id={id}
+                                    isCompleted={completedOrderIds.includes(id)}
+                                    onDrop={(id, position) => handleDropInZone(id, position)}
+                                />
+                            );
+                        })}
                     </View>
 
                     <View style={[
