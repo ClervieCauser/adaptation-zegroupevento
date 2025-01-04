@@ -7,13 +7,17 @@ import {ThemedText} from "@/components/ThemedText";
 
 type CustomHeaderProps = {
     user: User;
+    title: string;
 };
-const CustomHeader = ({ user }: CustomHeaderProps) => {
+const CustomHeader = ({ user, title }: CustomHeaderProps) => {
     const { isTablet } = useResponsiveLayout();
 
     if(isTablet) {
         return (
             <View style={styles.headerContainer}>
+                <View style={styles.leftContent}>
+                    <Text style={styles.titleText}>{title}</Text>
+                </View>
                 <View style={styles.rightContent}>
                     <TouchableOpacity>
                         <Feather
@@ -48,12 +52,10 @@ const CustomHeader = ({ user }: CustomHeaderProps) => {
                 </View>
                 <View style={styles.appTitle}>
                         <Text style={styles.nomViolet}>Poly</Text>
-                        <Text style={styles.nom}>Recipe_</Text>
+                        <Text style={styles.nom}>Recipe</Text>
                     </View>
                 <View style={styles.headerRight}>
-                    <View style={styles.levelBadge}>
-                        <Text style={styles.levelText}>Novice</Text>
-                    </View>
+                    <ThemedText style={styles.levelBadge}>{MOCK_USER.level}</ThemedText>
                 </View>
             </View>
     )
@@ -169,6 +171,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 8,
         paddingVertical: 2,
         borderRadius: 12,
+        fontFamily: 'Jua',
     },
     micStatus: {
         color: '#1C0D45',

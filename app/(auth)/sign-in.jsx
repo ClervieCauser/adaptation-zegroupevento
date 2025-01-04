@@ -54,7 +54,7 @@ const SignIn = () => {
             />
             <CustomButton
               title="Sign in"
-              handlePress={submit}
+              onPress={submit}
               containerStyles={{width: '100%', marginTop: 20}}
               isLoading={isSubmitting}
             />

@@ -12,10 +12,10 @@ const TabletNavigation = () => {
 
     const navigationItems = [
         // Notez que nous utilisons "(tabs)" dans les routes pour correspondre à la structure
+        { label: 'Home', route: '/(tabs)/home' },
         { label: 'Pending orders', route: '/(tabs)/pending-orders' },
         { label: 'Orders in progress', route: '/(tabs)/orders-progress' },
         { label: 'Recipe', route: '/(tabs)/recipe' },
-        { label: 'Add recipe', route: '/(tabs)/create' },
         { label: 'Settings', route: '/(tabs)/settings' },
     ];
 

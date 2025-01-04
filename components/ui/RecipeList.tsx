@@ -1,5 +1,10 @@
-import { StyleSheet, View, Text, FlatList, Image, Pressable } from 'react-native'
+import { StyleSheet, View, Text, FlatList, Image, Pressable, Dimensions, TouchableOpacity } from 'react-native'
+import { widthPercentageToDP as wp, heightPercentageToDP as hp } from 'react-native-responsive-screen';
 import React from 'react'
+import { router } from 'expo-router';
+
+const { width, height } = Dimensions.get('window');
+const isTablet = width >= 600;
 
 export interface Recipe {
   id: string;
@@ -7,6 +12,8 @@ export interface Recipe {
   duration: string;
   difficulty: string;
   imageUrl: string;
+  ingredients?: string[];
+  calories: string;
 }
 
 interface RecipeCardProps {
@@ -14,6 +21,8 @@ interface RecipeCardProps {
   duration: string;
   difficulty: string;
   imageUrl: string;
+  ingredients?: string[];
+  calories: string;
 }
 
 export const SAMPLE_RECIPES: Recipe[] = [
@@ -22,34 +31,73 @@ export const SAMPLE_RECIPES: Recipe[] = [
     title: 'Spaghetti Carbonara',
     duration: '30 min',
     difficulty: 'Facile',
-    imageUrl: 'https://example.com/carbonara.jpg',
+    imageUrl: require('../../assets/images/citron.jpg'),
+    ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
+    calories: '500 kcal',
   },
   {
     id: '2',
     title: 'Poulet Rôti',
     duration: '1h30',
     difficulty: 'Moyen',
-    imageUrl: 'https://example.com/poulet.jpg',
+    imageUrl: require('../../assets/images/citron.jpg'),
+    ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
+    calories: '800 kcal',
+  },
+  {
+    id: '3',
+    title: 'Poulet Citron',
+    duration: '1h30',
+    difficulty: 'Moyen',
+    imageUrl: require('../../assets/images/citron.jpg'),
+    ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
+    calories: '700 kcal',
+  },
+  {
+    id: '4',
+    title: 'Spaghetti Carbonara',
+    duration: '30 min',
+    difficulty: 'Facile',
+    imageUrl: require('../../assets/images/citron.jpg'),
+    ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
+    calories: '500 kcal',
   },
 ];
 
-const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, imageUrl }) => {
+const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, imageUrl, ingredients, calories}) => {
+  const imageSource = typeof imageUrl === 'string' ? { uri: imageUrl } : imageUrl;
   return (
     <Pressable style={styles.recipeCard}>
       <View style={styles.imageContainer}>
         <Image 
-          source={{ uri: imageUrl }} 
+          source={imageSource}
           style={styles.recipeImage}
           resizeMode="cover"
         />
       </View>
       <View style={styles.recipeInfo}>
         <Text style={styles.recipeTitle}>{title}</Text>
+        <Text style={styles.recipeText}>{calories}</Text>
         <View style={styles.recipeDetails}>
           <Text style={styles.recipeText}>{duration}</Text>
           <Text style={styles.recipeText}>{difficulty}</Text>
         </View>
+        {isTablet && (
+          <View>
+            <Text style={styles.recipeTitle}>Ingrédients (4 personnes) :</Text>
+            <View style={styles.ingredients}>
+              {ingredients && ingredients.map((ingredient, index) => (
+                <View key={index} style={styles.ingredientContainer}>
+                  <Text style={styles.ingredientText}>{ingredient}</Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        )}
       </View>
+      <TouchableOpacity style={styles.button} onPress={() => router.push('/recipe')}>
+        <Text style={styles.buttonText}>Voir la recette</Text>
+      </TouchableOpacity>
     </Pressable>
   );
 };
@@ -59,12 +107,16 @@ interface RecipeListProps {
 }
 
 export const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
+  const numColumns = isTablet ? 3 : 1;
+
   const renderRecipe = ({ item }: { item: Recipe }) => (
     <RecipeCard
       title={item.title}
       duration={item.duration}
       difficulty={item.difficulty}
       imageUrl={item.imageUrl}
+      ingredients={item.ingredients}
+      calories={item.calories}
     />
   );
 
@@ -76,35 +128,25 @@ export const RecipeList: React.FC<RecipeListProps> = ({ recipes }) => {
       style={styles.recipeList}
       contentContainerStyle={styles.recipeListContent}
       showsVerticalScrollIndicator={false}
+      horizontal={isTablet? false: true}
+      numColumns={numColumns}
     />
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#F9F7FA',
-    paddingTop: 24,
-  },
-  topSection: {
-    paddingTop: 16,
-  },
-  searchContainer: {
-    marginLeft: 15,
-    marginRight: 15,
-  },
   recipeList: {
     flex: 1,
     marginTop: 20,
   },
   recipeListContent: {
-    paddingHorizontal: 15,
-    paddingBottom: 20,
+    paddingLeft: '2%',
+    paddingRight: '2%',
+    height: isTablet ? '80%': '70%',
   },
   recipeCard: {
     backgroundColor: 'white',
     borderRadius: 12,
-    marginBottom: 16,
     shadowColor: '#000',
     shadowOffset: {
       width: 0,
@@ -113,25 +155,30 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-  },
+    width: isTablet ? wp('25%') : wp('35%'),
+    marginRight: 15,
+    marginTop: 8,
+    },
   imageContainer: {
-    height: 200,
     borderTopLeftRadius: 12,
     borderTopRightRadius: 12,
-    overflow: 'hidden',
+    flexDirection: 'row',
+    justifyContent: 'center',
   },
   recipeImage: {
-    width: '100%',
-    height: '100%',
-  },
+    margin: isTablet ? wp('1%') : wp('2%'),
+    height: isTablet ? wp('9%') : wp('25%'),
+    width: isTablet ? wp('18%') : wp('30%'),
+    borderRadius: 12,
+    },
   recipeInfo: {
-    padding: 16,
+    padding: 10,
   },
   recipeTitle: {
     fontSize: 18,
     fontFamily: 'Jua',
     color: '#1C0D45',
-    marginBottom: 8,
+    marginBottom: '6%',
   },
   recipeDetails: {
     flexDirection: 'row',
@@ -139,6 +186,41 @@ const styles = StyleSheet.create({
   },
   recipeText: {
     fontSize: 14,
+    color: '#666',
+  },
+  button: {
+    backgroundColor: '#E8A85F',
+    borderRadius: 12,
+    padding: 16,
+    alignItems: 'center',
+    alignSelf: 'center',
+    width: isTablet? '50%' : '80%',
+    margin: isTablet ? '5%' : '10%',
+  },
+  buttonText: {
+    color: '#FFFFFF',
+    fontFamily: 'Jua',
+    fontSize: 16,
+  },
+  ingredientsContainer: {
+    marginTop: 10,
+  },
+  ingredients: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  ingredientContainer: {
+    backgroundColor: '#F5F5F5',
+    borderRadius: 12,
+    padding: 10,
+    margin: 5,
+    width: '30%',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  ingredientText: {
+    fontSize: 14,
+    fontFamily: 'Jua',
     color: '#666',
   },
 });

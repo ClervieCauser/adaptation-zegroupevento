@@ -8,7 +8,6 @@ const Title = () => {
             <ThemedText style={styles.titleText}>
                 <ThemedText style={styles.titlePoly}>Poly</ThemedText>
                 <ThemedText style={styles.titleRecipe}>Recipe</ThemedText>
-                <ThemedText style={styles.titleUnderscore}>_</ThemedText>
             </ThemedText>
         </View>
     );
@@ -29,10 +28,6 @@ const styles = StyleSheet.create({
     },
     titleRecipe: {
         color: '#E8A85F',
-        fontFamily: 'Jua',
-    },
-    titleUnderscore: {
-        color: '#3A1994',
         fontFamily: 'Jua',
     },
 });
