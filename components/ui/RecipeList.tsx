@@ -25,45 +25,6 @@ interface RecipeCardProps {
   calories: string;
 }
 
-export const SAMPLE_RECIPES: Recipe[] = [
-  {
-    id: '1',
-    title: 'Spaghetti Carbonara',
-    duration: '30 min',
-    difficulty: 'Facile',
-    imageUrl: require('../../assets/images/citron.jpg'),
-    ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
-    calories: '500 kcal',
-  },
-  {
-    id: '2',
-    title: 'Poulet Rôti',
-    duration: '1h30',
-    difficulty: 'Moyen',
-    imageUrl: require('../../assets/images/citron.jpg'),
-    ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
-    calories: '800 kcal',
-  },
-  {
-    id: '3',
-    title: 'Poulet Citron',
-    duration: '1h30',
-    difficulty: 'Moyen',
-    imageUrl: require('../../assets/images/citron.jpg'),
-    ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
-    calories: '700 kcal',
-  },
-  {
-    id: '4',
-    title: 'Spaghetti Carbonara',
-    duration: '30 min',
-    difficulty: 'Facile',
-    imageUrl: require('../../assets/images/citron.jpg'),
-    ingredients: ['Poulet', 'Citron', 'Ail', 'Thym', 'Sel', 'Poivre'],
-    calories: '500 kcal',
-  },
-];
-
 const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, imageUrl, ingredients, calories}) => {
   const imageSource = typeof imageUrl === 'string' ? { uri: imageUrl } : imageUrl;
   return (

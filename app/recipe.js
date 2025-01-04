@@ -3,6 +3,9 @@ export const recipes = [
     id: 1,
     name: 'Poulet citron',
     difficulty: 'Novice',
+    imageUrl: require('../assets/images/citron.jpg'),
+    duration: '1h',
+    calories: '380 kcal',
     recipeNumber: '#1234',
     steps: [
       {
@@ -115,6 +118,9 @@ export const recipes = [
     id: 2,
     name: 'Tartiflette Savoyarde',
     difficulty: 'Intermédiaire',
+    imageUrl: require('../assets/images/citron.jpg'),
+    duration: '1h',
+    calories: '380 kcal',
     recipeNumber: '#5678',
     steps: [
       {
@@ -224,6 +230,9 @@ export const recipes = [
     name: 'Risotto aux champignons',
     difficulty: 'Intermédiaire',
     recipeNumber: '#2345',
+    imageUrl: require('../assets/images/citron.jpg'),
+    duration: '1h',
+    calories: '380 kcal',
     steps: [
       {
         id: 1,
@@ -301,6 +310,9 @@ export const recipes = [
     name: 'Quiche Lorraine',
     difficulty: 'Facile',
     recipeNumber: '#3456',
+    imageUrl: require('../assets/images/citron.jpg'),
+    duration: '1h',
+    calories: '380 kcal',
     steps: [
       {
         id: 1,
