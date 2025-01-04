@@ -38,7 +38,7 @@ const SignIn = () => {
             source={icons.logo}
             resizeMode='contain'
             style={styles.logo}/>
-            <Text style={styles.text}>Log in to PolyRecipe</Text>
+            <Text style={styles.text}>Se connecter a PolyRecipe</Text>
             <FormField
               title="Email"
               value={form.email}
@@ -47,21 +47,21 @@ const SignIn = () => {
               keybaordType="email-address"
             />
             <FormField
-              title="Password"
+              title="Mot de passe"
               value={form.password}
               handleChangeText={(e) => setForm({...form, password: e})}
               otherStyles={{marginTop: 20}}
             />
             <CustomButton
-              title="Sign in"
+              title="Se connecter"
               onPress={submit}
               containerStyles={{width: '100%', marginTop: 20}}
               isLoading={isSubmitting}
             />
 
             <View style={styles.comment}>
-              <Text style={styles.account}>Don't have an account?</Text>
-              <Link style={styles.link} href="/sign-up">Sign up</Link>
+              <Text style={styles.account}>Vous n'avez pas de compte?</Text>
+              <Link style={styles.link} href="/sign-up">S'inscrire</Link>
             </View>
         </View>
       </ScrollView>

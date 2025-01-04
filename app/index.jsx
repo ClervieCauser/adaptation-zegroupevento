@@ -23,7 +23,7 @@ export default function App() {
           </View>
 
           <CustomButton
-            title="Continue with email"
+            title="Continuer avec l'email"
             onPress={() => router.push('/sign-in')}
             containerStyles={{width: '100%', marginTop: 20}}
           />

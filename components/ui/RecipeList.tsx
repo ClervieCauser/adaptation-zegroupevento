@@ -45,7 +45,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ title, duration, difficulty, im
         </View>
         {isTablet && (
           <View>
-            <Text style={styles.recipeTitle}>Ingrédients (4 personnes) :</Text>
+            <Text style={styles.recipeTitle}>Ingredients (4 personnes) :</Text>
             <View style={styles.ingredients}>
               {ingredients && ingredients.map((ingredient, index) => (
                 <View key={index} style={styles.ingredientContainer}>

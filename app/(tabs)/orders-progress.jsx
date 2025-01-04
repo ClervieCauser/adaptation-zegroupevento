@@ -32,7 +32,7 @@ const OrdersInProgress = () => {
             <ScrollView style={styles.mainContent}>
                 <View style={styles.headerSection}>
                     <View style={styles.titleContainer}>
-                        <ThemedText style={styles.title}>Orders in progress</ThemedText>
+                        <ThemedText style={styles.title}>Commandes en cours</ThemedText>
                     </View>
                 </View>
 

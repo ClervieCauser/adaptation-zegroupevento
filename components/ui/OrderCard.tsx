@@ -58,7 +58,7 @@ const OrderCard = ({
                             style={[styles.gridCell, styles.seeMoreCell]}
                             onPress={onToggleExpand}
                         >
-                            <ThemedText style={styles.seeMoreText}>see more</ThemedText>
+                            <ThemedText style={styles.seeMoreText}>Voir plus</ThemedText>
                         </TouchableOpacity>
                     )}
                     {rowItems.length < columns && !showSeeMore && (
@@ -94,15 +94,15 @@ const OrderCard = ({
             <View style={styles.cardContent}>
                 <View style={styles.header}>
                     <View style={styles.orderInfo}>
-                        <ThemedText style={styles.orderId}>ORDER#{order.id}</ThemedText>
+                        <ThemedText style={styles.orderId}>Commande #{order.id}</ThemedText>
                         <ThemedText style={styles.time}>{order.time}</ThemedText>
                     </View>
                     <View style={styles.tags}>
                         <View style={styles.tag}>
-                            <ThemedText style={styles.tagText}>main course</ThemedText>
+                            <ThemedText style={styles.tagText}>Plat principal</ThemedText>
                         </View>
                         <View style={styles.tag}>
-                            <ThemedText style={styles.tagText}>Latest</ThemedText>
+                            <ThemedText style={styles.tagText}>Plus ancien</ThemedText>
                         </View>
                         <View style={[styles.tag, styles.tagExport]}>
                             <ThemedText style={styles.tagText}>EXPORT</ThemedText>
@@ -122,14 +122,14 @@ const OrderCard = ({
                         style={styles.cookButton}
                         onPress={() => handleSingleCook(order.id)}
                     >
-                        <ThemedText style={styles.cookButtonText}>Cook</ThemedText>
+                        <ThemedText style={styles.cookButtonText}>Cuisiner</ThemedText>
                     </TouchableOpacity>
                 ) : (
                     <TouchableOpacity
                         style={[styles.cookButton, styles.continueButton]}
                         onPress={handleContinue}
                     >
-                        <ThemedText style={styles.cookButtonText}>Continue</ThemedText>
+                        <ThemedText style={styles.cookButtonText}>Continuer</ThemedText>
                     </TouchableOpacity>
                 )}
             </View>

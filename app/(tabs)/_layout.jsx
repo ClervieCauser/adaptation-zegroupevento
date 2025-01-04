@@ -107,10 +107,10 @@ const TabLayout = () => {
                             <Tabs.Screen
                                 name="pending-orders"
                                 options={{
-                                    title: 'Pending Orders',
+                                    title: 'Commandes en attente',
                                     headerShown: false,
                                     tabBarIcon: ({ color, focused }) => (
-                                        <TabIcon icon={icons.bookmark} color={color} name="Pending Orders" focused={focused} />
+                                        <TabIcon icon={icons.bookmark} color={color} name="Commandes en attente" focused={focused} />
                                     ),
                                 }}
                             />

@@ -65,14 +65,14 @@ const Settings = () => {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
-      <CustomHeader title="Settings" /> 
+      <CustomHeader title="Paramètres" /> 
 
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
         <TextInput
           style={styles.searchInput}
-          placeholder="Search by settings name"
+          placeholder="Rechercher par nom de paramètre"
           placeholderTextColor="#999"
           value={searchText}
           onChangeText={setSearchText}
@@ -89,7 +89,7 @@ const Settings = () => {
 
       {/* Settings Section */}
       <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Assistance preferences</Text>
+        <Text style={styles.sectionTitle}>Préférences d'assistance</Text>
 
         {/* Text to Speech Setting */}
         <View style={styles.settingCard}>
@@ -121,7 +121,7 @@ const Settings = () => {
             <View style={styles.trophyContainer}>
               <Ionicons name="trophy" size={24} color="#f90" />
             </View>
-            <Text style={styles.settingTitle}>Cook level ?</Text>
+            <Text style={styles.settingTitle}>Niveau de cuisinier ?</Text>
           </View>
           <View style={styles.levelContainer}>
             <TouchableOpacity

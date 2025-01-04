@@ -98,17 +98,17 @@ const PendingOrders = () => {
                         style={styles.resetButton}
                         onPress={resetOrders}
                     >
-                        <ThemedText style={styles.resetButtonText}>Reset Orders</ThemedText>
+                        <ThemedText style={styles.resetButtonText}>   Rafraichir</ThemedText>
                     </TouchableOpacity>
 
                     <View style={styles.titleContainer}>
-                        <ThemedText style={styles.title}>Pending orders</ThemedText>
+                        <ThemedText style={styles.title}>Commandes en attente</ThemedText>
                         {!isSelectMode && !isNoviceUser ? (
                             <TouchableOpacity
                                 style={styles.selectButton}
                                 onPress={toggleSelectMode}
                             >
-                                <ThemedText style={styles.selectButtonText}>Select</ThemedText>
+                                <ThemedText style={styles.selectButtonText}>Selectionner</ThemedText>
                             </TouchableOpacity>
                         ) : (
                             isSelectMode && (
@@ -125,7 +125,7 @@ const PendingOrders = () => {
                                         style={styles.cancelButton}
                                         onPress={toggleSelectMode}
                                     >
-                                        <ThemedText style={styles.cancelButtonText}>Cancel</ThemedText>
+                                        <ThemedText style={styles.cancelButtonText}>Annuler</ThemedText>
                                     </TouchableOpacity>
                                 </View>
                             )
@@ -159,7 +159,7 @@ const PendingOrders = () => {
                 <View style={styles.pagination}>
                     {currentPage > 1 && (
                         <TouchableOpacity style={styles.prevButton} onPress={handlePreviousPage}>
-                            <ThemedText style={styles.prevButtonText}>Previous</ThemedText>
+                            <ThemedText style={styles.prevButtonText}>Precedent</ThemedText>
                         </TouchableOpacity>
                     )}
                     {[...Array(totalPages)].map((_, index) => (
@@ -183,7 +183,7 @@ const PendingOrders = () => {
                     ))}
                     {currentPage < totalPages && (
                         <TouchableOpacity style={styles.nextButton} onPress={handleNextPage}>
-                            <ThemedText style={styles.nextButtonText}>Next</ThemedText>
+                            <ThemedText style={styles.nextButtonText}>Suivant</ThemedText>
                         </TouchableOpacity>
                     )}
                 </View>

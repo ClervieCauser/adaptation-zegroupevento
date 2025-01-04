@@ -28,7 +28,7 @@ const SignUp = () => {
             source={icons.logo}
             resizeMode='contain'
             style={styles.logo}/>
-            <Text style={styles.text}>Sign up to PolyRecipe</Text>
+            <Text style={styles.text}>Se connecter a PolyRecipe</Text>
             <FormField
               title="Username"
               value={form.username}
@@ -56,8 +56,8 @@ const SignUp = () => {
             />
 
             <View style={styles.comment}>
-              <Text style={styles.account}>Have an account already?</Text>
-              <Link style={styles.link} href="/sign-in">Sign in</Link>
+              <Text style={styles.account}>Vous avez déjà un compte?</Text>
+              <Link style={styles.link} href="/sign-in">S'inscrire</Link>
             </View>
         </View>
       </ScrollView>
