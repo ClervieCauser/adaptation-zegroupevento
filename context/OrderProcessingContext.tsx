@@ -4,10 +4,12 @@ import {MOCK_ORDERS, Order, OrderItem} from '@/types/order';
 
 type ProcessingOrder = {
     orderId: string;
+    groupId: string;  // Pour regrouper les orders sélectionnées ensemble
     zoneId: string | null;
     items: (OrderItem & { isReady: boolean })[];
     isCompleted: boolean;
 };
+
 
 type OrderProcessingContextType = {
     processingOrders: ProcessingOrder[];
@@ -79,11 +81,12 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
     }, []);
 
     // context/OrderProcessingContext.tsx
-    const addOrderToProcessing = useCallback((order: Order) => {
+    const addOrderToProcessing = useCallback((order: Order, groupId?: string) => {
         setProcessingOrders(prev => {
             if (!prev.some(po => po.orderId === order.id)) {
                 return [...prev, {
                     orderId: order.id,
+                    groupId: groupId || order.id, // utilise orderId comme groupId pour singleCook
                     zoneId: null,
                     items: order.items.map(item => ({ ...item, isReady: false })),
                     isCompleted: false
@@ -129,14 +132,15 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
     }, []);
 
     const resetZonesAndItems = useCallback(() => {
-        setProcessingOrders(prev =>
-            prev.map(order => ({
-                ...order,
-                zoneId: null,
-                items: order.items.map(item => ({ ...item, isReady: false })),
-                isCompleted: false
-            }))
-        );
+        setProcessingOrders(prev => prev.map(order => ({
+            ...order,
+            zoneId: null, // Réinitialise explicitement la zone
+            items: order.items.map(item => ({
+                ...item,
+                isReady: false
+            })),
+            isCompleted: false
+        })));
     }, []);
 
     return (

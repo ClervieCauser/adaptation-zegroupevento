@@ -50,26 +50,25 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
 
     const handleCookSelected = useCallback(() => {
         if (selectedIds.length > 0) {
+            const groupId = Date.now().toString();
             selectedIds.forEach(id => {
                 const order = pendingOrders.find(o => o.id === id);
-                if (order) addOrderToProcessing(order);
+                if (order) addOrderToProcessing(order, groupId);
             });
-            setOrderToCook(null); // Clear orderToCook when using selection
-            markOrdersAsInProgress(selectedIds);
             router.push('/recipe-prep');
         }
-    }, [selectedIds, pendingOrders, markOrdersAsInProgress]);
+    }, [selectedIds, pendingOrders]);
 
-    const handleSingleCook = useCallback((orderId: string) => {
-        const order = pendingOrders.find(o => o.id === orderId) ||
-            processingOrders.find(o => o.orderId === orderId);
+    const handleSingleCook = useCallback((orderId: string, groupId?: string) => {
+        const order = processingOrders.find(o => o.groupId === groupId);
         if (order) {
-            addOrderToProcessing(order);
-            setOrderToCook(orderId); // Assurons-nous que orderToCook est défini
-            setSelectedIds([]);
+            setSelectedIds(processingOrders
+                .filter(o => o.groupId === groupId)
+                .map(o => o.orderId)
+            );
         }
         router.push('/recipe-prep');
-    }, [pendingOrders, processingOrders]);
+    }, [processingOrders]);
 
     const getOrdersToShow = useCallback(() => {
         return orderToCook ? [orderToCook] : selectedIds;

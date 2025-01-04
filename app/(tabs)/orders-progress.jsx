@@ -1,5 +1,5 @@
 // app/(tabs)/orders-progress.tsx
-import React, {useEffect, useState} from 'react';
+import React, {useEffect, useMemo, useState} from 'react';
 import { StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
@@ -15,11 +15,23 @@ const OrdersInProgress = () => {
     const { processingOrders } = useOrderProcessing();
     const { cleanupOrderState } = useOrderSelection();
 
+    // Grouper les ordres par groupId
+    const groupedOrders = useMemo(() => {
+        return processingOrders.reduce((groups, order) => {
+            const group = groups.find(g => g[0].groupId === order.groupId);
+            if (group) {
+                group.push(order);
+            } else {
+                groups.push([order]);
+            }
+            return groups;
+        }, []);
+    }, [processingOrders]);
+
     useEffect(() => {
-        // Cleanup une seule fois
-        console.log("CleanupOrderState appelé depuis OrdersInProgress");
         cleanupOrderState();
     }, [cleanupOrderState]);
+
     return (
         <ThemedView style={styles.container}>
             <View style={styles.topSection}>
@@ -38,27 +50,32 @@ const OrdersInProgress = () => {
 
                 <View style={styles.scrollableContent}>
                     <View style={styles.ordersGrid}>
-                        {processingOrders.map((processingOrder) => {
-                            const completedItems = processingOrder.items.filter(item => item.isReady).length;
-                            const totalItems = processingOrder.items.length;
+                        {groupedOrders.map((group) => {
+                            const orderGroup = group[0];
+                            const groupIds = group.map(order => order.orderId);
+                            const completedItems = group.reduce((sum, order) =>
+                                sum + order.items.filter(item => item.isReady).length, 0);
+                            const totalItems = group.reduce((sum, order) =>
+                                sum + order.items.length, 0);
 
                             return (
                                 <OrderCard
-                                    key={`order-${processingOrder.orderId}`}
+                                    key={`order-${orderGroup.groupId}`}
                                     order={{
-                                        id: processingOrder.orderId,
-                                        items: processingOrder.items,
+                                        id: groupIds.join(', #'),
+                                        items: group.flatMap(order => order.items),
                                         status: 'IN_PROGRESS',
                                         time: `${completedItems}/${totalItems} ready`
                                     }}
-                                    expanded={expandedCardId === processingOrder.orderId}
+                                    expanded={expandedCardId === orderGroup.groupId}
                                     onToggleExpand={() => setExpandedCardId(
-                                        expandedCardId === processingOrder.orderId ? null : processingOrder.orderId
+                                        expandedCardId === orderGroup.groupId ? null : orderGroup.groupId
                                     )}
                                     showContinue={true}
                                     isSelectMode={false}
                                     isSelected={false}
                                     onSelect={() => {}}
+                                    groupId={orderGroup.groupId}
                                 />
                             );
                         })}
@@ -68,7 +85,6 @@ const OrdersInProgress = () => {
         </ThemedView>
     );
 };
-
 
 const styles = StyleSheet.create({
     container: {
