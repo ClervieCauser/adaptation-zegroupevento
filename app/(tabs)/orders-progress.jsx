@@ -25,7 +25,7 @@ const OrdersInProgress = () => {
             <View style={styles.topSection}>
                 <CustomHeader />
                 <View style={styles.searchContainer}>
-                    <SearchBar value={searchText} onChangeText={setSearchText} />
+                    <SearchBar value={searchText} onChangeText={setSearchText} placeholder="Rechercher par commande" />
                 </View>
             </View>
 
