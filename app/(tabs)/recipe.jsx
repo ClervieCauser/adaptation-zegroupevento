@@ -12,7 +12,7 @@ import CustomButton from '../../components/ui/CustomButton';
 import Pagination from '../../components/ui/Pagination';
 import UtensilRow from '../../components/ui/UtensilRow';
 import { recipes } from '../../app/recipe';
-import { Lightbulb, Bell, MessageSquare, ChevronRight } from 'lucide-react';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const RecipePage = () => {
   const { isTablet } = useResponsiveLayout();
@@ -157,8 +157,8 @@ const RecipePage = () => {
           <Text style={styles.recipeName}>{recipe.name}</Text>
           <Text style={styles.recipeNumber}>#{recipe.recipeNumber}</Text>
           <View style={styles.headerIcons}>
-            <MessageSquare size={24} />
-            <Bell size={24} />
+            <Icon name="message-outline" size={24} color="#000" />
+            <Icon name="bell-outline" size={24} color="#000" />
             <View style={styles.difficultyBadge}>
               <Text style={styles.difficultyText}>{recipe.difficulty}</Text>
             </View>
@@ -193,8 +193,8 @@ const RecipePage = () => {
               )}
               {substep.tip && (
                 <View style={styles.tipContainer}>
-                  <Lightbulb size={20} color="#FFB800" />
-                  <Text style={styles.tipText}>{substep.tip}</Text>
+                <Icon name="lightbulb-on-outline" size={24} color="#000" />                  
+                <Text style={styles.tipText}>{substep.tip}</Text>
                 </View>
               )}
             </View>
@@ -207,7 +207,7 @@ const RecipePage = () => {
               onPress={handleNextStep}
               containerStyles={styles.nextButton}
               textStyles={styles.nextButtonText}
-              Icon={ChevronRight}
+              Icon={() => <Icon name="chevron-right" size={24} color="#fff" />}
             />
           </View>
 
