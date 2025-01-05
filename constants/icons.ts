@@ -13,6 +13,8 @@ import eye from "../assets/icons/eye.png";
 import process from "../assets/icons/process.png";
 import sablier from "../assets/icons/sablier.png";
 import recipe from "../assets/icons/recipe.png";
+import settings from "../assets/icons/settings.png";
+import statistiques from "../assets/icons/statistiques.png";
 
 export const icons = {
   bookmark,
@@ -29,5 +31,7 @@ export const icons = {
   eye,
   process,
   sablier,
-  recipe
+  recipe,
+  settings,
+  statistiques
 };

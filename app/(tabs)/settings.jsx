@@ -65,7 +65,7 @@ const Settings = () => {
   return (
     <View style={styles.container}>
       {/* Header */}
-      <CustomHeader title="Paramètres" /> 
+      <CustomHeader /> 
       {/* Settings Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Préférences d'assistance</Text>
