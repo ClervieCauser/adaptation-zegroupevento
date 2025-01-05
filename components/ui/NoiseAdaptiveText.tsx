@@ -192,13 +192,15 @@ const styles = StyleSheet.create({
     container: {
         position: 'relative',
         width: '100%',
+        padding: 16,
+        backgroundColor: 'white',
+        borderRadius: 8,
     },
     mainText: {
         fontSize: 16,
         fontFamily: 'Jua',
-        padding: 16,
-        backgroundColor: 'white',
-        borderRadius: 8,
+        width: '90%',
+        marginBottom: 8,
     },
     replayButton: {
         position: 'absolute',
