@@ -100,17 +100,30 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
             .map(order => order.orderId);
     }, [processingOrders]);
 
+    // Dans OrderProcessingContext.tsx
+    // Dans OrderProcessingContext.tsx
     const resetZonesAndItems = useCallback(() => {
         setProcessingOrders(prev => {
-            const updatedOrders = prev.filter(order => !order.isCompleted);
-            return updatedOrders.map(order => ({
+            const groups = prev.reduce((acc, order) => {
+                if (!acc[order.groupId]) {
+                    acc[order.groupId] = [];
+                }
+                acc[order.groupId].push(order);
+                return acc;
+            }, {});
+
+            return prev.filter(order => {
+                const group = groups[order.groupId];
+                return !group.every(o => o.isCompleted);
+            }).map(order => ({
                 ...order,
                 zoneId: null,
+                // Garder l'état prêt si déjà prêt
                 items: order.items.map(item => ({
                     ...item,
-                    isReady: false
+                    isReady: item.isReady || false
                 })),
-                isCompleted: false
+                isCompleted: order.isCompleted
             }));
         });
     }, []);
