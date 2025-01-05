@@ -118,7 +118,7 @@ export const recipes = [
     id: 2,
     name: 'Tartiflette Savoyarde',
     difficulty: 'Intermédiaire',
-    imageUrl: require('../assets/images/citron.jpg'),
+    imageUrl: require('../assets/images/tartiflette.jpg'),
     duration: '1h',
     calories: '380 kcal',
     recipeNumber: '#5678',
@@ -230,7 +230,7 @@ export const recipes = [
     name: 'Risotto aux champignons',
     difficulty: 'Intermédiaire',
     recipeNumber: '#2345',
-    imageUrl: require('../assets/images/citron.jpg'),
+    imageUrl: require('../assets/images/risotto.jpg'),
     duration: '1h',
     calories: '380 kcal',
     steps: [
@@ -310,7 +310,7 @@ export const recipes = [
     name: 'Quiche Lorraine',
     difficulty: 'Facile',
     recipeNumber: '#3456',
-    imageUrl: require('../assets/images/citron.jpg'),
+    imageUrl: require('../assets/images/quiche.jpg'),
     duration: '1h',
     calories: '380 kcal',
     steps: [
