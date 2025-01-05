@@ -71,6 +71,10 @@ const TabLayout = () => {
                                                 name="settings"
                                                 options={{ href: null }}
                                             />
+                                            <Tabs.Screen
+                                                name="stats"
+                                                options={{ href: null }}
+                                            />
                                         </Tabs>
                                     </View>
                                 </ThemedView>
@@ -150,6 +154,16 @@ const TabLayout = () => {
                                     headerShown: false,
                                     tabBarIcon: ({ color, focused }) => (
                                         <TabIcon icon={icons.profile} color={color} name="Paramètres" focused={focused} />
+                                    ),
+                                }}
+                            />
+                            <Tabs.Screen
+                                name="stats"
+                                options={{
+                                    title: 'Statistiques',
+                                    headerShown: false,
+                                    tabBarIcon: ({ color, focused }) => (
+                                        <TabIcon icon={icons.profile} color={color} name="Statistiques" focused={focused} />
                                     ),
                                 }}
                             />
