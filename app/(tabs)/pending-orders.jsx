@@ -9,6 +9,9 @@ import { MOCK_USER } from '@/types/user';
 import { router } from 'expo-router';
 import CustomHeader from "../../components/ui/CustomHeader";
 import { useOrderSelection } from "@/context/OrderContext";
+import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
+import { Columns } from 'lucide-react';
+
 
 const FilterButton = ({ label, active, onPress }) => (
     <TouchableOpacity
@@ -26,6 +29,7 @@ const PendingOrders = () => {
     const [activeFilter, setActiveFilter] = useState('Meal');
     const [expandedCardId, setExpandedCardId] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
+    const { isTablet } = useResponsiveLayout();
 
     const {
         isSelectMode,
@@ -98,10 +102,10 @@ const PendingOrders = () => {
                         style={styles.resetButton}
                         onPress={resetOrders}
                     >
-                        <ThemedText style={styles.resetButtonText}>   Rafraichir</ThemedText>
+                        <ThemedText style={styles.resetButtonText}>Rafraichir</ThemedText>
                     </TouchableOpacity>
 
-                    <View style={styles.titleContainer}>
+                    <View style={[styles.titleContainer, {flexDirection: isTablet ? 'row' : 'column'}]}>
                         <ThemedText style={styles.title}>Commandes en attente</ThemedText>
                         {!isSelectMode && !isNoviceUser ? (
                             <TouchableOpacity
@@ -236,15 +240,16 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
     },
     titleContainer: {
-        flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        paddingBottom:16,
+        paddingBottom: 16,
     },
     title: {
         fontSize: 24,
         fontFamily: 'Jua',
         color: '#1C0D45',
+        marginBottom: 8,
+        marginTop: 8,
     },
     selectButton: {
         backgroundColor: '#E8A85F',

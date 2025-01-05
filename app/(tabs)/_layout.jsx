@@ -81,8 +81,8 @@ const TabLayout = () => {
     }
 
     return (
-        <OrderSelectionProvider>
-            <OrderProcessingProvider>
+        <OrderProcessingProvider>
+            <OrderSelectionProvider>
                 <GestureHandlerRootView style={{ flex: 1 }}>
                     <DraxProvider>
 
@@ -137,9 +137,8 @@ const TabLayout = () => {
                         </Tabs>
                     </DraxProvider>
                 </GestureHandlerRootView>
-            </OrderProcessingProvider>
-
-        </OrderSelectionProvider>
+            </OrderSelectionProvider>
+        </OrderProcessingProvider>
     );
 };
 
