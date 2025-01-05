@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useEffect, useState} from 'react';
 import { View, Text, Image, ScrollView, StyleSheet } from 'react-native';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import NutritionalInfo from '../../components/ui/NutritionalInfo';
@@ -13,6 +13,8 @@ import Pagination from '../../components/ui/Pagination';
 import UtensilRow from '../../components/ui/UtensilRow';
 import { recipes } from '../../app/recipe';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import {MOCK_USER} from "../../types/user";
+import * as Speech from 'expo-speech';
 
 const RecipePage = () => {
   const { isTablet } = useResponsiveLayout();
@@ -32,6 +34,8 @@ const RecipePage = () => {
     return <Text>Recette(s) introuvable(s)</Text>;
   }
 
+
+
   const handlePageChange = (page) => {
     setActivePage(page);
     setActiveTab(page === 0 ? 'ingredients' : 'utensils');
@@ -43,7 +47,7 @@ const RecipePage = () => {
 
   const handleNextStep = () => {
     const currentRecipe = recipesMatched[currentRecipeIndex];
-    
+
     if (currentStep < currentRecipe.steps.length - 1) {
       // S'il reste des étapes dans la recette actuelle
       setCurrentStep(currentStep + 1);
@@ -82,7 +86,7 @@ const RecipePage = () => {
 
   const renderContent = () => {
     const recipe = recipesMatched[currentRecipeIndex]; // Utiliser la première recette, si plusieurs
-    
+
     switch (activeTab) {
       case 'ingredients':
         return (
@@ -101,12 +105,12 @@ const RecipePage = () => {
             <ScrollView style={styles.scrollableContainerPhone} contentContainerStyle={styles.ingredientsContainer}>
               {recipe.ingredients.map((item, index) => (
                 <View key={index} style={styles.ingredientContainer}>
-                  <IngredientRow 
-                    ingredient={item.ingredient} 
-                    quantity={item.quantity} 
-                    unit={item.unit} 
-                    quantityStyle={styles.textPhone} 
-                    nameStyle={styles.textPhone} 
+                  <IngredientRow
+                    ingredient={item.ingredient}
+                    quantity={item.quantity}
+                    unit={item.unit}
+                    quantityStyle={styles.textPhone}
+                    nameStyle={styles.textPhone}
                     containerStyle={styles.ingredientRowPhone}
                   />
                 </View>
@@ -172,15 +176,32 @@ const RecipePage = () => {
         return null;
     }
   };
+  const recipe = recipesMatched[currentRecipeIndex];
+  const currentStepData = recipe.steps[currentStep];
+  useEffect(() => {
+    if (MOCK_USER.micEnabled && !isRecipeHome && currentStepData) {
+      currentStepData.substeps.forEach(async (substep) => {
+        await Speech.speak(substep.instruction, {
+          language: 'fr-FR',
+          rate: 0.9,
+          pitch: 1.1,
+          volume: 1
+        });
+      });
+    }
 
+    return () => {
+      Speech.stop();
+    };
+  }, [currentStep, isRecipeHome, MOCK_USER.micEnabled]);
   // Étapes de recette pour la première recette correspondante
   if (!isRecipeHome) {
-    const recipe = recipesMatched[currentRecipeIndex];
-    const currentStepData = recipe.steps[currentStep];
+
+
     return (
       <View style={isTablet ? styles.container : styles.containerPhone}>
         <CustomHeader onBack={handleBackToHome} />
-        
+
         <View style={styles.recipeHeader}>
           <Text style={styles.recipeName}>{recipe.name}</Text>
           <Text style={styles.recipeNumber}>#{recipe.recipeNumber}</Text>
@@ -205,7 +226,7 @@ const RecipePage = () => {
             {currentStepData.substeps.map((substep, index) => (
               <View key={index} style={styles.substepBox}>
                 {substep.gif && (
-                  <Image 
+                  <Image
                     source={substep.gif}
                     style={styles.stepGif}
                     resizeMode="cover"
@@ -221,7 +242,7 @@ const RecipePage = () => {
                 )}
                 {substep.tip && (
                   <View style={styles.tipContainer}>
-                  <Icon name="lightbulb-on-outline" size={24} color="#000" />                  
+                  <Icon name="lightbulb-on-outline" size={24} color="#000" />
                   <Text style={styles.tipText}>{substep.tip}</Text>
                   </View>
                 )}
@@ -306,9 +327,9 @@ const RecipePage = () => {
               <>
                 <View style={styles.ingredientTextAndCounter}>
                   <Text style={styles.ingredientsText}>Ingredients</Text>
-                  <Counter/>  
+                  <Counter/>
                 </View>
-                
+
                 <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
                   {recipesMatched[currentRecipeIndex].ingredients.map((item, index) => (
                     <View key={index} style={styles.ingredientContainer}>
@@ -321,9 +342,9 @@ const RecipePage = () => {
               <>
                 <View style={styles.ingredientTextAndCounter}>
                   <Text style={styles.ingredientsText}>Ustensils</Text>
-                  <Counter/>  
+                  <Counter/>
                 </View>
-                
+
                 <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
                   {recipesMatched[currentRecipeIndex].utensils.map((item, index) => (
                     <View key={index} style={styles.ingredientContainer}>
@@ -339,9 +360,9 @@ const RecipePage = () => {
               total={totalPages}
               onDotClick={handlePageChange}
             />
-            <CustomButton 
-              title="Commencer la recette !" 
-              textStyles={styles.startButtonText} 
+            <CustomButton
+              title="Commencer la recette !"
+              textStyles={styles.startButtonText}
               containerStyles={styles.startButton}
               style={styles.paginationDots}
               onPress={handleStartRecipe}
@@ -365,18 +386,18 @@ const RecipePage = () => {
       </View>
 
       <View style={styles.tabsContainer}>
-        <TabButton 
-          text="Ingredients" 
+        <TabButton
+          text="Ingredients"
           isActive={activeTab === 'ingredients'}
           onPress={() => setActiveTab('ingredients')}
         />
-        <TabButton 
-          text="Ustensiles" 
+        <TabButton
+          text="Ustensiles"
           isActive={activeTab === 'utensils'}
           onPress={() => setActiveTab('utensils')}
         />
-        <TabButton 
-          text="Autres" 
+        <TabButton
+          text="Autres"
           isActive={activeTab === 'autres'}
           onPress={() => setActiveTab('autres')}
         />
@@ -386,9 +407,9 @@ const RecipePage = () => {
         {renderContent()}
       </View>
 
-      <CustomButton 
-        title="Commencer la recette !" 
-        textStyles={styles.startButtonTextPhone} 
+      <CustomButton
+        title="Commencer la recette !"
+        textStyles={styles.startButtonTextPhone}
         containerStyles={styles.startButtonPhone}
         style={styles.paginationDots}
         onPress={handleStartRecipe}
