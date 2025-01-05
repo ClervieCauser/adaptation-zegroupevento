@@ -14,6 +14,8 @@ import CustomHeader from '../../components/ui/CustomHeader';
 import { Feather } from '@expo/vector-icons';
 import { MOCK_USER } from '../../types/user';
 import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
+import CustomButton from '../../components/ui/CustomButton';
+import {router} from 'expo-router';
 
 
 const Badge = ({ type }) => {
@@ -61,6 +63,15 @@ const Settings = () => {
       </Text>
     </View>
   );
+
+  const submit = async () => {
+      try {
+        router.replace('/');
+      } catch (error) {
+        console.error(error);
+      }
+    }
+
 
   return (
     <View style={styles.container}>
@@ -117,6 +128,13 @@ const Settings = () => {
             </TouchableOpacity>
           </View>
         </View>
+          <View style={styles.settingDisconnect}>
+              <CustomButton
+                title="Déconnexion"
+                onPress={submit}
+                containerStyles={styles.disconnectButton}
+              />
+        </View>
       </View>
     </View>
   );
@@ -155,6 +173,7 @@ const styles = StyleSheet.create({
     right: 28,
   },
   section: {
+    flex: 1,
     padding: 16,
   },
   sectionTitle: {
@@ -333,6 +352,16 @@ const styles = StyleSheet.create({
   bellContainer: {
     padding: 4,
   },
+  settingDisconnect:{
+    flex: 1,
+    justifyContent: 'flex-end',
+  },
+  disconnectButton: {
+    width: '40%', 
+    justifyContent: 'center', 
+    alignSelf: 'center',
+    marginBottom: 10,
+  }
 });
 
 export default Settings;
