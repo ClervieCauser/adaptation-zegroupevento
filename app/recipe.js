@@ -136,6 +136,7 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Pelez et coupez les pommes de terre en rondelles',
+            gif: require('../assets/gifs/peeling.gif'),
             important: true
           },
           {
@@ -152,10 +153,12 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Émincez les oignons',
+            gif: require('../assets/gifs/oignon.gif'),
             important: false
           },
           {
             instruction: 'Faites revenir les lardons et les oignons dans une poêle',
+            gif: require('../assets/gifs/bacon.gif'),
             important: true
           }
         ]
@@ -167,6 +170,7 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Disposez une couche de pommes de terre dans un plat à gratin',
+
             important: false
           },
           {
@@ -327,6 +331,7 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Étalez la pâte feuilletée dans un moule à tarte et piquez-la avec une fourchette',
+            gif: require('../assets/gifs/fork.gif'),
             important: true
           }
         ]
@@ -338,10 +343,12 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Battez les œufs avec la crème fraîche dans un bol',
+            gif: require('../assets/gifs/eggs.gif'),
             important: true
           },
           {
             instruction: 'Ajoutez du sel, du poivre et de la muscade râpée',
+            gif: require('../assets/gifs/salt.gif'),
             important: false
           }
         ]
@@ -353,10 +360,12 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Disposez les lardons sur la pâte',
+            tip: 'Vous pouvez ajouter des oignons ou des champignons pour plus de saveur',
             important: true
           },
           {
             instruction: 'Versez l’appareil par-dessus',
+            tip: 'Veillez à ne pas déborder pour ne pas que la quiche déborde à la cuisson',
             important: true
           }
         ]
@@ -368,6 +377,7 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Enfournez la quiche à 180°C jusqu’à ce qu’elle soit dorée',
+            gif: require('../assets/gifs/pie.gif'),
             important: true
           }
         ]

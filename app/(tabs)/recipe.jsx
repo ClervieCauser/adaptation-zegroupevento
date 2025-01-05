@@ -30,6 +30,7 @@ const RecipePage = () => {
   const { id, orderId} = useLocalSearchParams();
   const ids = id ? id.split(',').map(i => parseInt(i, 10)) : [];
   const orderid = orderId ? parseInt(orderId, 10) : null;
+
   const recipesMatched = recipes.filter(recipe => ids.includes(recipe.id));
   if (recipesMatched.length === 0) {
     return <Text>Recette(s) introuvable(s)</Text>;
@@ -72,6 +73,12 @@ const RecipePage = () => {
     }
   };
 
+  const handlePreviousStep = () => {
+    if (currentStep > 0) {
+      setCurrentStep(currentStep - 1);
+    }
+  };
+
   const getNextButtonText = () => {
     const currentRecipe = recipesMatched[currentRecipeIndex];
     if (currentStep < currentRecipe.steps.length - 1) {
@@ -101,7 +108,7 @@ const RecipePage = () => {
             <View style={styles.imageAndText}>
               <View style={styles.mainImageContainer}>
                 <Image
-                  source={require('../../assets/images/citron.jpg')}
+                  source={recipe.imageUrl}
                   style={styles.mainImage}
                 />
               </View>
@@ -131,7 +138,7 @@ const RecipePage = () => {
             <View style={styles.imageAndText}>
               <View style={styles.mainImageContainer}>
                 <Image
-                  source={require('../../assets/images/citron.jpg')}
+                  source={recipe.imageUrl}
                   style={styles.mainImage}
                 />
               </View>
@@ -151,7 +158,7 @@ const RecipePage = () => {
             <View style={styles.imageAndText}>
               <View style={styles.mainImageContainer}>
                 <Image
-                  source={require('../../assets/images/citron.jpg')}
+                  source={recipe.imageUrl}
                   style={styles.mainImage}
                 />
               </View>
@@ -260,6 +267,13 @@ const RecipePage = () => {
 
           <View style={styles.navigationContainer}>
           <CustomButton
+            title={'Précédent'}
+            onPress={handlePreviousStep}
+            containerStyles={styles.nextButton}
+            textStyles={styles.nextButtonText}
+            Icon={() => <Icon name="chevron-left" size={24} color="#fff" />}
+          />
+          <CustomButton
             title={getNextButtonText()}
             onPress={handleNextStep}
             containerStyles={styles.nextButton}
@@ -306,7 +320,7 @@ const RecipePage = () => {
         <View style={styles.imageAndText}>
           <View style={styles.mainImageContainer}>
             <Image
-              source={require('../../assets/images/citron.jpg')}
+              source={recipesMatched[currentRecipeIndex].imageUrl}
               style={styles.mainImage}
             />
 
@@ -708,12 +722,18 @@ const styles = StyleSheet.create({
   navigationContainer: {
     alignItems: 'center',
     marginTop: -20,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: 24,
   },
   nextButton: {
     backgroundColor: '#ED9405',
     paddingVertical: 16,
     paddingHorizontal: 32,
     borderRadius: 24,
+    display: 'flex',
+    width: '30%',
     flexDirection: 'row',
     alignItems: 'center',
   },
