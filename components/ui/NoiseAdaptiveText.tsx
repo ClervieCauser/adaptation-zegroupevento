@@ -106,7 +106,7 @@ const NoiseAdaptiveText = ({ instruction, longInstruction, micEnabled, tip }) =>
                     // -20 dB est très fort (cri/musique forte)
                     // -30 dB est une conversation normale
                     // -40 dB est un murmure
-                    const newIsNoisy = volume > -10;  // Seuil conversation normale
+                    const newIsNoisy = volume > -20;  // Seuil conversation normale
 
                     setDebugInfo(`Volume: ${volume.toFixed(2)}dB Time: ${lastUpdate}`);
                     setIsNoisy(newIsNoisy);
