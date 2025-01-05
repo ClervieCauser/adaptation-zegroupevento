@@ -206,8 +206,6 @@ const RecipePage = () => {
           <Text style={styles.recipeName}>{recipe.name}</Text>
           <Text style={styles.recipeNumber}>#{recipe.recipeNumber}</Text>
           <View style={styles.headerIcons}>
-            <Icon name="message-outline" size={24} color="#000" />
-            <Icon name="bell-outline" size={24} color="#000" />
             <View style={styles.difficultyBadge}>
               <Text style={styles.difficultyText}>{recipe.difficulty}</Text>
             </View>
@@ -634,6 +632,7 @@ const styles = StyleSheet.create({
   },
   stepContent: {
     padding: 16,
+    height: '100%',
   },
   stepHeader: {
     flexDirection: 'row',
@@ -660,7 +659,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   substepsContainer: {
-    maxHeight: 400,
+    height: '100%',
+    maxHeight: 450,
   },
   substepBox: {
     marginBottom: 16,
@@ -696,8 +696,8 @@ const styles = StyleSheet.create({
     color: '#666',
   },
   navigationContainer: {
-    marginTop: 24,
     alignItems: 'center',
+    marginTop: -20,
   },
   nextButton: {
     backgroundColor: '#ED9405',
@@ -740,8 +740,10 @@ const styles = StyleSheet.create({
     backgroundColor: '#ED9405',
   },
   stepGif: {
-    width: '100%',
-    height: 200,
+    width: '50%',
+    height: 250,
+    display: 'flex',
+    alignSelf: 'center',
     borderRadius: 8,
     marginBottom: 8,
   }

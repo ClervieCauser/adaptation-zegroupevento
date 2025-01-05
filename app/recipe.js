@@ -16,8 +16,25 @@ export const recipes = [
           {
             instruction: 'Préchauffez votre four à 200 degrés',
             tip: 'En prechauffant son four avant, on optimise son temps !',
+            gif: require('../assets/gifs/preheat.gif'),
             important: true
-          }
+          },
+          {
+            instruction: 'Préchauffez votre four à 200 degrés',
+            tip: 'En prechauffant son four avant, on optimise son temps !',
+            gif: require('../assets/gifs/preheat.gif'),
+            important: true
+          },
+          {
+            instruction: 'Préchauffez votre four à 200 degrés',
+            tip: 'En prechauffant son four avant, on optimise son temps !',
+            gif: require('../assets/gifs/preheat.gif'),
+            important: true
+          },
+          {
+            instruction: 'Sortez votre poulet du frigo pour qu\'il soit à température ambiante',
+            important: false
+          },
         ]
       },
       {
@@ -26,7 +43,8 @@ export const recipes = [
         duration: '5 min',
         substeps: [
           {
-            instruction: 'Rincez et séchez le poulet',
+            instruction: 'Coupez et rincez le poulet',
+            gif: require('../assets/gifs/cutchicken.gif'),
             important: false
           },
           {
