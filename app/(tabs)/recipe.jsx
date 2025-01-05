@@ -30,8 +30,8 @@ const RecipePage = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState(new Set());
   const [currentRecipeIndex, setCurrentRecipeIndex] = useState(0);
-  let [numberOfItemsOfCurrentRecipe, setNumberOfItemsOfCurrentRecipe] = useState(1);
-  const { id, orderId} = useLocalSearchParams();
+  const [numberOfItemsOfCurrentRecipe, setNumberOfItemsOfCurrentRecipe] = useState(1);
+  const { id, orderId } = useLocalSearchParams();
   const ids = id ? id.split(',').map(i => parseInt(i, 10)) : [];
   const orderid = orderId ? parseInt(orderId, 10) : null;
 
@@ -48,14 +48,19 @@ const RecipePage = () => {
   }
 
   const order = MOCK_ORDERS.find(order => parseInt(order.id, 10) === orderid);
-  if (order) {
-    // for the current recipe, find the number of items in the order and put it in numberOfItemsOfCurrentRecipe
-    const currentRecipe = recipesMatched[currentRecipeIndex];
-    const currentItem = order.items.find(item => item.name === currentRecipe.name);
-    numberOfItemsOfCurrentRecipe = currentItem ? currentItem.quantity : 0;
-  } else {
-    numberOfItemsOfCurrentRecipe = 1;
-  }
+
+  // Effet pour mettre à jour `numberOfItemsOfCurrentRecipe` quand `currentRecipeIndex` change
+  useEffect(() => {
+    if (order) {
+      const currentRecipe = recipesMatched[currentRecipeIndex];
+      const currentItem = order.items.find(item => item.name === currentRecipe.name);
+      setNumberOfItemsOfCurrentRecipe(currentItem ? currentItem.quantity : 0);
+      console.log('Order found');
+    } else {
+      console.log('No order found');
+      setNumberOfItemsOfCurrentRecipe(1);
+    }
+  }, [currentRecipeIndex, order, recipesMatched, orderId, id]);
 
   const handlePageChange = (page) => {
     setActivePage(page);
@@ -132,7 +137,10 @@ const RecipePage = () => {
                 />
               </View>
 
-              <Counter initialValue={numberOfItemsOfCurrentRecipe} />
+              <Counter
+                value={numberOfItemsOfCurrentRecipe}
+                onValueChange={(newValue) => setNumberOfItemsOfCurrentRecipe(newValue)}
+              />
             </View>
 
             <ScrollView style={styles.scrollableContainerPhone} contentContainerStyle={styles.ingredientsContainer}>
@@ -274,7 +282,7 @@ const RecipePage = () => {
                   ) : (
                       <NoiseAdaptiveText
                           instruction={substep.instruction + (substep.attachedIngredient ? `\nIngrédient(s) concerné(s): ${substep.attachedIngredient}` : '')}
-                          longInstruction={substep.longinstruction}
+                          longInstruction={substep.longinstruction + (substep.attachedIngredient ? `\nIngrédient(s) concerné(s): ${substep.attachedIngredient}` : '')}
                           micEnabled={MOCK_USER.micEnabled}
                       />
                   )}
@@ -288,24 +296,24 @@ const RecipePage = () => {
             ))}
           </ScrollView>
 
-          <View style={[styles.navigationContainer, !isTablet && styles.navigationContainerPhone]}>
+          <View style={styles.navigationContainer}>
             <CustomButton
                 title="Précédent"
                 onPress={handlePreviousStep}
-                containerStyles={[styles.nextButton, !isTablet && styles.nextButtonPhone]}
-                textStyles={[styles.nextButtonText, !isTablet && styles.nextButtonTextPhone]}
+                containerStyles={styles.nextButton}
+                textStyles={styles.nextButtonText}
                 Icon={() => <ChevronLeft size={24} color="#fff" />}
             />
             <CustomButton
                 title={getNextButtonText()}
                 onPress={handleNextStep}
-                containerStyles={[styles.nextButton, !isTablet && styles.nextButtonPhone]}
-                textStyles={[styles.nextButtonText, !isTablet && styles.nextButtonTextPhone]}
+                containerStyles={styles.nextButton}
+                textStyles={styles.nextButtonText}
                 Icon={() => <ChevronRight size={24} color="#fff" />}
             />
         </View>
 
-        <View style={[styles.progressContainer, !isTablet && styles.progressContainerPhone]}>
+        <View style={styles.progressContainer}>
           <Text style={styles.progressText}>
             Étape {currentStep + 1} sur {recipesMatched[currentRecipeIndex].steps.length}
           </Text>
@@ -373,7 +381,10 @@ const RecipePage = () => {
               <>
                 <View style={styles.ingredientTextAndCounter}>
                   <Text style={styles.ingredientsText}>Ingredients</Text>
-                  <Counter initialValue={numberOfItemsOfCurrentRecipe}/>
+                  <Counter
+                    value={numberOfItemsOfCurrentRecipe}
+                    onValueChange={(newValue) => setNumberOfItemsOfCurrentRecipe(newValue)}
+                  />
                 </View>
 
                 <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
@@ -388,7 +399,10 @@ const RecipePage = () => {
               <>
                 <View style={styles.ingredientTextAndCounter}>
                   <Text style={styles.ingredientsText}>Ustensils</Text>
-                  <Counter initialValue={recipesMatched[currentRecipeIndex].utensils.length} />
+                  <Counter
+                    value={numberOfItemsOfCurrentRecipe}
+                    onValueChange={(newValue) => setNumberOfItemsOfCurrentRecipe(newValue)}
+                  />
                 </View>
 
                 <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
@@ -481,7 +495,7 @@ const styles = StyleSheet.create({
   },
   containerPhone: {
     flex: 1,
-    backgroundColor: '#F9F7FA',
+    backgroundColor: '#fff',
   },
   contentContainer: {
     padding: 16,
@@ -764,28 +778,21 @@ const styles = StyleSheet.create({
   },
   navigationContainer: {
     alignItems: 'center',
+    marginTop: -20,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 14,
-  },
-  navigationContainerPhone: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: -10,
+    gap: 24,
   },
   nextButton: {
     backgroundColor: '#ED9405',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
     borderRadius: 24,
     display: 'flex',
-    width: '35%',
+    width: '30%',
     flexDirection: 'row',
     alignItems: 'center',
-  },
-  nextButtonPhone: {
-    padding: 5,
-    minHeight: 40,
   },
   nextButtonText: {
     color: '#FFF',
@@ -793,18 +800,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginRight: 8,
   },
-  nextButtonTextPhone: {
-    color: '#FFF',
-    fontSize: 12,
-    fontWeight: 'bold',
-    marginRight: 8,
-  },
   progressContainer: {
-    marginTop: 15,
-    alignItems: 'center',
-  },
-  progressContainerPhone: {
-    marginTop: -40,
+    marginTop: 24,
     alignItems: 'center',
   },
   progressText: {
