@@ -48,7 +48,10 @@ const OrderCard = ({
             const row = (
                 <View key={i} style={styles.gridRow}>
                     {rowItems.map((item, index) => (
-                        <View key={index} style={styles.gridCell}>
+                        <View key={index} style={[
+                            styles.gridCell,
+                            item.isReady && styles.itemCompleted
+                        ]}>
                             <ThemedText style={styles.mealName}>{item.name}</ThemedText>
                             <ThemedText style={styles.mealQuantity}>×{item.quantity}</ThemedText>
                         </View>
@@ -148,6 +151,11 @@ const styles = StyleSheet.create({
     cardExpanded: {
         marginBottom: 24,
         height: 'auto',
+    },
+    itemCompleted: {
+        backgroundColor: '#E8F5E9',
+        borderColor: '#4CAF50',
+        borderWidth: 1
     },
     cardContent: {
         padding: 16,

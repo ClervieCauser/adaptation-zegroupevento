@@ -64,10 +64,13 @@ const OrdersInProgress = () => {
                                     key={`order-${orderGroup.groupId}`}
                                     order={{
                                         id: groupIds.join(', #'),
-                                        items: group.flatMap(order => order.items),
+                                        items: group.flatMap(order => ({
+                                            ...order.items[0],
+                                            isReady: order.items.every(item => item.isReady)
+                                        })),
                                         status: 'IN_PROGRESS',
                                         time: `${completedItems}/${totalItems} ready`,
-                                        groupId: orderGroup.groupId  // Ajoutez cette ligne
+                                        groupId: orderGroup.groupId
                                     }}
                                     expanded={expandedCardId === orderGroup.groupId}
                                     onToggleExpand={() => setExpandedCardId(
