@@ -281,7 +281,10 @@ const RecipePage = () => {
                       </View>
                   ) : (
                       <NoiseAdaptiveText
-                          instruction={substep.instruction + (substep.attachedIngredient ? `\nIngrédient(s) concerné(s): ${substep.attachedIngredient}` : '')}
+                          instruction={
+                            MOCK_USER.micEnabled ? substep.instruction + (substep.attachedIngredient ? `\nIngrédient(s) concerné(s): ${substep.attachedIngredient}` : '') 
+                            : substep.longinstruction + (substep.attachedIngredient ? `\nIngrédient(s) concerné(s): ${substep.attachedIngredient}` : '')
+                          }
                           longInstruction={substep.longinstruction + (substep.attachedIngredient ? `\nIngrédient(s) concerné(s): ${substep.attachedIngredient}` : '')}
                           micEnabled={MOCK_USER.micEnabled}
                       />
