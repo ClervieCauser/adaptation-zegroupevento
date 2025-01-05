@@ -244,7 +244,14 @@ const RecipePage = () => {
         <CustomHeader onBack={handleBackToHome} />
 
         <View style={styles.recipeHeader}>
-          <Text style={styles.recipeName}>{recipe.name}</Text>
+          <CustomButton
+                title="<"
+                onPress={handleBackToHome}
+                containerStyles={styles.backHomeButton}
+                textStyles={styles.backHomeText}
+                Icon={() => <ChevronLeft size={24} color="#fff" />}
+            />
+           <Text style={styles.recipeName}>{recipe.name}</Text>
           { orderId ? (
           <Text style={styles.recipeNumber}>Plat {currentRecipeIndex+1}/{recipesMatched.length} de la commande {orderId}</Text>
           ) : (null)
@@ -796,6 +803,20 @@ const styles = StyleSheet.create({
     width: '30%',
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  backHomeButton: {
+    backgroundColor: '#ED9405',
+    borderRadius: 24,
+    width: '15%',
+    padding: 5,
+    minHeight: 40,
+    maxWidth: 40,
+    marginBottom: 16,
+  },
+  backHomeText: {
+    color: '#FFF',
+    fontSize: 18,
+    fontWeight: 'bold',
   },
   nextButtonText: {
     color: '#FFF',
