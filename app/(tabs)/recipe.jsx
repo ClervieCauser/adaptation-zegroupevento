@@ -251,31 +251,6 @@ const RecipePage = () => {
 
           <ScrollView style={styles.substepsContainer}>
             {currentStepData.substeps.map((substep, index) => (
-<<<<<<< HEAD
-              <View key={index} style={styles.substepBox}>
-                {substep.gif && (
-                  <Image
-                    source={substep.gif}
-                    style={styles.stepGif}
-                    resizeMode="cover"
-                  />
-                )}
-                {substep.important && (
-                  <View style={styles.importantIndicator}>
-                    <Text style={styles.warningText}>{substep.instruction}\n Ingrédient(s) concerné(s): {substep.attachedIngredient}</Text>
-                  </View>
-                )}
-                {!substep.important && (
-                  <Text style={styles.substepText}>{substep.instruction}\n Ingrédient(s) concerné(s): {substep.attachedIngredient}</Text>
-                )}
-                {substep.tip && (
-                  <View style={styles.tipContainer}>
-                    <Icon name="lightbulb-on-outline" size={24} color="#000" />
-                    <Text style={styles.tipText}>{substep.tip}</Text>
-                  </View>
-                )}
-              </View>
-=======
                 <View key={index} style={styles.substepBox}>
                   {substep.gif && (
                       <Image
@@ -286,11 +261,11 @@ const RecipePage = () => {
                   )}
                   {substep.important ? (
                       <View style={styles.importantIndicator}>
-                        <Text style={styles.warningText}>{substep.instruction}</Text>
+                        <Text style={styles.warningText}>{substep.instruction}\n Ingrédient(s) concerné(s): {substep.attachedIngredient}</Text>
                       </View>
                   ) : (
                       <NoiseAdaptiveText
-                          instruction={substep.instruction}
+                          instruction={substep.instruction + (substep.attachedIngredient ? `\nIngrédient(s) concerné(s): ${substep.attachedIngredient}` : '')}
                           longInstruction={substep.longinstruction}
                           micEnabled={MOCK_USER.micEnabled}
                       />
@@ -302,7 +277,6 @@ const RecipePage = () => {
                       </View>
                   )}
                 </View>
->>>>>>> 830266ba3cb9fa6377dbf55fff9f943595b5ce1d
             ))}
           </ScrollView>
 
