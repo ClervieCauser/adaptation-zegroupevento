@@ -114,7 +114,7 @@ const styles = StyleSheet.create({
   recipeListContent: {
     paddingLeft: '2%',
     paddingRight: '2%',
-    height: isTablet ? '80%': '70%',
+    height: isTablet ? '80%': '80%',
   },
   recipeCard: {
     backgroundColor: 'white',
@@ -127,7 +127,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 3,
-    width: isTablet ? wp('25%') : wp('35%'),
+    width: isTablet ? wp('25%') : wp('40%'),
     marginRight: 15,
     marginTop: 8,
     },
@@ -168,6 +168,7 @@ const styles = StyleSheet.create({
     alignSelf: 'center',
     width: isTablet? '50%' : '80%',
     margin: isTablet ? '5%' : '10%',
+    marginBottom: '2%',
   },
   buttonText: {
     color: '#FFFFFF',
