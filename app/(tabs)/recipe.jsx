@@ -27,8 +27,9 @@ const RecipePage = () => {
   const [completedSteps, setCompletedSteps] = useState(new Set());
   const [currentRecipeIndex, setCurrentRecipeIndex] = useState(0);
 
-  const { id } = useLocalSearchParams();
+  const { id, orderId} = useLocalSearchParams();
   const ids = id ? id.split(',').map(i => parseInt(i, 10)) : [];
+  const orderid = orderId ? parseInt(orderId, 10) : null;
   const recipesMatched = recipes.filter(recipe => ids.includes(recipe.id));
   if (recipesMatched.length === 0) {
     return <Text>Recette(s) introuvable(s)</Text>;
@@ -49,20 +50,24 @@ const RecipePage = () => {
     const currentRecipe = recipesMatched[currentRecipeIndex];
 
     if (currentStep < currentRecipe.steps.length - 1) {
-      // S'il reste des étapes dans la recette actuelle
       setCurrentStep(currentStep + 1);
       setCompletedSteps(new Set([...completedSteps, currentStep]));
     } else {
-      // Si c'est la dernière étape de la recette actuelle
       if (currentRecipeIndex < recipesMatched.length - 1) {
-        // S'il reste des recettes à faire
         setCurrentRecipeIndex(currentRecipeIndex + 1);
         setCurrentStep(0);
         setCompletedSteps(new Set());
         setIsRecipeHome(true);
       } else {
-        // Si c'était la dernière recette
-        router.push('/pending-orders');
+        if(orderid){
+          router.push('/pending-orders');
+        } else {
+          router.push('/home');
+        }
+        setCurrentRecipeIndex(0);
+        setCurrentStep(0);
+        setCompletedSteps(new Set());
+        setIsRecipeHome(true);
       }
     }
   };
@@ -73,8 +78,10 @@ const RecipePage = () => {
       return "Prochaine étape";
     } else if (currentRecipeIndex < recipesMatched.length - 1) {
       return "Recette suivante";
-    } else {
+    } else if (orderid) {
       return "Terminer la commande";
+    } else {
+    return "Retour à l'accueil";
     }
   };
 
@@ -85,7 +92,7 @@ const RecipePage = () => {
   };
 
   const renderContent = () => {
-    const recipe = recipesMatched[currentRecipeIndex]; // Utiliser la première recette, si plusieurs
+    const recipe = recipesMatched[currentRecipeIndex]; 
 
     switch (activeTab) {
       case 'ingredients':
@@ -204,7 +211,10 @@ const RecipePage = () => {
 
         <View style={styles.recipeHeader}>
           <Text style={styles.recipeName}>{recipe.name}</Text>
-          <Text style={styles.recipeNumber}>#{recipe.recipeNumber}</Text>
+          { orderId ? (
+          <Text style={styles.recipeNumber}>Plat {currentRecipeIndex+1}/{recipesMatched.length} de la commande {orderId}</Text>
+          ) : (null)
+          }
           <View style={styles.headerIcons}>
             <View style={styles.difficultyBadge}>
               <Text style={styles.difficultyText}>{recipe.difficulty}</Text>
