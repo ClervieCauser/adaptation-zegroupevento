@@ -1,9 +1,14 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, TouchableOpacity, StyleSheet, Text } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 
 const Counter = ({ initialValue = 0, onValueChange }) => {
   const [value, setValue] = useState(initialValue);
+
+  // Met à jour l'état interne lorsque initialValue change
+  useEffect(() => {
+    setValue(initialValue);
+  }, [initialValue]);
 
   const increment = () => {
     const newValue = value + 1;
