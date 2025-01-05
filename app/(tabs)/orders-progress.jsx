@@ -11,21 +11,22 @@ import {useOrderSelection} from "../../context/OrderContext";
 
 const OrdersInProgress = () => {
     const [searchText, setSearchText] = useState('');
+
+    // Grouper les ordres par groupId
     const [expandedCardId, setExpandedCardId] = useState(null);
     const { processingOrders } = useOrderProcessing();
     const { cleanupOrderState } = useOrderSelection();
 
     // Grouper les ordres par groupId
     const groupedOrders = useMemo(() => {
-        return processingOrders.reduce((groups, order) => {
-            const group = groups.find(g => g[0].groupId === order.groupId);
-            if (group) {
-                group.push(order);
-            } else {
-                groups.push([order]);
+        const groups = {};
+        processingOrders.forEach(order => {
+            if (!groups[order.groupId]) {
+                groups[order.groupId] = [];
             }
-            return groups;
-        }, []);
+            groups[order.groupId].push(order);
+        });
+        return Object.values(groups);
     }, [processingOrders]);
 
     useEffect(() => {
@@ -65,7 +66,8 @@ const OrdersInProgress = () => {
                                         id: groupIds.join(', #'),
                                         items: group.flatMap(order => order.items),
                                         status: 'IN_PROGRESS',
-                                        time: `${completedItems}/${totalItems} ready`
+                                        time: `${completedItems}/${totalItems} ready`,
+                                        groupId: orderGroup.groupId  // Ajoutez cette ligne
                                     }}
                                     expanded={expandedCardId === orderGroup.groupId}
                                     onToggleExpand={() => setExpandedCardId(
@@ -75,7 +77,6 @@ const OrdersInProgress = () => {
                                     isSelectMode={false}
                                     isSelected={false}
                                     onSelect={() => {}}
-                                    groupId={orderGroup.groupId}
                                 />
                             );
                         })}

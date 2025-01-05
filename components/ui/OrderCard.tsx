@@ -74,9 +74,9 @@ const OrderCard = ({
     };
 
     const handleContinue = useCallback(() => {
-        // Protection contre les redirections multiples
-        handleSingleCook(order.id);
-    }, [order.id, handleSingleCook]);
+        // Utiliser order.groupId de la props
+        handleSingleCook(order.id.split(', #')[0], order.groupId);
+    }, [order.id, order.groupId, handleSingleCook]);
 
     return (
         <ThemedView style={[
