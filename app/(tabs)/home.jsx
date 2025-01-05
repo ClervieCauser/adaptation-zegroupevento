@@ -1,4 +1,4 @@
-import { StyleSheet, View, FlatList, Dimensions, TouchableOpacity, Text} from 'react-native';
+import { StyleSheet, ScrollView, View, FlatList, Dimensions, TouchableOpacity, Text} from 'react-native';
 import React, { useState, useEffect} from 'react';
 import CustomHeader from "../../components/ui/CustomHeader";
 import SearchBar from '@/components/ui/SearchBar';
@@ -27,9 +27,7 @@ const Home = () => {
   const [searchText, setSearchText] = useState('');
   const [selectedTags, setSelectedTags] = useState([]);
 
-  useEffect(() => {
-    console.log('Selected tags:', selectedTags);
-  }, [selectedTags]);
+  useEffect(() => {}, [selectedTags]);
 
   const toggleTag = (tag) => {
     setSelectedTags(prevTags =>
@@ -51,7 +49,7 @@ const Home = () => {
         <View style={styles.searchContainer}>
           <SearchBar value={searchText} onChangeText={setSearchText} placeholder="Rechercher par recette" />
         </View>
-        <View style={styles.tagContainer}>
+        <ScrollView horizontal={true} style={styles.tagScrollView} contentContainerStyle={styles.tagContainer}>
           {['Four', 'Poulet', 'Fromage', 'Léger', 'Réconfortant'].map(tag => (
             <TouchableOpacity
               key={tag}
@@ -67,7 +65,7 @@ const Home = () => {
                 ]}>{tag}</Text>
             </TouchableOpacity>
           ))}
-        </View>
+        </ScrollView>
       </View>
       <ThemedText style={styles.title}>Liste des recettes</ThemedText>
       <RecipeList recipes={filteredRecipes} style={styles.recipeList} />
@@ -116,7 +114,8 @@ const styles = StyleSheet.create({
     flexGrow: 1,
   },
   tagContainer: {
-    marginLeft: 15,
+    marginLeft: 10,
+    marginRight: 10,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'left',

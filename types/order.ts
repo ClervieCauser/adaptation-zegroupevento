@@ -10,7 +10,8 @@ export type Order = {
     time: string;
     status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
     items: OrderItem[];
-    groupId?: string;  // Ajoutez cette ligne
+    groupId?: string;
+    isOrderReady?: (orderId: string) => boolean;
 };
 
 export type OrderSelectionState = {

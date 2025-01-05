@@ -5,6 +5,7 @@ import { MOCK_USER } from '@/types/user';
 import { MOCK_ORDERS, Order } from '@/types/order';
 import { useOrderProcessing } from "@/context/OrderProcessingContext";
 import { recipes } from '../app/recipe';
+
 type OrderSelectionContextType = {
     selectedIds: string[];
     orderToCook: string | null;
@@ -34,10 +35,8 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
 
     const toggleSelectMode = useCallback(() => {
         setIsSelectMode(prev => !prev);
-        if (isSelectMode) {
-            setSelectedIds([]);
-        }
-    }, [isSelectMode]);
+        setSelectedIds([]); // Reset selection when toggling mode
+    }, []);
 
     const toggleOrderSelection = useCallback((orderId: string) => {
         setSelectedIds(prev =>
@@ -57,7 +56,6 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
             });
 
             setPendingOrders(prev => prev.filter(order => !selectedIds.includes(order.id)));
-            setOrderToCook(null);
             router.push('/recipe-prep');
         }
     }, [selectedIds, pendingOrders, addOrderToProcessing]);
@@ -65,6 +63,8 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
     const handleSingleCook = useCallback(
         (orderId: string, groupId?: string) => {
             if (MOCK_USER.level === 'EXPERT') {
+                setSelectedIds([]); // Clear previous selections
+
                 if (groupId) {
                     // Pour les ordres déjà en cours
                     const groupOrders = processingOrders.filter(o => o.groupId === groupId);
@@ -84,12 +84,10 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
             } else {
                 const order = pendingOrders.find(o => o.id === orderId);
                 if (order) {
-                    // Vérifie si l'ordre est trouvé et récupère les recettes en fonction de leur nom
                     const recipeIds = order.items
                         .map(item => recipes.find(recipe => recipe.name === item.name)?.id)
-                        .filter(Boolean); // On filtre les IDs undefined s'il y en a
-    
-                    // Si des IDs de recettes sont trouvés, redirige vers la page correspondante
+                        .filter(Boolean);
+
                     if (recipeIds.length > 0) {
                         router.push({
                             pathname: '/recipe',
@@ -104,7 +102,7 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
         },
         [pendingOrders, addOrderToProcessing, processingOrders, router]
     );
-    
+
 
     const getOrdersToShow = useCallback(() => {
         if (orderToCook) return [orderToCook];

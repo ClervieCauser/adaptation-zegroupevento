@@ -15,6 +15,7 @@ type OrderCardProps = {
     isSelected: boolean;
     onSelect: (id: string) => void;
     showContinue?: boolean;
+    showProgress?: boolean;
 };
 
 const OrderCard = ({
@@ -23,6 +24,7 @@ const OrderCard = ({
                        onToggleExpand,
                        isSelectMode,
                        isSelected,
+                       showProgress = false,
                        onSelect,
                        showContinue = false
                    }) => {
@@ -38,17 +40,20 @@ const OrderCard = ({
     const remainingItems = order.items.length - MAX_VISIBLE_ITEMS;
     const isExpert = order.items.length > 4;
 
+
     const handleContinue = useCallback(() => {
         // Utiliser order.groupId de la props
         handleSingleCook(order.id.split(', #')[0], order.groupId);
     }, [order.id, order.groupId, handleSingleCook]);
 
+
+
     const renderToggleButton = () => {
         if (!hasMoreItems) return null;
-        
+
         if (isExpanded) {
             return (
-                <TouchableOpacity 
+                <TouchableOpacity
                     style={[styles.itemBox, styles.seeMoreBox]}
                     onPress={() => setIsExpanded(false)}
                 >
@@ -58,7 +63,7 @@ const OrderCard = ({
         }
 
         return (
-            <TouchableOpacity 
+            <TouchableOpacity
                 style={[styles.itemBox, styles.seeMoreBox]}
                 onPress={() => setIsExpanded(true)}
             >
@@ -71,7 +76,8 @@ const OrderCard = ({
         <ThemedView style={[
             styles.card,
             expanded && styles.cardExpanded,
-            { width: expanded ? '100%' : 'calc(25% - 12px)' }]}>   
+            { width: expanded ? '100%' : 'calc(25% - 12px)' }
+        ]}>
             {isSelectMode && (
                 <TouchableOpacity
                     style={[styles.selectCircle, isSelected && styles.selectCircleActive]}
@@ -83,7 +89,24 @@ const OrderCard = ({
             <View style={styles.cardContent}>
                 <View style={styles.header}>
                     <View style={styles.orderInfo}>
-                        <ThemedText style={styles.orderId}>Commande #{order.id}</ThemedText>
+                        <View style={styles.orderIdContainer}>
+                            <ThemedText style={styles.orderLabel}>Commande : </ThemedText>
+                            {order.id.split(', #').map((id, index) => {
+                                // Trouver l'order correspondante et vérifier si tous ses plats sont prêts
+                                const isOrderReady = order.readyOrders && order.readyOrders.includes(id);
+                                return (
+                                    <ThemedText
+                                        key={id}
+                                        style={[
+                                            styles.orderId,
+                                            isOrderReady && styles.orderIdReady
+                                        ]}
+                                    >
+                                        {index > 0 ? ', #' : '#'}{id}
+                                    </ThemedText>
+                                );
+                            })}
+                        </View>
                         <ThemedText style={styles.time}>{order.time}</ThemedText>
                     </View>
                     <View style={styles.tags}>
@@ -93,21 +116,39 @@ const OrderCard = ({
                         <View style={styles.tag}>
                             <ThemedText style={styles.tagText}>Plus ancien</ThemedText>
                         </View>
-                        <View style={[styles.tag, isExpert ? styles.expertTag : styles.noviceTag]}>
-                            <ThemedText style={styles.tagText}>{isExpert ? 'EXPERT' : 'NOVICE'}</ThemedText>
+                        <View style={[styles.tag, order.items.length > 4 ? styles.expertTag : styles.noviceTag]}>
+                            <ThemedText style={styles.tagText}>
+                                {order.items.length > 4 ? 'EXPERT' : 'NOVICE'}
+                            </ThemedText>
                         </View>
                     </View>
                 </View>
 
                 <View style={styles.itemsGrid}>
                     {visibleItems.map((item, index) => (
-                        <View key={index} style={styles.itemBox}>
-                            <ThemedText style={styles.itemName}>{item.name}</ThemedText>
-                            <ThemedText style={styles.itemQuantity}>×{item.quantity}</ThemedText>
+                        <View
+                            key={`${item.name}-${index}`}
+                            style={[
+                                styles.itemBox,
+                                {
+                                    background: `linear-gradient(to right, #E8F5E9 ${(item.readyCount / item.quantity) * 100}%, #FFFFFF ${(item.readyCount / item.quantity) * 100}%)`
+                                }
+                            ]}
+                        >
+                            <ThemedText style={styles.itemName}>
+                                {item.name}
+                            </ThemedText>
+                            <ThemedText style={styles.itemQuantity}>
+                                {showProgress
+                                    ? `${item.readyCount}/${item.quantity}`
+                                    : `×${item.quantity}`
+                                }
+                            </ThemedText>
                         </View>
                     ))}
                     {renderToggleButton()}
                 </View>
+
 
                 {!showContinue ? (
                     <TouchableOpacity
@@ -205,16 +246,6 @@ const styles = StyleSheet.create({
         gap: 8,
         marginBottom: 16,
     },
-    itemBox: {
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        backgroundColor: '#FFFFFF',
-        padding: 12,
-        borderRadius: 8,
-        width: '48%',
-        minWidth: 120,
-    },
     seeMoreBox: {
         justifyContent: 'center',
         cursor: 'pointer',
@@ -272,6 +303,60 @@ const styles = StyleSheet.create({
     continueButton: {
         backgroundColor: '#4CAF50',
     },
+    itemBoxReady: {
+        backgroundColor: '#E8F5E9',
+        borderColor: '#4CAF50',
+        borderWidth: 1
+    },
+    itemTextReady: {
+        color: '#4CAF50',
+    },
+    orderIdReady: {
+        color: '#4CAF50',
+    },
+    orderIdContainer: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'center',
+    },
+    itemContent: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: '100%',
+        marginBottom: 4,
+    },
+    progressBarContainer: {
+        width: '100%',
+        height: 4,
+        backgroundColor: '#E0E0E0',
+        borderRadius: 2,
+        overflow: 'hidden',
+    },
+    progressBar: {
+        height: '100%',
+        backgroundColor: '#4CAF50',
+        borderRadius: 2,
+        transition: 'width 0.3s ease',
+    },
+    orderLabel: {
+        fontSize: 16,
+        fontFamily: 'Jua',
+        color: '#1C0D45',
+        marginRight: 4,
+    },
+    itemBox: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        padding: 12,
+        borderRadius: 8,
+        width: '48%',
+        minWidth: 120,
+        backgroundColor: '#FFFFFF',
+        position: 'relative',
+        overflow: 'hidden',
+    }
 });
 
 export default OrderCard;
