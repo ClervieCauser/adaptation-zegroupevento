@@ -11,7 +11,7 @@ import Animated, {
     withDelay
 } from "react-native-reanimated";
 
-const DragZone = ({ zoneId, onMeasure }) => {
+const DragZone = ({ zoneId, onMeasure, onReadyAll }) => {
     const { getOrderByZone, toggleItemReady, removeOrderFromZone } = useOrderProcessing();
     const order = getOrderByZone(zoneId);
     const orderData = order ? MOCK_ORDERS.find(o => o.id === order.orderId) : null;
@@ -64,6 +64,12 @@ const DragZone = ({ zoneId, onMeasure }) => {
             ) : (
                 <Animated.View style={[styles.content, opacity]}>
                     <ThemedText style={styles.orderTitle}>Order #{orderData.id}</ThemedText>
+                    <TouchableOpacity
+                        style={styles.readyAllButton}
+                        onPress={() => onReadyAll(order.orderId)}
+                    >
+                        <ThemedText style={styles.readyAllText}>Ready All</ThemedText>
+                    </TouchableOpacity>
                     <ScrollView style={styles.itemsContainer}>
                         {order?.items?.map((item, index) => (
                             <TouchableOpacity
@@ -173,6 +179,23 @@ const styles = StyleSheet.create({
         color: '#FFFFFF',
         fontFamily: 'Jua',
         fontSize: 14,
+    },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: 16,
+    },
+    readyAllButton: {
+        backgroundColor: '#4CAF50',
+        paddingHorizontal: 12,
+        paddingVertical: 4,
+        borderRadius: 8,
+    },
+    readyAllText: {
+        color: 'white',
+        fontSize: 12,
+        fontFamily: 'Jua',
     },
 });
 

@@ -49,3 +49,10 @@ const mockRecipe = {
 };
 
 export default mockRecipe;
+
+export type SubStep = {
+  instruction: string;
+  tip?: string;
+  important: boolean;
+  gif?: any;
+};

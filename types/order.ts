@@ -4,11 +4,13 @@ export type OrderItem = {
     quantity: number;
 };
 
+// types/order.ts
 export type Order = {
     id: string;
     time: string;
     status: 'PENDING' | 'IN_PROGRESS' | 'COMPLETED';
     items: OrderItem[];
+    groupId?: string;  // Ajoutez cette ligne
 };
 
 export type OrderSelectionState = {
