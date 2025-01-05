@@ -319,6 +319,7 @@ const RecipePage = () => {
       <View style={styles.container}>
         <CustomHeader />
         <Text style={styles.title}>{recipesMatched[currentRecipeIndex].name}</Text>
+        <Text style={styles.subtitle}>{orderId ? `Plat ${currentRecipeIndex+1}/${recipesMatched.length} de la commande #${orderId}` : ''}</Text>
 
         <View style={styles.tagContainer}>
           {recipesMatched[currentRecipeIndex].tags.map((item, index) => (
@@ -379,7 +380,7 @@ const RecipePage = () => {
                 <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
                   {recipesMatched[currentRecipeIndex].utensils.map((item, index) => (
                     <View key={index} style={styles.ingredientContainer}>
-                      <UtensilRow utensil={item.utensil} />
+                      <UtensilRow utensil={item.utensil}/>
                     </View>
                   ))}
                 </ScrollView>
@@ -409,6 +410,7 @@ const RecipePage = () => {
       <CustomHeader/>
 
       <Text style={styles.title}>{recipesMatched[currentRecipeIndex].name}</Text>
+      <Text style={styles.subtitle}>{orderId ? `Plat ${currentRecipeIndex+1}/${recipesMatched.length} de la commande #${orderId}` : ''}</Text>
 
       <View style={styles.tagContainer}>
         {recipesMatched[currentRecipeIndex].tags.map((item, index) => (
@@ -587,6 +589,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 24,
     fontWeight: 'bold',
+    textAlign: 'center',
+    fontFamily: 'Jua',
+  },
+  subtitle: {
+    fontSize: 18,
+    color: '#666',
     textAlign: 'center',
     fontFamily: 'Jua',
   },
