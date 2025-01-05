@@ -1,5 +1,5 @@
-import { StyleSheet, View, FlatList, Dimensions } from 'react-native';
-import React, { useState } from 'react';
+import { StyleSheet, View, FlatList, Dimensions, TouchableOpacity, Text} from 'react-native';
+import React, { useState, useEffect} from 'react';
 import CustomHeader from "../../components/ui/CustomHeader";
 import SearchBar from '@/components/ui/SearchBar';
 import { ThemedView } from '@/components/ThemedView';
@@ -18,13 +18,30 @@ const adaptedRecipes = recipes.map(recipe => ({
   imageUrl: recipe.imageUrl,
   ingredients: recipe.ingredients.map(ingredient => ingredient.ingredient),
   calories: recipe.calories,
+  tags: recipe.tags,
 }));
+
+const allTags = [...new Set(adaptedRecipes.flatMap(recipe => recipe.tags))];
 
 const Home = () => {
   const [searchText, setSearchText] = useState('');
+  const [selectedTags, setSelectedTags] = useState([]);
+
+  useEffect(() => {
+    console.log('Selected tags:', selectedTags);
+  }, [selectedTags]);
+
+  const toggleTag = (tag) => {
+    setSelectedTags(prevTags =>
+      prevTags.includes(tag)
+        ? prevTags.filter(t => t !== tag)
+        : [...prevTags, tag]
+    );
+  };
 
   const filteredRecipes = adaptedRecipes.filter(recipe =>
-    recipe.title.toLowerCase().includes(searchText.toLowerCase())
+    recipe.title.toLowerCase().includes(searchText.toLowerCase()) &&
+    (selectedTags.length === 0 || selectedTags.every(tag => recipe.tags.includes(tag)))
   );
 
   const renderContent = () => (
@@ -33,6 +50,23 @@ const Home = () => {
         <CustomHeader />
         <View style={styles.searchContainer}>
           <SearchBar value={searchText} onChangeText={setSearchText} placeholder="Rechercher par recette" />
+        </View>
+        <View style={styles.tagContainer}>
+          {['Four', 'Poulet', 'Fromage', 'Léger', 'Réconfortant'].map(tag => (
+            <TouchableOpacity
+              key={tag}
+              style={[
+                styles.tagButton,
+                selectedTags.includes(tag) && styles.tagButtonSelected
+              ]}
+              onPress={() => toggleTag(tag)}
+            >
+              <Text key={tag} style={[
+                styles.tagButtonText,
+                selectedTags.includes(tag) && styles.tagButtonTextSelected
+                ]}>{tag}</Text>
+            </TouchableOpacity>
+          ))}
         </View>
       </View>
       <ThemedText style={styles.title}>Liste des recettes</ThemedText>
@@ -80,5 +114,31 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     flexGrow: 1,
+  },
+  tagContainer: {
+    marginLeft: 15,
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'left',
+  },
+  tagButton: {
+    padding: 10,
+    margin: 8,
+    borderRadius: 10,
+    backgroundColor: '#fff',
+    borderColor: '#E8A85F',
+    borderWidth: 2,
+    fontFamily: 'Jua',
+  },
+  tagButtonSelected: {
+    backgroundColor: '#E8A85F',
+    color: '#fff',
+  },
+  tagButtonText: {
+    color: '#E8A85F',
+    fontFamily: 'Jua',
+  },
+  tagButtonTextSelected: {
+    color: '#fff'
   },
 });
