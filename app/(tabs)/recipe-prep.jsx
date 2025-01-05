@@ -72,7 +72,7 @@ const RecipePrep = () => {
     const { addOrderToZone, getCompletedOrderIds, resetZonesAndItems } = useOrderProcessing();
     const { processingOrders } = useOrderProcessing();
 
-
+    const { setAllItemsReady } = useOrderProcessing();
     const [displayMode, setDisplayMode] = useState('4');
     const [showSettings, setShowSettings] = useState(true);
     const [zoneMeasures, setZoneMeasures] = useState({});
@@ -199,7 +199,11 @@ const RecipePrep = () => {
                                 onValidate={handleValidate}
                             />
                         ) : (
-                            <DragAreaLayout mode={displayMode} onMeasure={measureZone} />
+                            <DragAreaLayout
+                                mode={displayMode}
+                                onMeasure={measureZone}
+                                onReadyAll={setAllItemsReady}
+                            />
                         )}
                     </View>
 

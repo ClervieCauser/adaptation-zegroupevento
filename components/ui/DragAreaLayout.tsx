@@ -5,9 +5,10 @@ import { DisplayMode } from '@/types/display';
 
 interface DragAreaLayoutProps {
     mode: DisplayMode;
-    onMeasure: (zoneId: string, layout: { x: number; y: number; width: number; height: number }) => void;
+    onMeasure: (zoneId: string, layout: any) => void;
+    onReadyAll: (orderId: string) => void;
 }
-const DragAreaLayout = ({ mode, onMeasure }: DragAreaLayoutProps) => {
+const DragAreaLayout = ({ mode, onMeasure, onReadyAll }: DragAreaLayoutProps) => {
     const containerRef = useRef<View>(null);
 
     const handleZoneMeasure = (zoneId: string, layout: any) => {
@@ -25,34 +26,34 @@ const DragAreaLayout = ({ mode, onMeasure }: DragAreaLayoutProps) => {
     const renderLayout = () => {
         switch (mode) {
             case '1':
-                return <DragZone zoneId="zone1" onMeasure={handleZoneMeasure} />;
+                return <DragZone zoneId="zone1" onMeasure={handleZoneMeasure} onReadyAll={onReadyAll} />
             case '2':
                 return (
                     <View style={styles.twoContainer}>
-                        <DragZone zoneId="zone1" onMeasure={handleZoneMeasure} />
-                        <DragZone zoneId="zone2" onMeasure={handleZoneMeasure} />
+                        <DragZone zoneId="zone1" onMeasure={handleZoneMeasure} onReadyAll={onReadyAll} />
+                        <DragZone zoneId="zone2" onMeasure={handleZoneMeasure} onReadyAll={onReadyAll} />
                     </View>
                 );
             case '3':
                 return (
                     <View style={styles.threeContainer}>
                         <View style={styles.topRow}>
-                            <DragZone zoneId="zone1" onMeasure={handleZoneMeasure} />
-                            <DragZone zoneId="zone2" onMeasure={handleZoneMeasure} />
+                            <DragZone zoneId="zone1" onMeasure={handleZoneMeasure} onReadyAll={onReadyAll} />
+                            <DragZone zoneId="zone2" onMeasure={handleZoneMeasure} onReadyAll={onReadyAll} />
                         </View>
-                        <DragZone zoneId="zone3" onMeasure={handleZoneMeasure} />
+                        <DragZone zoneId="zone3" onMeasure={handleZoneMeasure} onReadyAll={onReadyAll} />
                     </View>
                 );
             case '4':
                 return (
                     <View style={styles.fourContainer}>
                         <View style={styles.row}>
-                            <DragZone zoneId="zone1" onMeasure={handleZoneMeasure} />
-                            <DragZone zoneId="zone2" onMeasure={handleZoneMeasure} />
+                            <DragZone zoneId="zone1" onMeasure={handleZoneMeasure} onReadyAll={onReadyAll} />
+                            <DragZone zoneId="zone2" onMeasure={handleZoneMeasure} onReadyAll={onReadyAll} />
                         </View>
                         <View style={styles.row}>
-                            <DragZone zoneId="zone3" onMeasure={handleZoneMeasure} />
-                            <DragZone zoneId="zone4" onMeasure={handleZoneMeasure} />
+                            <DragZone zoneId="zone3" onMeasure={handleZoneMeasure} onReadyAll={onReadyAll} />
+                            <DragZone zoneId="zone4" onMeasure={handleZoneMeasure} onReadyAll={onReadyAll} />
                         </View>
                     </View>
                 );

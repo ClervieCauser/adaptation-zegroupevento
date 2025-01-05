@@ -20,6 +20,7 @@ type OrderProcessingContextType = {
     getCompletedOrderIds: () => string[];
     addOrderToProcessing: (order: Order, groupId: string) => void;
     resetZonesAndItems: () => void;
+    setAllItemsReady: (orderId: string) => void;
 };
 
 const OrderProcessingContext = createContext<OrderProcessingContextType | undefined>(undefined);
@@ -128,6 +129,19 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
         });
     }, []);
 
+    const setAllItemsReady = useCallback((orderId: string) => {
+        setProcessingOrders(prev => {
+            return prev.map(order => {
+                if (order.orderId !== orderId) return order;
+                return {
+                    ...order,
+                    items: order.items.map(item => ({ ...item, isReady: true })),
+                    isCompleted: true
+                };
+            });
+        });
+    }, []);
+
     return (
         <OrderProcessingContext.Provider value={{
             processingOrders,
@@ -139,6 +153,7 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
             getCompletedOrderIds,
             addOrderToProcessing,
             resetZonesAndItems,
+            setAllItemsReady,
         }}>
             {children}
         </OrderProcessingContext.Provider>
