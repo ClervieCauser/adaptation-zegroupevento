@@ -4,6 +4,7 @@ import { router } from 'expo-router';
 import { MOCK_USER } from '@/types/user';
 import { MOCK_ORDERS, Order } from '@/types/order';
 import {useOrderProcessing} from "@/context/OrderProcessingContext";
+import {recipes} from "../app/recipe";
 
 type OrderSelectionContextType = {
     selectedIds: string[];
@@ -60,14 +61,35 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
     }, [selectedIds, pendingOrders]);
 
     const handleSingleCook = useCallback((orderId: string, groupId?: string) => {
-        const order = processingOrders.find(o => o.groupId === groupId);
-        if (order) {
-            setSelectedIds(processingOrders
-                .filter(o => o.groupId === groupId)
-                .map(o => o.orderId)
-            );
+        if(MOCK_USER.level === 'EXPERT') {
+            const order = processingOrders.find(o => o.groupId === groupId);
+            if (order) {
+                setSelectedIds(processingOrders
+                    .filter(o => o.groupId === groupId)
+                    .map(o => o.orderId)
+                );
+            }
+            router.push('/recipe-prep');
+        } else if(MOCK_USER.level === 'NOVICE') {
+            const order = pendingOrders.find(o => o.id === orderId);
+
+            // Vérifie si l'ordre est trouvé et récupère les recettes en fonction de leur nom
+            const recipeIds = order?.items
+            .map(item => recipes.find(recipe => recipe.name === item.name)?.id)
+            .filter(Boolean);  // On filtre les IDs undefined s'il y en a
+            if(recipeIds.length > 0) {
+            // Si des IDs de recettes sont trouvés, redirige vers la page correspondante
+            if (recipeIds.length > 0) {
+            router.push({
+                pathname: '/recipe',
+                params: { id: recipeIds.join(',') },  // On joint les ids par des virgules dans la query
+            });
+            } else {
+            // Gérer le cas où aucune recette n'est trouvée
+            console.log("Aucune recette trouvée pour cet ordre");
+                }
+            }
         }
-        router.push('/recipe-prep');
     }, [processingOrders]);
 
     const getOrdersToShow = useCallback(() => {

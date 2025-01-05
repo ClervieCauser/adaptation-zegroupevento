@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, StyleSheet } from 'react-native';
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useRouter } from 'expo-router';
 import NutritionalInfo from '../../components/ui/NutritionalInfo';
 import Tags from '../../components/ui/Tags';
 import TabButton from '../../components/ui/TabButton';
@@ -16,22 +16,21 @@ import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
 const RecipePage = () => {
   const { isTablet } = useResponsiveLayout();
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('ingredients');
   const [activePage, setActivePage] = useState(0);
   const [isRecipeHome, setIsRecipeHome] = useState(true);
   const totalPages = 2;
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState(new Set());
-  
-  const { id } = useLocalSearchParams();
-  const recipeId = parseInt(id, 10) || 0;
-  
-  const recipe = recipes.find((recipe) => recipe.id === recipeId);
-  
-  if(!recipe) {
-    return <Text>Recette introuvable</Text>;
-  }
+  const [currentRecipeIndex, setCurrentRecipeIndex] = useState(0);
 
+  const { id } = useLocalSearchParams();
+  const ids = id ? id.split(',').map(i => parseInt(i, 10)) : [];
+  const recipesMatched = recipes.filter(recipe => ids.includes(recipe.id));
+  if (recipesMatched.length === 0) {
+    return <Text>Recette(s) introuvable(s)</Text>;
+  }
 
   const handlePageChange = (page) => {
     setActivePage(page);
@@ -43,9 +42,35 @@ const RecipePage = () => {
   };
 
   const handleNextStep = () => {
-    if (currentStep < recipe.steps.length - 1) {
+    const currentRecipe = recipesMatched[currentRecipeIndex];
+    
+    if (currentStep < currentRecipe.steps.length - 1) {
+      // S'il reste des étapes dans la recette actuelle
       setCurrentStep(currentStep + 1);
       setCompletedSteps(new Set([...completedSteps, currentStep]));
+    } else {
+      // Si c'est la dernière étape de la recette actuelle
+      if (currentRecipeIndex < recipesMatched.length - 1) {
+        // S'il reste des recettes à faire
+        setCurrentRecipeIndex(currentRecipeIndex + 1);
+        setCurrentStep(0);
+        setCompletedSteps(new Set());
+        setIsRecipeHome(true);
+      } else {
+        // Si c'était la dernière recette
+        router.push('/pending-orders');
+      }
+    }
+  };
+
+  const getNextButtonText = () => {
+    const currentRecipe = recipesMatched[currentRecipeIndex];
+    if (currentStep < currentRecipe.steps.length - 1) {
+      return "Prochaine étape";
+    } else if (currentRecipeIndex < recipesMatched.length - 1) {
+      return "Recette suivante";
+    } else {
+      return "Terminer la commande";
     }
   };
 
@@ -56,6 +81,8 @@ const RecipePage = () => {
   };
 
   const renderContent = () => {
+    const recipe = recipesMatched[currentRecipeIndex]; // Utiliser la première recette, si plusieurs
+    
     switch (activeTab) {
       case 'ingredients':
         return (
@@ -68,11 +95,11 @@ const RecipePage = () => {
                 />
               </View>
 
-              <Counter/>
+              <Counter />
             </View>
 
             <ScrollView style={styles.scrollableContainerPhone} contentContainerStyle={styles.ingredientsContainer}>
-            {recipe.ingredients.map((item, index) => (
+              {recipe.ingredients.map((item, index) => (
                 <View key={index} style={styles.ingredientContainer}>
                   <IngredientRow 
                     ingredient={item.ingredient} 
@@ -98,14 +125,14 @@ const RecipePage = () => {
                 />
               </View>
             </View>
-                <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
-                  {recipe.utensils.map((item, index) => (
-                    <View key={index} style={styles.ingredientContainer}>
-                      <UtensilRow utensil={item.utensil} styleText={styles.textPhone} styleContainer={styles.utensilRowPhone}/>
-                    </View>
-                  ))}
-                </ScrollView>
-              </>
+            <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
+              {recipe.utensils.map((item, index) => (
+                <View key={index} style={styles.ingredientContainer}>
+                  <UtensilRow utensil={item.utensil} styleText={styles.textPhone} styleContainer={styles.utensilRowPhone}/>
+                </View>
+              ))}
+            </ScrollView>
+          </>
         );
       case 'autres':
         return (
@@ -132,10 +159,10 @@ const RecipePage = () => {
                 <Text style={styles.timeLabelPhone}>Préparation des ingrédients:</Text>
                 <Text style={styles.timeValuePhone}>{recipe.prepTime}</Text>
               </View>
-              
+
               <View style={styles.nutritionalInfoContainer}>
                 {recipe.nutrition.map((item, index) => (
-                  <NutritionalInfo key={index} quantity={item.quantity} text={item.text}/>
+                  <NutritionalInfo key={index} quantity={item.quantity} text={item.text} />
                 ))}
               </View>
             </View>
@@ -146,8 +173,9 @@ const RecipePage = () => {
     }
   };
 
-  // TODO: Créer un composant pour afficher les étapes de la recette
+  // Étapes de recette pour la première recette correspondante
   if (!isRecipeHome) {
+    const recipe = recipesMatched[currentRecipeIndex];
     const currentStepData = recipe.steps[currentStep];
     return (
       <View style={isTablet ? styles.container : styles.containerPhone}>
@@ -174,74 +202,74 @@ const RecipePage = () => {
           </View>
 
           <ScrollView style={styles.substepsContainer}>
-          {currentStepData.substeps.map((substep, index) => (
-            <View key={index} style={styles.substepBox}>
-              {substep.gif && (
-                <Image 
-                  source={substep.gif}
-                  style={styles.stepGif}
-                  resizeMode="cover"
-                />
-              )}
-              {substep.important && (
-                <View style={styles.importantIndicator}>
-                  <Text style={styles.warningText}>{substep.instruction}</Text>
-                </View>
-              )}
-              {!substep.important && (
-                <Text style={styles.substepText}>{substep.instruction}</Text>
-              )}
-              {substep.tip && (
-                <View style={styles.tipContainer}>
-                <Icon name="lightbulb-on-outline" size={24} color="#000" />                  
-                <Text style={styles.tipText}>{substep.tip}</Text>
-                </View>
-              )}
-            </View>
-          ))}
+            {currentStepData.substeps.map((substep, index) => (
+              <View key={index} style={styles.substepBox}>
+                {substep.gif && (
+                  <Image 
+                    source={substep.gif}
+                    style={styles.stepGif}
+                    resizeMode="cover"
+                  />
+                )}
+                {substep.important && (
+                  <View style={styles.importantIndicator}>
+                    <Text style={styles.warningText}>{substep.instruction}</Text>
+                  </View>
+                )}
+                {!substep.important && (
+                  <Text style={styles.substepText}>{substep.instruction}</Text>
+                )}
+                {substep.tip && (
+                  <View style={styles.tipContainer}>
+                  <Icon name="lightbulb-on-outline" size={24} color="#000" />                  
+                  <Text style={styles.tipText}>{substep.tip}</Text>
+                  </View>
+                )}
+              </View>
+            ))}
           </ScrollView>
 
           <View style={styles.navigationContainer}>
-            <CustomButton
-              title="Prochaine étape"
-              onPress={handleNextStep}
-              containerStyles={styles.nextButton}
-              textStyles={styles.nextButtonText}
-              Icon={() => <Icon name="chevron-right" size={24} color="#fff" />}
-            />
-          </View>
+          <CustomButton
+            title={getNextButtonText()}
+            onPress={handleNextStep}
+            containerStyles={styles.nextButton}
+            textStyles={styles.nextButtonText}
+            Icon={() => <Icon name="chevron-right" size={24} color="#fff" />}
+          />
+        </View>
 
-          <View style={styles.progressContainer}>
-            <Text style={styles.progressText}>
-              Étape {currentStep + 1} sur {recipe.steps.length}
-            </Text>
-            <View style={styles.progressBar}>
-              {recipe.steps.map((_, index) => (
-                <View
-                  key={index}
-                  style={[
-                    styles.progressDot,
-                    index === currentStep && styles.progressDotActive,
-                    completedSteps.has(index) && styles.progressDotCompleted
-                  ]}
-                />
-              ))}
-            </View>
+        <View style={styles.progressContainer}>
+          <Text style={styles.progressText}>
+            Étape {currentStep + 1} sur {recipesMatched[currentRecipeIndex].steps.length}
+          </Text>
+          <View style={styles.progressBar}>
+            {recipesMatched[currentRecipeIndex].steps.map((_, index) => (
+              <View
+                key={index}
+                style={[
+                  styles.progressDot,
+                  index === currentStep && styles.progressDotActive,
+                  completedSteps.has(index) && styles.progressDotCompleted
+                ]}
+              />
+            ))}
           </View>
+        </View>
         </View>
       </View>
     );
   }
 
-  if(isTablet) {
+  // Affichage des recettes pour tablette
+  if (isTablet) {
     return (
       <View style={styles.container}>
         <CustomHeader />
-    
-        <Text style={styles.title}>{recipe.name}</Text>
+        <Text style={styles.title}>{recipesMatched[currentRecipeIndex].name}</Text>
 
         <View style={styles.tagContainer}>
-          {recipe.tags.map((item, index) => (
+          {recipesMatched[currentRecipeIndex].tags.map((item, index) => (
             <Tags key={index} text={item} />
           ))}
         </View>
@@ -255,19 +283,19 @@ const RecipePage = () => {
 
             <View style={styles.timeContainer}>
               <Text style={styles.timeLabel}>Total:</Text>
-              <Text style={styles.timeValue}>{recipe.totalTime}</Text>
+              <Text style={styles.timeValue}>{recipesMatched[currentRecipeIndex].totalTime}</Text>
             </View>
             <View style={styles.timeContainer}>
               <Text style={styles.timeLabel}>Cuisson au four:</Text>
-              <Text style={styles.timeValue}>{recipe.cookingTime}</Text>
+              <Text style={styles.timeValue}>{recipesMatched[currentRecipeIndex].cookingTime}</Text>
             </View>
             <View style={styles.timeContainer}>
               <Text style={styles.timeLabel}>Préparation des ingrédients:</Text>
-              <Text style={styles.timeValue}>{recipe.prepTime}</Text>
+              <Text style={styles.timeValue}>{recipesMatched[currentRecipeIndex].prepTime}</Text>
             </View>
 
             <View style={styles.nutritionalInfoContainer}>
-              {recipe.nutrition.map((item, index) => (
+              {recipesMatched[currentRecipeIndex].nutrition.map((item, index) => (
                 <NutritionalInfo key={index} quantity={item.quantity} text={item.text} styleText={styles.textPhone}/>
               ))}
             </View>
@@ -282,7 +310,7 @@ const RecipePage = () => {
                 </View>
                 
                 <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
-                  {recipe.ingredients.map((item, index) => (
+                  {recipesMatched[currentRecipeIndex].ingredients.map((item, index) => (
                     <View key={index} style={styles.ingredientContainer}>
                       <IngredientRow ingredient={item.ingredient} quantity={item.quantity} unit={item.unit} />
                     </View>
@@ -297,7 +325,7 @@ const RecipePage = () => {
                 </View>
                 
                 <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
-                  {recipe.utensils.map((item, index) => (
+                  {recipesMatched[currentRecipeIndex].utensils.map((item, index) => (
                     <View key={index} style={styles.ingredientContainer}>
                       <UtensilRow utensil={item.utensil} />
                     </View>
@@ -328,31 +356,31 @@ const RecipePage = () => {
     <ScrollView style={styles.containerPhone}>
       <CustomHeader/>
 
-      <Text style={styles.title}>{recipe.name}</Text>
+      <Text style={styles.title}>{recipesMatched[currentRecipeIndex].name}</Text>
 
       <View style={styles.tagContainer}>
-        {recipe.tags.map((item, index) => (
+        {recipesMatched[currentRecipeIndex].tags.map((item, index) => (
           <Tags key={index} text={item} />
         ))}
       </View>
 
       <View style={styles.tabsContainer}>
-          <TabButton 
-            text="Ingredients" 
-            isActive={activeTab === 'ingredients'}
-            onPress={() => setActiveTab('ingredients')}
-          />
-          <TabButton 
-            text="Ustensiles" 
-            isActive={activeTab === 'utensils'}
-            onPress={() => setActiveTab('utensils')}
-          />
-          <TabButton 
-            text="Autres" 
-            isActive={activeTab === 'autres'}
-            onPress={() => setActiveTab('autres')}
-          />
-        </View>
+        <TabButton 
+          text="Ingredients" 
+          isActive={activeTab === 'ingredients'}
+          onPress={() => setActiveTab('ingredients')}
+        />
+        <TabButton 
+          text="Ustensiles" 
+          isActive={activeTab === 'utensils'}
+          onPress={() => setActiveTab('utensils')}
+        />
+        <TabButton 
+          text="Autres" 
+          isActive={activeTab === 'autres'}
+          onPress={() => setActiveTab('autres')}
+        />
+      </View>
 
       <View style={styles.border}>
         {renderContent()}
