@@ -15,8 +15,8 @@ const TabletNavigation = () => {
         { label: 'Commandes en attente', route: '/(tabs)/pending-orders' },
         { label: 'Commandes en cours', route: '/(tabs)/orders-progress' },
         { label: 'Recette', route: '/(tabs)/home' },
-        { label: 'Paramètres', route: '/(tabs)/settings' },
         { label: 'Statistiques', route: '/(tabs)/stats' },
+        { label: 'Paramètres', route: '/(tabs)/settings' },
     ];
 
     const handleNavigation = (route: string) => {

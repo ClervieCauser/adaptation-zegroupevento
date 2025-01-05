@@ -2,6 +2,7 @@ import React, { useMemo } from 'react';
 import { View, Text, ScrollView, StyleSheet, Dimensions } from 'react-native';
 import { LineChart } from 'react-native-chart-kit';
 import { MOCK_ORDERS } from '../../types/order';
+import CustomHeader from '../../components/ui/CustomHeader';
 
 const OrderStatistics = () => {
   const stats = useMemo(() => {
@@ -37,66 +38,73 @@ const OrderStatistics = () => {
   }, []);
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.cardsContainer}>
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Commandes Totales</Text>
-          <Text style={styles.cardValue}>{stats.totalOrders}</Text>
-        </View>
-        
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Articles Totaux</Text>
-          <Text style={styles.cardValue}>{stats.totalItems}</Text>
-        </View>
+    <View style={styles.content}>
+        <CustomHeader title="Statistiques" />
+        <ScrollView style={styles.container}>
+          <View style={styles.cardsContainer}>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Commandes Totales</Text>
+              <Text style={styles.cardValue}>{stats.totalOrders}</Text>
+            </View>
+            
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Articles Totaux</Text>
+              <Text style={styles.cardValue}>{stats.totalItems}</Text>
+            </View>
 
-        <View style={styles.card}>
-          <Text style={styles.cardTitle}>Moyenne Articles/Commande</Text>
-          <Text style={styles.cardValue}>{stats.averageItemsPerOrder.toFixed(1)}</Text>
-        </View>
-      </View>
-
-      <ScrollView style={styles.section}>
-        <Text style={styles.sectionTitle}>Articles Populaires</Text>
-        {stats.popularItems.map((item, index) => (
-          <View key={item.name} style={styles.itemBox}>
-            <Text style={styles.itemName}>{item.name}</Text>
-            <Text style={styles.itemQuantity}>x{item.quantity}</Text>
+            <View style={styles.card}>
+              <Text style={styles.cardTitle}>Moyenne Articles/Commande</Text>
+              <Text style={styles.cardValue}>{stats.averageItemsPerOrder.toFixed(1)}</Text>
+            </View>
           </View>
-        ))}
-      </ScrollView>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Distribution Horaire</Text>
-        <LineChart
-          data={{
-            labels: Object.keys(stats.ordersByHour),
-            datasets: [{
-              data: Object.values(stats.ordersByHour)
-            }]
-          }}
-          width={Dimensions.get('window').width - 32}
-          height={220}
-          chartConfig={{
-            backgroundColor: '#DEEEFA',
-            backgroundGradientFrom: '#DEEEFA',
-            backgroundGradientTo: '#FFFFFF',
-            decimalPlaces: 0,
-            color: (opacity = 1) => `rgba(232, 168, 95, ${opacity})`,
-            style: {
-              borderRadius: 16,
-            }
-          }}
-          style={styles.chart}
-          bezier
-        />
-      </View>
-    </ScrollView>
+          <ScrollView style={styles.section}>
+            <Text style={styles.sectionTitle}>Articles Populaires</Text>
+            {stats.popularItems.map((item, index) => (
+              <View key={item.name} style={styles.itemBox}>
+                <Text style={styles.itemName}>{item.name}</Text>
+                <Text style={styles.itemQuantity}>x{item.quantity}</Text>
+              </View>
+            ))}
+          </ScrollView>
+
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Distribution Horaire</Text>
+            <LineChart
+              data={{
+                labels: Object.keys(stats.ordersByHour),
+                datasets: [{
+                  data: Object.values(stats.ordersByHour)
+                }]
+              }}
+              width={Dimensions.get('window').width - 32}
+              height={220}
+              chartConfig={{
+                backgroundColor: '#DEEEFA',
+                backgroundGradientFrom: '#DEEEFA',
+                backgroundGradientTo: '#FFFFFF',
+                decimalPlaces: 0,
+                color: (opacity = 1) => `rgba(232, 168, 95, ${opacity})`,
+                style: {
+                  borderRadius: 16,
+                }
+              }}
+              style={styles.chart}
+              bezier
+            />
+          </View>
+        </ScrollView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
+  content: {
     flex: 1,
+    backgroundColor: '#F9F7FA',
+    paddingTop: 24,
+  },
+  container: {
     backgroundColor: '#F5F8FA',
     padding: 16,
   },

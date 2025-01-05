@@ -98,13 +98,6 @@ const PendingOrders = () => {
                         {/* Les FilterButtons restent les mêmes */}
                     </View>
 
-                    <TouchableOpacity
-                        style={styles.resetButton}
-                        onPress={resetOrders}
-                    >
-                        <ThemedText style={styles.resetButtonText}>Rafraichir</ThemedText>
-                    </TouchableOpacity>
-
                     <View style={[styles.titleContainer, {flexDirection: isTablet ? 'row' : 'column'}]}>
                         <ThemedText style={styles.title}>Commandes en attente</ThemedText>
                         {!isSelectMode && !isNoviceUser ? (
@@ -333,6 +326,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'row',
         flexWrap: 'wrap',
+        justifyContent: 'center',
         gap: 16,
         paddingBottom: 80,
     },
