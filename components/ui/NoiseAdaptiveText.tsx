@@ -4,20 +4,17 @@ import { useTextToSpeech } from '../../hooks/useTextToSpeech';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import { Audio } from 'expo-av';
 
-// Seuil de bruit pour considérer l'environnement comme bruyant (conversation ~60dB)
+// Seuil de bruit pour considérer l'environnement comme bruyant
 const NOISE_THRESHOLD = 10;
 
-// Référence globale pour s'assurer qu'un seul enregistrement est actif
-let globalRecording = null;
-
 const NoiseAdaptiveText = ({ instruction, longInstruction, micEnabled, tip, onNoiseChange }) => {
+    const [displayText, setDisplayText] = useState(instruction); // État pour le texte affiché
     const [noiseLevel, setNoiseLevel] = useState(0);
     const [isNoisy, setIsNoisy] = useState(false);
-    const fadeAnim = useRef(new Animated.Value(1)).current;
-    const textRef = useRef(instruction);
+    const fadeAnim = useRef(new Animated.Value(1)).current; // Animation pour le texte
+    const recordingRef = useRef(null); // Référence pour l'enregistrement en cours
+    const mountedRef = useRef(true); // Référence pour vérifier si le composant est monté
     const { speak } = useTextToSpeech(micEnabled);
-    const recordingRef = useRef(null);
-    const mountedRef = useRef(true);
 
     const stopRecording = async () => {
         if (recordingRef.current) {
@@ -27,23 +24,18 @@ const NoiseAdaptiveText = ({ instruction, longInstruction, micEnabled, tip, onNo
                 console.error('Error stopping recording:', error);
             }
             recordingRef.current = null;
-            globalRecording = null;
         }
     };
 
     const speakInstructions = () => {
         if (!micEnabled) return;
 
-        // Construction du texte avec les conseils
         let fullText = Array.isArray(longInstruction)
             ? longInstruction.join('. ')
             : longInstruction;
 
-        // Ajouter les tips s'ils existent
-        if (Array.isArray(tip) && tip.length > 0) {
-            fullText += '. Petits conseils : ' + tip.join('. ');
-        } else if (tip) {
-            fullText += '. Petit conseil : ' + tip;
+        if (tip) {
+            fullText += `. Conseil : ${Array.isArray(tip) ? tip.join('. ') : tip}`;
         }
 
         speak(fullText);
@@ -59,7 +51,6 @@ const NoiseAdaptiveText = ({ instruction, longInstruction, micEnabled, tip, onNo
                     return;
                 }
 
-                // Arrêter l'enregistrement précédent s'il existe
                 await stopRecording();
 
                 const { granted } = await Audio.requestPermissionsAsync();
@@ -75,7 +66,6 @@ const NoiseAdaptiveText = ({ instruction, longInstruction, micEnabled, tip, onNo
 
                 const recording = new Audio.Recording();
                 recordingRef.current = recording;
-                globalRecording = recording;
 
                 await recording.prepareToRecordAsync({
                     android: {
@@ -100,9 +90,8 @@ const NoiseAdaptiveText = ({ instruction, longInstruction, micEnabled, tip, onNo
 
                 recording.setOnRecordingStatusUpdate(status => {
                     if (mountedRef.current && status.metering) {
-                        const normalizedLevel = (status.metering + 160) * (100/160);
+                        const normalizedLevel = (status.metering + 160) * (100 / 160);
                         setNoiseLevel(normalizedLevel);
-                        // Ajustement du seuil pour mieux détecter les conversations
                         const newIsNoisy = normalizedLevel > NOISE_THRESHOLD;
                         setIsNoisy(newIsNoisy);
                         if (onNoiseChange) {
@@ -128,24 +117,25 @@ const NoiseAdaptiveText = ({ instruction, longInstruction, micEnabled, tip, onNo
     }, [micEnabled]);
 
     useEffect(() => {
+        setDisplayText(isNoisy ? longInstruction : instruction);
+
         Animated.sequence([
             Animated.timing(fadeAnim, {
                 toValue: 0,
                 duration: 300,
-                useNativeDriver: true
+                useNativeDriver: true,
             }),
             Animated.timing(fadeAnim, {
                 toValue: 1,
                 duration: 300,
-                useNativeDriver: true
-            })
+                useNativeDriver: true,
+            }),
         ]).start(() => {
-            textRef.current = isNoisy ? longInstruction : instruction;
             if (!isNoisy && micEnabled) {
                 speakInstructions();
             }
         });
-    }, [isNoisy, micEnabled]);
+    }, [isNoisy, micEnabled, instruction, longInstruction, tip]);
 
     const handleReplay = () => {
         speakInstructions();
@@ -153,18 +143,13 @@ const NoiseAdaptiveText = ({ instruction, longInstruction, micEnabled, tip, onNo
 
     return (
         <View style={styles.container}>
-            <Animated.Text
-                style={[styles.mainText, { opacity: fadeAnim }]}
-            >
-                {textRef.current}
+            <Animated.Text style={[styles.mainText, { opacity: fadeAnim }]}>
+                {displayText}
             </Animated.Text>
 
             {micEnabled && (
                 <>
-                    <TouchableOpacity
-                        onPress={handleReplay}
-                        style={styles.replayButton}
-                    >
+                    <TouchableOpacity onPress={handleReplay} style={styles.replayButton}>
                         <Icon name="volume-high" size={24} color="#ED9405" />
                     </TouchableOpacity>
 
