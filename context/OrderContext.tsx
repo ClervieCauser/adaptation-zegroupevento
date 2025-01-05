@@ -4,7 +4,7 @@ import { router } from 'expo-router';
 import { MOCK_USER } from '@/types/user';
 import { MOCK_ORDERS, Order } from '@/types/order';
 import { useOrderProcessing } from "@/context/OrderProcessingContext";
-
+import { recipes } from '../app/recipe';
 type OrderSelectionContextType = {
     selectedIds: string[];
     orderToCook: string | null;
@@ -62,24 +62,48 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
         }
     }, [selectedIds, pendingOrders, addOrderToProcessing]);
 
-    const handleSingleCook = useCallback((orderId: string, groupId?: string) => {
-        if (groupId) {
-            // Pour les ordres déjà en cours
-            const groupOrders = processingOrders.filter(o => o.groupId === groupId);
-            const orderIds = groupOrders.map(o => o.orderId);
-            setSelectedIds(orderIds);
-        } else {
-            // Pour les nouvelles commandes
-            const order = pendingOrders.find(o => o.id === orderId);
-            if (order) {
-                const newGroupId = `single_${orderId}`;
-                addOrderToProcessing(order, newGroupId);
-                setPendingOrders(prev => prev.filter(o => o.id !== orderId));
-                setSelectedIds([orderId]);
+    const handleSingleCook = useCallback(
+        (orderId: string, groupId?: string) => {
+            if (MOCK_USER.level === 'EXPERT') {
+                if (groupId) {
+                    // Pour les ordres déjà en cours
+                    const groupOrders = processingOrders.filter(o => o.groupId === groupId);
+                    const orderIds = groupOrders.map(o => o.orderId);
+                    setSelectedIds(orderIds);
+                } else {
+                    // Pour les nouvelles commandes
+                    const order = pendingOrders.find(o => o.id === orderId);
+                    if (order) {
+                        const newGroupId = `single_${orderId}`;
+                        addOrderToProcessing(order, newGroupId);
+                        setPendingOrders(prev => prev.filter(o => o.id !== orderId));
+                        setSelectedIds([orderId]);
+                    }
+                }
+                router.push('/recipe-prep');
+            } else {
+                const order = pendingOrders.find(o => o.id === orderId);
+                if (order) {
+                    // Vérifie si l'ordre est trouvé et récupère les recettes en fonction de leur nom
+                    const recipeIds = order.items
+                        .map(item => recipes.find(recipe => recipe.name === item.name)?.id)
+                        .filter(Boolean); // On filtre les IDs undefined s'il y en a
+    
+                    // Si des IDs de recettes sont trouvés, redirige vers la page correspondante
+                    if (recipeIds.length > 0) {
+                        router.push({
+                            pathname: '/recipe',
+                            params: { id: recipeIds.join(','),
+                                    reset: 1
+                             }, // Utilisation correcte de `query` dans next/router
+                        });
+                    }
+                }
             }
-        }
-        router.push('/recipe-prep');
-    }, [pendingOrders, processingOrders, addOrderToProcessing]);
+        },
+        [pendingOrders, addOrderToProcessing, processingOrders, router]
+    );
+    
 
     const getOrdersToShow = useCallback(() => {
         if (orderToCook) return [orderToCook];
