@@ -276,7 +276,7 @@ const RecipePage = () => {
                   )}
                   {substep.important ? (
                       <View style={styles.importantIndicator}>
-                        <Text style={styles.warningText}>{substep.instruction}</Text>
+                        <Text style={styles.warningText}>{substep.longinstruction}</Text>
                         <Text style={styles.warningText}>Ingrédient(s) concerné(s): {substep.attachedIngredient}</Text>
                       </View>
                   ) : (
