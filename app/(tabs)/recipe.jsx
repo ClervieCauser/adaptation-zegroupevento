@@ -15,6 +15,7 @@ import { recipes } from '../../app/recipe';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {MOCK_USER} from "../../types/user";
 import * as Speech from 'expo-speech';
+import { MOCK_ORDERS } from '../../types/order';
 
 const RecipePage = () => {
   const { isTablet } = useResponsiveLayout();
@@ -26,7 +27,7 @@ const RecipePage = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState(new Set());
   const [currentRecipeIndex, setCurrentRecipeIndex] = useState(0);
-
+  let [numberOfItemsOfCurrentRecipe, setNumberOfItemsOfCurrentRecipe] = useState(1);
   const { id, orderId} = useLocalSearchParams();
   const ids = id ? id.split(',').map(i => parseInt(i, 10)) : [];
   const orderid = orderId ? parseInt(orderId, 10) : null;
@@ -36,7 +37,15 @@ const RecipePage = () => {
     return <Text>Recette(s) introuvable(s)</Text>;
   }
 
-
+  const order = MOCK_ORDERS.find(order => parseInt(order.id, 10) === orderid);
+  if (order) {
+    // for the current recipe, find the number of items in the order and put it in numberOfItemsOfCurrentRecipe
+    const currentRecipe = recipesMatched[currentRecipeIndex];
+    const currentItem = order.items.find(item => item.name === currentRecipe.name);
+    numberOfItemsOfCurrentRecipe = currentItem ? currentItem.quantity : 0;
+  } else {
+    numberOfItemsOfCurrentRecipe = 1;
+  }
 
   const handlePageChange = (page) => {
     setActivePage(page);
@@ -113,7 +122,7 @@ const RecipePage = () => {
                 />
               </View>
 
-              <Counter />
+              <Counter initialValue={numberOfItemsOfCurrentRecipe} />
             </View>
 
             <ScrollView style={styles.scrollableContainerPhone} contentContainerStyle={styles.ingredientsContainer}>
@@ -349,7 +358,7 @@ const RecipePage = () => {
               <>
                 <View style={styles.ingredientTextAndCounter}>
                   <Text style={styles.ingredientsText}>Ingredients</Text>
-                  <Counter/>
+                  <Counter initialValue={numberOfItemsOfCurrentRecipe}/>
                 </View>
 
                 <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
@@ -364,7 +373,7 @@ const RecipePage = () => {
               <>
                 <View style={styles.ingredientTextAndCounter}>
                   <Text style={styles.ingredientsText}>Ustensils</Text>
-                  <Counter/>
+                  <Counter initialValue={recipesMatched[currentRecipeIndex].utensils.length} />
                 </View>
 
                 <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
