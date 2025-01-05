@@ -288,24 +288,24 @@ const RecipePage = () => {
             ))}
           </ScrollView>
 
-          <View style={styles.navigationContainer}>
+          <View style={[styles.navigationContainer, !isTablet && styles.navigationContainerPhone]}>
             <CustomButton
                 title="Précédent"
                 onPress={handlePreviousStep}
-                containerStyles={styles.nextButton}
-                textStyles={styles.nextButtonText}
+                containerStyles={[styles.nextButton, !isTablet && styles.nextButtonPhone]}
+                textStyles={[styles.nextButtonText, !isTablet && styles.nextButtonTextPhone]}
                 Icon={() => <ChevronLeft size={24} color="#fff" />}
             />
             <CustomButton
                 title={getNextButtonText()}
                 onPress={handleNextStep}
-                containerStyles={styles.nextButton}
-                textStyles={styles.nextButtonText}
+                containerStyles={[styles.nextButton, !isTablet && styles.nextButtonPhone]}
+                textStyles={[styles.nextButtonText, !isTablet && styles.nextButtonTextPhone]}
                 Icon={() => <ChevronRight size={24} color="#fff" />}
             />
         </View>
 
-        <View style={styles.progressContainer}>
+        <View style={[styles.progressContainer, !isTablet && styles.progressContainerPhone]}>
           <Text style={styles.progressText}>
             Étape {currentStep + 1} sur {recipesMatched[currentRecipeIndex].steps.length}
           </Text>
@@ -481,7 +481,7 @@ const styles = StyleSheet.create({
   },
   containerPhone: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: '#F9F7FA',
   },
   contentContainer: {
     padding: 16,
@@ -764,21 +764,28 @@ const styles = StyleSheet.create({
   },
   navigationContainer: {
     alignItems: 'center',
-    marginTop: -20,
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 24,
+    gap: 14,
+  },
+  navigationContainerPhone: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: -10,
   },
   nextButton: {
     backgroundColor: '#ED9405',
-    paddingVertical: 16,
-    paddingHorizontal: 32,
     borderRadius: 24,
     display: 'flex',
-    width: '30%',
+    width: '35%',
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  nextButtonPhone: {
+    padding: 5,
+    minHeight: 40,
   },
   nextButtonText: {
     color: '#FFF',
@@ -786,8 +793,18 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     marginRight: 8,
   },
+  nextButtonTextPhone: {
+    color: '#FFF',
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginRight: 8,
+  },
   progressContainer: {
-    marginTop: 24,
+    marginTop: 15,
+    alignItems: 'center',
+  },
+  progressContainerPhone: {
+    marginTop: -40,
     alignItems: 'center',
   },
   progressText: {

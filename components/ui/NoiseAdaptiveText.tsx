@@ -173,14 +173,15 @@ const styles = StyleSheet.create({
     container: {
         position: 'relative',
         width: '100%',
+        padding: 16,
+        backgroundColor: 'white',
+        borderRadius: 8,
     },
     mainText: {
         fontSize: 16,
         fontFamily: 'Jua',
-        padding: 16,
-        backgroundColor: 'white',
-        borderRadius: 8,
-        marginBottom: 20,
+        width: '90%',
+        marginBottom: 8,
     },
     replayButton: {
         position: 'absolute',
@@ -191,9 +192,6 @@ const styles = StyleSheet.create({
         backgroundColor: '#FFF3E0',
     },
     noiseIndicator: {
-        position: 'absolute',
-        left: 8,
-        bottom: 8,
         flexDirection: 'row',
         alignItems: 'center',
     },
