@@ -63,30 +63,9 @@ const Settings = () => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       {/* Header */}
       <CustomHeader title="Paramètres" /> 
-
-      {/* Search Bar */}
-      <View style={styles.searchContainer}>
-        <Ionicons name="search" size={20} color="#999" style={styles.searchIcon} />
-        <TextInput
-          style={styles.searchInput}
-          placeholder="Rechercher par nom de paramètre"
-          placeholderTextColor="#999"
-          value={searchText}
-          onChangeText={setSearchText}
-        />
-        {searchText !== '' && (
-          <TouchableOpacity 
-            style={styles.clearButton}
-            onPress={() => setSearchText('')}
-          >
-            <Ionicons name="close-circle" size={20} color="#999" />
-          </TouchableOpacity>
-        )}
-      </View>
-
       {/* Settings Section */}
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Préférences d'assistance</Text>
@@ -139,7 +118,7 @@ const Settings = () => {
           </View>
         </View>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -147,6 +126,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#F9F7FA',
+    paddingTop: 24,
   },
   searchContainer: {
     flexDirection: 'row',

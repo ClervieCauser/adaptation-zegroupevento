@@ -64,7 +64,7 @@ const RecipeCard: React.FC<RecipeCardProps> = ({ id, title, duration, difficulty
         style={styles.button} 
         onPress={() => router.push({
           pathname: '/recipe',
-          params: { id }
+          params: { id, reset: 1}
         })}
       >
         <Text style={styles.buttonText}>Voir la recette</Text>

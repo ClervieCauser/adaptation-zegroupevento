@@ -15,6 +15,7 @@ import { recipes } from '../../app/recipe';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {MOCK_USER} from "../../types/user";
 import * as Speech from 'expo-speech';
+import { MOCK_ORDERS } from '../../types/order';
 
 const RecipePage = () => {
   const { isTablet } = useResponsiveLayout();
@@ -26,7 +27,7 @@ const RecipePage = () => {
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState(new Set());
   const [currentRecipeIndex, setCurrentRecipeIndex] = useState(0);
-
+  let [numberOfItemsOfCurrentRecipe, setNumberOfItemsOfCurrentRecipe] = useState(1);
   const { id, orderId} = useLocalSearchParams();
   const ids = id ? id.split(',').map(i => parseInt(i, 10)) : [];
   const orderid = orderId ? parseInt(orderId, 10) : null;
@@ -36,7 +37,15 @@ const RecipePage = () => {
     return <Text>Recette(s) introuvable(s)</Text>;
   }
 
-
+  const order = MOCK_ORDERS.find(order => parseInt(order.id, 10) === orderid);
+  if (order) {
+    // for the current recipe, find the number of items in the order and put it in numberOfItemsOfCurrentRecipe
+    const currentRecipe = recipesMatched[currentRecipeIndex];
+    const currentItem = order.items.find(item => item.name === currentRecipe.name);
+    numberOfItemsOfCurrentRecipe = currentItem ? currentItem.quantity : 0;
+  } else {
+    numberOfItemsOfCurrentRecipe = 1;
+  }
 
   const handlePageChange = (page) => {
     setActivePage(page);
@@ -113,7 +122,7 @@ const RecipePage = () => {
                 />
               </View>
 
-              <Counter />
+              <Counter initialValue={numberOfItemsOfCurrentRecipe} />
             </View>
 
             <ScrollView style={styles.scrollableContainerPhone} contentContainerStyle={styles.ingredientsContainer}>
@@ -257,8 +266,8 @@ const RecipePage = () => {
                 )}
                 {substep.tip && (
                   <View style={styles.tipContainer}>
-                  <Icon name="lightbulb-on-outline" size={24} color="#000" />
-                  <Text style={styles.tipText}>{substep.tip}</Text>
+                    <Icon name="lightbulb-on-outline" size={24} color="#000" />
+                    <Text style={styles.tipText}>{substep.tip}</Text>
                   </View>
                 )}
               </View>
@@ -310,6 +319,7 @@ const RecipePage = () => {
       <View style={styles.container}>
         <CustomHeader />
         <Text style={styles.title}>{recipesMatched[currentRecipeIndex].name}</Text>
+        <Text style={styles.subtitle}>{orderId ? `Plat ${currentRecipeIndex+1}/${recipesMatched.length} de la commande #${orderId}` : ''}</Text>
 
         <View style={styles.tagContainer}>
           {recipesMatched[currentRecipeIndex].tags.map((item, index) => (
@@ -349,7 +359,7 @@ const RecipePage = () => {
               <>
                 <View style={styles.ingredientTextAndCounter}>
                   <Text style={styles.ingredientsText}>Ingredients</Text>
-                  <Counter/>
+                  <Counter initialValue={numberOfItemsOfCurrentRecipe}/>
                 </View>
 
                 <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
@@ -364,13 +374,13 @@ const RecipePage = () => {
               <>
                 <View style={styles.ingredientTextAndCounter}>
                   <Text style={styles.ingredientsText}>Ustensils</Text>
-                  <Counter/>
+                  <Counter initialValue={recipesMatched[currentRecipeIndex].utensils.length} />
                 </View>
 
                 <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
                   {recipesMatched[currentRecipeIndex].utensils.map((item, index) => (
                     <View key={index} style={styles.ingredientContainer}>
-                      <UtensilRow utensil={item.utensil} />
+                      <UtensilRow utensil={item.utensil}/>
                     </View>
                   ))}
                 </ScrollView>
@@ -400,6 +410,7 @@ const RecipePage = () => {
       <CustomHeader/>
 
       <Text style={styles.title}>{recipesMatched[currentRecipeIndex].name}</Text>
+      <Text style={styles.subtitle}>{orderId ? `Plat ${currentRecipeIndex+1}/${recipesMatched.length} de la commande #${orderId}` : ''}</Text>
 
       <View style={styles.tagContainer}>
         {recipesMatched[currentRecipeIndex].tags.map((item, index) => (
@@ -581,6 +592,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Jua',
   },
+  subtitle: {
+    fontSize: 18,
+    color: '#666',
+    textAlign: 'center',
+    fontFamily: 'Jua',
+  },
   startButton: {
     backgroundColor: '#E9A23B',
     margin: 16,
@@ -626,7 +643,7 @@ const styles = StyleSheet.create({
 
   recipeHeader: {
     padding: 16,
-    backgroundColor: '#FFF',
+    backgroundColor: '#F9F7FA',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -639,6 +656,7 @@ const styles = StyleSheet.create({
   recipeNumber: {
     color: '#666',
     fontSize: 16,
+    fontFamily: 'Jua',
   },
   headerIcons: {
     flexDirection: 'row',
@@ -696,28 +714,39 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     padding: 16,
     borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3.84,
+    elevation: 4,
+    zIndex: 2,
   },
   warningText: {
     color: '#ED9405',
     fontWeight: 'bold',
+    fontFamily: 'Jua',
   },
   substepText: {
     fontSize: 16,
     backgroundColor: '#FFF',
     padding: 16,
     borderRadius: 8,
+    fontFamily: 'Jua',
   },
   tipContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFEFDF',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 8,
+    padding: 6,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+    marginLeft: 15,
+    marginRight: 15,
   },
   tipText: {
     marginLeft: 8,
     color: '#666',
+    fontFamily: 'Jua',
   },
   navigationContainer: {
     alignItems: 'center',
@@ -751,6 +780,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginBottom: 8,
+    fontFamily: 'Jua',
   },
   progressBar: {
     flexDirection: 'row',
