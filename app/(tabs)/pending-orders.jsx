@@ -152,6 +152,7 @@ const PendingOrders = () => {
                                 isSelectMode={isSelectMode}
                                 isSelected={selectedIds.includes(order.id)}
                                 onSelect={toggleOrderSelection}
+                                showProgress={false}
                             />
                         ))}
                     </View>
