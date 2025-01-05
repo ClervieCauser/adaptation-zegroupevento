@@ -94,7 +94,8 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
                         router.push({
                             pathname: '/recipe',
                             params: { id: recipeIds.join(','),
-                                    reset: 1
+                                    reset: 1,
+                                    orderId: orderId
                              }, // Utilisation correcte de `query` dans next/router
                         });
                     }
