@@ -11,6 +11,7 @@ import { OrderSelectionProvider } from '@/context/OrderContext';
 import { OrderProcessingProvider } from '@/context/OrderProcessingContext';
 import { DraxProvider } from 'react-native-drax';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+
 const TabIcon = ({ icon, color, name, focused }) => {
     const { isTablet, isDesktop } = useResponsiveLayout();
 
@@ -95,33 +96,51 @@ const TabLayout = () => {
                             }}
                         >
                             <Tabs.Screen
+                                name="pending-orders"
+                                options={{
+                                    title: 'En attente',
+                                    headerShown: false,
+                                    tabBarIcon: ({ color, focused }) => (
+                                        <TabIcon icon={icons.sablier} color={color} name="En attente" focused={focused} />
+                                    ),
+                                }}
+                            />
+                            <Tabs.Screen
+                                name="recipe-prep"
+                                options={{
+                                    tabBarButton: () => null,
+                                }}
+                            />
+                            <Tabs.Screen
+                                name="orders-progress"
+                                options={{
+                                    title: 'En cours',
+                                    headerShown: false,
+                                    tabBarIcon: ({ color, focused }) => (
+                                        <TabIcon icon={icons.process} color={color} name="En cours" focused={focused} />
+                                    ),
+                                }}
+                            />
+                            <Tabs.Screen
+                                name="favorites"
+                                options={{
+                                    tabBarButton: () => null,
+                                }}
+                            />
+                            <Tabs.Screen
                                 name="home"
                                 options={{
                                     title: 'Home',
                                     headerShown: false,
                                     tabBarIcon: ({ color, focused }) => (
-                                        <TabIcon icon={icons.home} color={color} name="Home" focused={focused} />
+                                        <TabIcon icon={icons.recipe} color={color} name="Recettes" focused={focused} />
                                     ),
                                 }}
                             />
                             <Tabs.Screen
-                                name="pending-orders"
+                                name="recipe"
                                 options={{
-                                    title: 'Commandes en attente',
-                                    headerShown: false,
-                                    tabBarIcon: ({ color, focused }) => (
-                                        <TabIcon icon={icons.bookmark} color={color} name="Commandes en attente" focused={focused} />
-                                    ),
-                                }}
-                            />
-                            <Tabs.Screen
-                                name="create"
-                                options={{
-                                    title: 'Create',
-                                    headerShown: false,
-                                    tabBarIcon: ({ color, focused }) => (
-                                        <TabIcon icon={icons.plus} color={color} name="Create" focused={focused} />
-                                    ),
+                                    tabBarButton: () => null,
                                 }}
                             />
                             <Tabs.Screen
@@ -130,7 +149,7 @@ const TabLayout = () => {
                                     title: 'Settings',
                                     headerShown: false,
                                     tabBarIcon: ({ color, focused }) => (
-                                        <TabIcon icon={icons.profile} color={color} name="Settings" focused={focused} />
+                                        <TabIcon icon={icons.profile} color={color} name="Paramètres" focused={focused} />
                                     ),
                                 }}
                             />

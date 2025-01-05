@@ -49,20 +49,20 @@ const RecipePage = () => {
     const currentRecipe = recipesMatched[currentRecipeIndex];
 
     if (currentStep < currentRecipe.steps.length - 1) {
-      // S'il reste des étapes dans la recette actuelle
       setCurrentStep(currentStep + 1);
       setCompletedSteps(new Set([...completedSteps, currentStep]));
     } else {
-      // Si c'est la dernière étape de la recette actuelle
       if (currentRecipeIndex < recipesMatched.length - 1) {
-        // S'il reste des recettes à faire
         setCurrentRecipeIndex(currentRecipeIndex + 1);
         setCurrentStep(0);
         setCompletedSteps(new Set());
         setIsRecipeHome(true);
       } else {
-        // Si c'était la dernière recette
         router.push('/pending-orders');
+        setCurrentRecipeIndex(0);
+        setCurrentStep(0);
+        setCompletedSteps(new Set());
+        setIsRecipeHome(true);
       }
     }
   };
@@ -85,7 +85,7 @@ const RecipePage = () => {
   };
 
   const renderContent = () => {
-    const recipe = recipesMatched[currentRecipeIndex]; // Utiliser la première recette, si plusieurs
+    const recipe = recipesMatched[currentRecipeIndex]; 
 
     switch (activeTab) {
       case 'ingredients':
