@@ -258,11 +258,11 @@ const RecipePage = () => {
                 )}
                 {substep.important && (
                   <View style={styles.importantIndicator}>
-                    <Text style={styles.warningText}>{substep.instruction}</Text>
+                    <Text style={styles.warningText}>{substep.instruction}\n Ingrédient(s) concerné(s): {substep.attachedIngredient}</Text>
                   </View>
                 )}
                 {!substep.important && (
-                  <Text style={styles.substepText}>{substep.instruction}</Text>
+                  <Text style={styles.substepText}>{substep.instruction}\n Ingrédient(s) concerné(s): {substep.attachedIngredient}</Text>
                 )}
                 {substep.tip && (
                   <View style={styles.tipContainer}>

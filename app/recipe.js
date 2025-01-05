@@ -16,6 +16,7 @@ export const recipes = [
           {
             instruction: 'Préchauffez votre four à 200 degrés',
             longinstruction: 'Préchauffez votre four à 200 degrés pour qu\'il soit bien chaud au moment d\'enfourner le poulet',
+            attachedIngredient: 'Four préchauffé',
             tip: 'En prechauffant son four avant, on optimise son temps !',
             gif: require('../assets/gifs/preheat.gif'),
             important: true
@@ -23,6 +24,7 @@ export const recipes = [
           {
             instruction: 'Sortez votre poulet du frigo pour qu\'il soit à température ambiante',
             longinstruction: 'Sortez votre poulet du frigo pour qu\'il soit à température ambiante et cuise de manière homogène',
+            attachedIngredient: '1.2kg de poulet',
             important: false
           },
         ]
@@ -35,12 +37,14 @@ export const recipes = [
           {
             instruction: 'Coupez et rincez le poulet',
             longinstruction: 'Coupez et rincez le poulet pour enlever les éventuels résidus',
+            attachedIngredient: '1.2kg de poulet',
             gif: require('../assets/gifs/cutchicken.gif'),
             important: false
           },
           {
             instruction: 'Placez le poulet dans un plat allant au four',
             longinstruction: 'Placez le poulet dans un plat allant au four pour la cuisson',
+            attachedIngredient: '1.2kg de poulet',
             tip: 'Utilisez un plat suffisamment grand pour que le poulet ne soit pas trop serré',
             important: true
           }
@@ -53,6 +57,7 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Pressez les citrons pour extraire le jus',
+            attachedIngredient: '200g de citrons jaunes',
             longinstruction: 'Pressez les citrons pour extraire le jus et enlever les pépins',
             gif: require('../assets/gifs/lemon.gif'),
             important: false
@@ -67,17 +72,20 @@ export const recipes = [
           {
             instruction: 'Badigeonnez le poulet avec le mélange citron-huile',
             longinstruction: 'Badigeonnez le poulet avec le mélange citron-huile pour le parfumer',
+            attachedIngredient: '2 c. à soupe d\'huile d\'olive',
             important: false
           },
           {
             instruction: 'Saupoudrez d\'ail et de romarin',
             longinstruction: 'Saupoudrez d\'ail et de romarin pour donner du goût',
+            attachedIngredient: '4 gousses d\'ail, 10g de romarin',
             important: false
           },
           {
             instruction: 'Salez et poivrez généreusement',
             longinstruction: 'Salez et poivrez généreusement pour relever le goût',
             tip: 'N\'hésitez pas sur l\'assaisonnement, une partie s\'évaporera à la cuisson',
+            attachedIngredient: '1 pincée de sel, 1 pincée de poivre',
             important: true
           }
         ]
@@ -90,12 +98,14 @@ export const recipes = [
           {
             instruction: 'Enfournez le plat à 200°C',
             longinstruction: 'Enfournez le plat à 200°C pour une cuisson homogène',
+            attachedIngredient: 'Four préchauffé',
             important: true
           },
           {
             instruction: 'Arrosez le poulet avec son jus toutes les 15 minutes',
             longinstruction: 'Arrosez le poulet avec son jus toutes les 15 minutes pour le garder moelleux',
             tip: 'Cela permet de garder le poulet bien moelleux',
+            attachedIngredient: 'Jus de cuisson',
             important: true
           }
         ]
@@ -147,6 +157,7 @@ export const recipes = [
           {
             instruction: 'Pelez et coupez les pommes de terre en rondelles',
             longinstruction: 'Pelez et coupez les pommes de terre en rondelles pour les cuire plus rapidement',
+            attachedIngredient: '1.2kg de pommes de terre',
             gif: require('../assets/gifs/peeling.gif'),
             important: true
           },
@@ -154,6 +165,7 @@ export const recipes = [
             instruction: 'Faites-les cuire dans de l\'eau salée jusqu\'à tendreté',
             longinstruction: 'Faites-les cuire dans de l\'eau salée jusqu\'à tendreté pour qu\'elles soient fondantes',
             tip: 'Ne laissez pas les pommes de terre trop molles, elles doivent rester fermes',
+            attachedIngredient: '1.2kg de pommes de terre',
             important: false
           }
         ]
@@ -166,12 +178,14 @@ export const recipes = [
           {
             instruction: 'Émincez les oignons',
             longinstruction: 'Émincez les oignons pour les faire revenir dans une poêle',
+            attachedIngredient: '2 oignons',
             tip: 'Pour éviter les larmes, placez les oignons au congélateur 10 minutes avant de les émincer',
             gif: require('../assets/gifs/oignon.gif'),
             important: false
           },
           {
             instruction: 'Faites revenir les lardons et les oignons dans une poêle',
+            attachedIngredient: '200g de lardons, 2 oignons',
             longinstruction: 'Faites revenir les lardons et les oignons dans une poêle pour les rendre croustillants',
             tip: 'Les lardons doivent être bien dorés pour apporter du croustillant à la tartiflette',
             gif: require('../assets/gifs/bacon.gif'),
@@ -186,28 +200,33 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Disposez une couche de pommes de terre dans un plat à gratin',
+            attachedIngredient: '1.2kg de pommes de terre',
             longinstruction: 'Disposez une couche de pommes de terre dans un plat à gratin pour la base de la tartiflette',
             tip: 'Les pommes de terre doivent être bien serrées pour que la tartiflette se tienne',
             important: false
           },
           {
             instruction: 'Ajoutez une couche de lardons et d\'oignons par-dessus',
+            attachedIngredient: '200g de lardons, 2 oignons',
             longinstruction: 'Ajoutez une couche de lardons et d\'oignons par-dessus pour apporter du goût',
             important: true
           },
           {
             instruction: 'Versez un filet de crème fraîche et un peu de vin blanc',
+            attachedIngredient: '20cl de crème fraîche, 10cl de vin blanc',
             longinstruction: 'Versez un filet de crème fraîche et un peu de vin blanc pour apporter de l\'onctuosité',
             tip: 'Le vin blanc ajoutera une touche savoureuse à votre tartiflette',
             important: true
           },
           {
             instruction: 'Répétez l’opération pour remplir le plat',
+            attachedIngredient: '1.2kg de pommes de terre, 200g de lardons, 2 oignons, 20cl de crème fraîche, 10cl de vin blanc',
             longinstruction: 'Répétez l’opération pour remplir le plat et obtenir une tartiflette bien garnie',
             important: false
           },
           {
             instruction: 'Terminez par des morceaux de reblochon disposés sur le dessus',
+            attachedIngredient: '500g de reblochon',
             longinstruction: 'Terminez par des morceaux de reblochon disposés sur le dessus pour gratiner la tartiflette',
             important: true
           }
@@ -273,6 +292,7 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Lavez, émincez et faites revenir les champignons dans une poêle avec du beurre',
+            attachedIngredient: '400g de champignons',
             longinstruction: 'Lavez, émincez et faites revenir les champignons dans une poêle avec du beurre pour les rendre dorés',
             tip: 'Les champignons doivent être bien dorés pour apporter du goût au risotto',
             important: true
@@ -286,11 +306,13 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Faites revenir le riz avec un peu d’huile d’olive jusqu’à ce qu’il devienne translucide',
+            attachedIngredient: '300g de riz Arborio',
             longinstruction: 'Faites revenir le riz avec un peu d’huile d’olive jusqu’à ce qu’il devienne translucide pour le rendre plus moelleux',
             important: true
           },
           {
             instruction: 'Ajoutez le bouillon louche par louche, en remuant constamment',
+            attachedIngredient: '1L de bouillon de légumes',
             longinstruction: 'Ajoutez le bouillon louche par louche, en remuant constamment pour que le riz absorbe le liquide',
             tip: 'N’ajoutez pas tout le bouillon d’un coup, laissez-le absorber par le riz entre chaque ajout',
             important: true
@@ -304,11 +326,13 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Incorporez les champignons au riz cuit',
+            attachedIngredient: '400g de champignons',
             longinstruction: 'Incorporez les champignons au riz cuit pour obtenir un risotto bien parfumé',
             important: false
           },
           {
             instruction: 'Ajoutez du parmesan râpé et une noix de beurre pour une texture crémeuse',
+            attachedIngredient: '50g de parmesan',
             longinstruction: 'Ajoutez du parmesan râpé et une noix de beurre pour une texture crémeuse et onctueuse à votre risotto aux champignons',
             important: true
           }
@@ -359,6 +383,7 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Étalez la pâte feuilletée dans un moule à tarte et piquez-la avec une fourchette',
+            attachedIngredient: 'Pâte feuilletée',
             longinstruction: 'Étalez la pâte feuilletée dans un moule à tarte et piquez-la avec une fourchette pour éviter qu’elle ne gonfle à la cuisson',
             gif: require('../assets/gifs/fork.gif'),
             important: true
@@ -372,12 +397,14 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Battez les œufs avec la crème fraîche dans un bol',
+            attachedIngredient: '3 œufs, 20cl de crème fraîche',
             longinstruction: 'Battez les œufs avec la crème fraîche dans un bol pour obtenir un appareil bien lisse',
             gif: require('../assets/gifs/eggs.gif'),
             important: true
           },
           {
             instruction: 'Ajoutez du sel, du poivre et de la muscade râpée',
+            attachedIngredient: '1 pincée de sel, 1 pincée de poivre, 1 pincée de muscade',
             longinstruction: 'Ajoutez du sel, du poivre et de la muscade râpée pour relever le goût de la quiche',
             gif: require('../assets/gifs/salt.gif'),
             important: false
@@ -391,12 +418,14 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Disposez les lardons sur la pâte',
+            attachedIngredient: '200g de lardons',
             longinstruction: 'Disposez les lardons sur la pâte pour la garnir de lardons et de saveur fumée',
             tip: 'Vous pouvez ajouter des oignons ou des champignons pour plus de saveur',
             important: true
           },
           {
             instruction: 'Versez l’appareil par-dessus',
+            attachedIngredient: 'Appareil',
             longinstruction: 'Versez l’appareil par-dessus pour recouvrir les lardons et obtenir une quiche bien moelleuse',
             tip: 'Veillez à ne pas déborder pour ne pas que la quiche déborde à la cuisson',
             important: true
@@ -410,6 +439,7 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Enfournez la quiche à 180°C jusqu’à ce qu’elle soit dorée',
+            attachedIngredient: 'Four préchauffé',
             longinstruction: 'Enfournez la quiche à 180°C jusqu’à ce qu’elle soit dorée pour que vos clients se régalent !',
             gif: require('../assets/gifs/pie.gif'),
             important: true
