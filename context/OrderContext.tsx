@@ -66,10 +66,12 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
                 setSelectedIds([]); // Clear previous selections
 
                 if (groupId) {
+                    // Pour les ordres déjà en cours
                     const groupOrders = processingOrders.filter(o => o.groupId === groupId);
                     const orderIds = groupOrders.map(o => o.orderId);
                     setSelectedIds(orderIds);
                 } else {
+                    // Pour les nouvelles commandes
                     const order = pendingOrders.find(o => o.id === orderId);
                     if (order) {
                         const newGroupId = `single_${orderId}`;
@@ -89,10 +91,10 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
                     if (recipeIds.length > 0) {
                         router.push({
                             pathname: '/recipe',
-                            params: {
-                                id: recipeIds.join(','),
-                                reset: 1
-                            }
+                            params: { id: recipeIds.join(','),
+                                    reset: 1,
+                                    orderId: orderId
+                             }, // Utilisation correcte de `query` dans next/router
                         });
                     }
                 }
@@ -100,6 +102,7 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
         },
         [pendingOrders, addOrderToProcessing, processingOrders, router]
     );
+
 
     const getOrdersToShow = useCallback(() => {
         if (orderToCook) return [orderToCook];

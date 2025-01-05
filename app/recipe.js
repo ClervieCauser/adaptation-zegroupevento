@@ -20,18 +20,6 @@ export const recipes = [
             important: true
           },
           {
-            instruction: 'Préchauffez votre four à 200 degrés',
-            tip: 'En prechauffant son four avant, on optimise son temps !',
-            gif: require('../assets/gifs/preheat.gif'),
-            important: true
-          },
-          {
-            instruction: 'Préchauffez votre four à 200 degrés',
-            tip: 'En prechauffant son four avant, on optimise son temps !',
-            gif: require('../assets/gifs/preheat.gif'),
-            important: true
-          },
-          {
             instruction: 'Sortez votre poulet du frigo pour qu\'il soit à température ambiante',
             important: false
           },
