@@ -27,7 +27,7 @@ export default function App() {
             onPress={() => router.push('/sign-in')}
             containerStyles={{width: '100%', marginTop: 20}}
           />
-          <Link href="/home">Go to home</Link>
+          <Link href="/recipe-prep">Go to home</Link>
         </View>
       </ScrollView>
       <StatusBar style='dark' backgroundColor='#F9F7FA'/>

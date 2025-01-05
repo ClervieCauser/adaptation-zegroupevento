@@ -21,7 +21,7 @@ const SignIn = () => {
       // Ici vous devrez appeler votre API d'authentification
       // Exemple :
       // await loginUser(form.email, form.password);
-      router.replace('/home'); // Redirection après succès
+      router.replace('/recipe-prep'); // Redirection après succès
     } catch (error) {
       console.error(error);
       // Gérer l'erreur

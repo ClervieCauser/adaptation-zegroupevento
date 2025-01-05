@@ -17,6 +17,9 @@ import {MOCK_USER} from "../../types/user";
 import * as Speech from 'expo-speech';
 import { MOCK_ORDERS } from '../../types/order';
 
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import NoiseAdaptiveText from '../../components/ui/NoiseAdaptiveText';
+
 const RecipePage = () => {
   const { isTablet } = useResponsiveLayout();
   const router = useRouter();
@@ -108,7 +111,7 @@ const RecipePage = () => {
   };
 
   const renderContent = () => {
-    const recipe = recipesMatched[currentRecipeIndex]; 
+    const recipe = recipesMatched[currentRecipeIndex];
 
     switch (activeTab) {
       case 'ingredients':
@@ -248,6 +251,7 @@ const RecipePage = () => {
 
           <ScrollView style={styles.substepsContainer}>
             {currentStepData.substeps.map((substep, index) => (
+<<<<<<< HEAD
               <View key={index} style={styles.substepBox}>
                 {substep.gif && (
                   <Image
@@ -271,24 +275,52 @@ const RecipePage = () => {
                   </View>
                 )}
               </View>
+=======
+                <View key={index} style={styles.substepBox}>
+                  {substep.gif && (
+                      <Image
+                          source={substep.gif}
+                          style={styles.stepGif}
+                          resizeMode="cover"
+                      />
+                  )}
+                  {substep.important ? (
+                      <View style={styles.importantIndicator}>
+                        <Text style={styles.warningText}>{substep.instruction}</Text>
+                      </View>
+                  ) : (
+                      <NoiseAdaptiveText
+                          instruction={substep.instruction}
+                          longInstruction={substep.longinstruction}
+                          micEnabled={MOCK_USER.micEnabled}
+                      />
+                  )}
+                  {substep.tip && (
+                      <View style={styles.tipContainer}>
+                        <Icon name="lightbulb-on-outline" size={24} color="#000" />
+                        <Text style={styles.tipText}>{substep.tip}</Text>
+                      </View>
+                  )}
+                </View>
+>>>>>>> 830266ba3cb9fa6377dbf55fff9f943595b5ce1d
             ))}
           </ScrollView>
 
           <View style={styles.navigationContainer}>
-          <CustomButton
-            title={'Précédent'}
-            onPress={handlePreviousStep}
-            containerStyles={styles.nextButton}
-            textStyles={styles.nextButtonText}
-            Icon={() => <Icon name="chevron-left" size={24} color="#fff" />}
-          />
-          <CustomButton
-            title={getNextButtonText()}
-            onPress={handleNextStep}
-            containerStyles={styles.nextButton}
-            textStyles={styles.nextButtonText}
-            Icon={() => <Icon name="chevron-right" size={24} color="#fff" />}
-          />
+            <CustomButton
+                title="Précédent"
+                onPress={handlePreviousStep}
+                containerStyles={styles.nextButton}
+                textStyles={styles.nextButtonText}
+                Icon={() => <ChevronLeft size={24} color="#fff" />}
+            />
+            <CustomButton
+                title={getNextButtonText()}
+                onPress={handleNextStep}
+                containerStyles={styles.nextButton}
+                textStyles={styles.nextButtonText}
+                Icon={() => <ChevronRight size={24} color="#fff" />}
+            />
         </View>
 
         <View style={styles.progressContainer}>
