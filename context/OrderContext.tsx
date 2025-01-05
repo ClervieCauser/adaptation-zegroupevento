@@ -1,9 +1,9 @@
-// context/OrderContext.tsx
+// OrderContext.tsx
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import { router } from 'expo-router';
 import { MOCK_USER } from '@/types/user';
 import { MOCK_ORDERS, Order } from '@/types/order';
-import {useOrderProcessing} from "@/context/OrderProcessingContext";
+import { useOrderProcessing } from "@/context/OrderProcessingContext";
 
 type OrderSelectionContextType = {
     selectedIds: string[];
@@ -32,7 +32,6 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
         setPendingOrders(prev => prev.filter(order => !orderIds.includes(order.id)));
     }, []);
 
-
     const toggleSelectMode = useCallback(() => {
         setIsSelectMode(prev => !prev);
         if (isSelectMode) {
@@ -50,29 +49,51 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
 
     const handleCookSelected = useCallback(() => {
         if (selectedIds.length > 0) {
-            const groupId = Date.now().toString();
-            selectedIds.forEach(id => {
-                const order = pendingOrders.find(o => o.id === id);
-                if (order) addOrderToProcessing(order, groupId);
+            const groupId = `group_${Date.now()}`;
+            const selectedOrders = pendingOrders.filter(order => selectedIds.includes(order.id));
+
+            selectedOrders.forEach(order => {
+                addOrderToProcessing(order, groupId);
             });
+
+            setPendingOrders(prev => prev.filter(order => !selectedIds.includes(order.id)));
+            setOrderToCook(null);
             router.push('/recipe-prep');
         }
-    }, [selectedIds, pendingOrders]);
+    }, [selectedIds, pendingOrders, addOrderToProcessing]);
 
     const handleSingleCook = useCallback((orderId: string, groupId?: string) => {
-        const order = processingOrders.find(o => o.groupId === groupId);
-        if (order) {
-            setSelectedIds(processingOrders
-                .filter(o => o.groupId === groupId)
-                .map(o => o.orderId)
-            );
+        if (groupId) {
+            // Pour les ordres déjà en cours
+            const groupOrders = processingOrders.filter(o => o.groupId === groupId);
+            const orderIds = groupOrders.map(o => o.orderId);
+            setSelectedIds(orderIds);
+        } else {
+            // Pour les nouvelles commandes
+            const order = pendingOrders.find(o => o.id === orderId);
+            if (order) {
+                const newGroupId = `single_${orderId}`;
+                addOrderToProcessing(order, newGroupId);
+                setPendingOrders(prev => prev.filter(o => o.id !== orderId));
+                setSelectedIds([orderId]);
+            }
         }
         router.push('/recipe-prep');
-    }, [processingOrders]);
+    }, [pendingOrders, processingOrders, addOrderToProcessing]);
 
     const getOrdersToShow = useCallback(() => {
-        return orderToCook ? [orderToCook] : selectedIds;
-    }, [orderToCook, selectedIds]);
+        if (orderToCook) return [orderToCook];
+
+        const selectedOrders = processingOrders.filter(order => selectedIds.includes(order.orderId));
+        if (selectedOrders.length > 0) {
+            const groupId = selectedOrders[0].groupId;
+            return processingOrders
+                .filter(order => order.groupId === groupId)
+                .map(order => order.orderId);
+        }
+
+        return selectedIds;
+    }, [orderToCook, selectedIds, processingOrders]);
 
     const resetSelection = useCallback(() => {
         setIsSelectMode(false);
@@ -80,28 +101,11 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
         setOrderToCook(null);
     }, []);
 
-    const resetOrders = useCallback(() => {
-        setPendingOrders(MOCK_ORDERS);
-    }, []);
-
     const cleanupOrderState = useCallback(() => {
         setOrderToCook(null);
         setSelectedIds([]);
         setIsSelectMode(false);
     }, []);
-
-
-    const value = {
-        selectedIds,
-        orderToCook,
-        isSelectMode,
-        toggleSelectMode,
-        toggleOrderSelection,
-        handleCookSelected,
-        handleSingleCook,
-        getOrdersToShow,
-        resetSelection
-    };
 
     return (
         <OrderSelectionContext.Provider value={{
@@ -116,8 +120,7 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
             getOrdersToShow,
             resetSelection,
             markOrdersAsInProgress,
-            resetOrders,
-            cleanupOrderState
+            cleanupOrderState,
         }}>
             {children}
         </OrderSelectionContext.Provider>

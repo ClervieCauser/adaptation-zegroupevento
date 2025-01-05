@@ -1,15 +1,14 @@
-// context/OrderProcessingContext.tsx
+// OrderProcessingContext.tsx
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import {MOCK_ORDERS, Order, OrderItem} from '@/types/order';
+import { Order, OrderItem } from '@/types/order';
 
 type ProcessingOrder = {
     orderId: string;
-    groupId: string;  // Pour regrouper les orders sélectionnées ensemble
+    groupId: string;
     zoneId: string | null;
     items: (OrderItem & { isReady: boolean })[];
     isCompleted: boolean;
 };
-
 
 type OrderProcessingContextType = {
     processingOrders: ProcessingOrder[];
@@ -18,45 +17,61 @@ type OrderProcessingContextType = {
     toggleItemReady: (orderId: string, itemIndex: number) => void;
     isOrderInZone: (orderId: string) => boolean;
     getOrderByZone: (zoneId: string) => ProcessingOrder | null;
-    clearCompletedOrders: () => string[];
     getCompletedOrderIds: () => string[];
-    addOrderToProcessing: (order: Order) => void;
+    addOrderToProcessing: (order: Order, groupId: string) => void;
     resetZonesAndItems: () => void;
+    setAllItemsReady: (orderId: string) => void;
 };
 
 const OrderProcessingContext = createContext<OrderProcessingContextType | undefined>(undefined);
 
 export const OrderProcessingProvider = ({ children }: { children: React.ReactNode }) => {
     const [processingOrders, setProcessingOrders] = useState<ProcessingOrder[]>([]);
-    const [completedOrders, setCompletedOrders] = useState<string[]>([]);
 
-    const addOrderToZone = useCallback((orderId: string, zoneId: string) => {
-        const orderData = MOCK_ORDERS.find(o => o.id === orderId);
-        if (!orderData) return;
-
+    const addOrderToProcessing = useCallback((order: Order, groupId: string) => {
         setProcessingOrders(prev => {
-            // Remove any existing order in the target zone and the order from any other zone
-            const filtered = prev.filter(o => o.orderId !== orderId && o.zoneId !== zoneId);
-            return [...filtered, {
-                orderId,
-                zoneId,
-                items: orderData.items.map(item => ({ ...item, isReady: false })),
+            // Vérifie si l'ordre existe déjà
+            if (prev.some(po => po.orderId === order.id)) {
+                return prev;
+            }
+
+            return [...prev, {
+                orderId: order.id,
+                groupId,
+                zoneId: null,
+                items: order.items.map(item => ({ ...item, isReady: false })),
                 isCompleted: false
             }];
         });
     }, []);
 
+    const addOrderToZone = useCallback((orderId: string, zoneId: string) => {
+        setProcessingOrders(prev => {
+            const orderToUpdate = prev.find(o => o.orderId === orderId);
+            if (!orderToUpdate) return prev;
 
-    const clearAllOrders = useCallback(() => {
-        setProcessingOrders([]);
+            // Maintenir le groupe lors du déplacement vers une zone
+            return prev.map(order => {
+                if (order.orderId === orderId) {
+                    return { ...order, zoneId };
+                }
+                if (order.zoneId === zoneId) {
+                    return { ...order, zoneId: null };
+                }
+                return order;
+            });
+        });
     }, []);
 
-    const resetOrderProcessing = useCallback(() => {
-        setProcessingOrders([]);
-        setCompletedOrders([]);
+    const removeOrderFromZone = useCallback((orderId: string) => {
+        setProcessingOrders(prev =>
+            prev.map(order =>
+                order.orderId === orderId
+                    ? { ...order, zoneId: null }
+                    : order
+            )
+        );
     }, []);
-
-
 
     const toggleItemReady = useCallback((orderId: string, itemIndex: number) => {
         setProcessingOrders(prev => {
@@ -70,34 +85,10 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
         });
     }, []);
 
-    const removeOrderFromZone = useCallback((orderId: string) => {
-        setProcessingOrders(prev => {
-            const orderToRemove = prev.find(order => order.orderId === orderId);
-            if (orderToRemove?.isCompleted) {
-                setCompletedOrders(prevCompleted => [...prevCompleted, orderId]);
-            }
-            return prev.filter(order => order.orderId !== orderId);
-        });
-    }, []);
-
-    // context/OrderProcessingContext.tsx
-    const addOrderToProcessing = useCallback((order: Order, groupId?: string) => {
-        setProcessingOrders(prev => {
-            if (!prev.some(po => po.orderId === order.id)) {
-                return [...prev, {
-                    orderId: order.id,
-                    groupId: groupId || order.id, // utilise orderId comme groupId pour singleCook
-                    zoneId: null,
-                    items: order.items.map(item => ({ ...item, isReady: false })),
-                    isCompleted: false
-                }];
-            }
-            return prev;
-        });
-    }, []);
-
     const isOrderInZone = useCallback((orderId: string) => {
-        return processingOrders.some(order => order.orderId === orderId);
+        return processingOrders.some(order =>
+            order.orderId === orderId && order.zoneId !== null
+        );
     }, [processingOrders]);
 
     const getOrderByZone = useCallback((zoneId: string) => {
@@ -105,42 +96,50 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
     }, [processingOrders]);
 
     const getCompletedOrderIds = useCallback(() => {
-        const activeCompleted = processingOrders
+        return processingOrders
             .filter(order => order.isCompleted)
             .map(order => order.orderId);
-        return [...new Set([...activeCompleted, ...completedOrders])];
-    }, [processingOrders, completedOrders]);
+    }, [processingOrders]);
 
-    const clearCompletedOrders = useCallback(() => {
-        const completedOrderIds: string[] = [];
-        setProcessingOrders(prev => {
-            const incomplete = prev.filter(order => {
-                if (order.isCompleted) {
-                    completedOrderIds.push(order.orderId);
-                    return false;
-                }
-                return true;
-            });
-            return incomplete;
-        });
-        return completedOrderIds;
-    }, []);
-
-    const clearProcessingOrders = useCallback(() => {
-        setProcessingOrders([]);
-        setCompletedOrders([]);
-    }, []);
-
+    // Dans OrderProcessingContext.tsx
+    // Dans OrderProcessingContext.tsx
     const resetZonesAndItems = useCallback(() => {
-        setProcessingOrders(prev => prev.map(order => ({
-            ...order,
-            zoneId: null, // Réinitialise explicitement la zone
-            items: order.items.map(item => ({
-                ...item,
-                isReady: false
-            })),
-            isCompleted: false
-        })));
+        setProcessingOrders(prev => {
+            const groups = prev.reduce((acc, order) => {
+                if (!acc[order.groupId]) {
+                    acc[order.groupId] = [];
+                }
+                acc[order.groupId].push(order);
+                return acc;
+            }, {});
+
+            return prev.filter(order => {
+                const group = groups[order.groupId];
+                return !group.every(o => o.isCompleted);
+            }).map(order => ({
+                ...order,
+                zoneId: null,
+                // Garder l'état prêt si déjà prêt
+                items: order.items.map(item => ({
+                    ...item,
+                    isReady: item.isReady || false
+                })),
+                isCompleted: order.isCompleted
+            }));
+        });
+    }, []);
+
+    const setAllItemsReady = useCallback((orderId: string) => {
+        setProcessingOrders(prev => {
+            return prev.map(order => {
+                if (order.orderId !== orderId) return order;
+                return {
+                    ...order,
+                    items: order.items.map(item => ({ ...item, isReady: true })),
+                    isCompleted: true
+                };
+            });
+        });
     }, []);
 
     return (
@@ -151,13 +150,10 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
             toggleItemReady,
             isOrderInZone,
             getOrderByZone,
-            clearCompletedOrders,
             getCompletedOrderIds,
-            clearAllOrders,
-            resetOrderProcessing,
             addOrderToProcessing,
             resetZonesAndItems,
-
+            setAllItemsReady,
         }}>
             {children}
         </OrderProcessingContext.Provider>
