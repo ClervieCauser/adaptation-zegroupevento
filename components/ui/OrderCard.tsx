@@ -149,22 +149,23 @@ const OrderCard = ({
                     {renderToggleButton()}
                 </View>
 
-
-                {!showContinue ? (
-                    <TouchableOpacity
-                        style={styles.cookButton}
-                        onPress={() => handleSingleCook(order.id)}
-                    >
-                        <ThemedText style={styles.cookButtonText}>Cuisiner</ThemedText>
-                    </TouchableOpacity>
-                ) : (
-                    <TouchableOpacity
-                        style={[styles.cookButton, styles.continueButton]}
-                        onPress={handleContinue}
-                    >
-                        <ThemedText style={styles.cookButtonText}>Continuer</ThemedText>
-                    </TouchableOpacity>
-                )}
+                <View style={styles.buttonContainer}>
+                    {!showContinue ? (
+                        <TouchableOpacity
+                            style={styles.cookButton}
+                            onPress={() => handleSingleCook(order.id)}
+                        >
+                            <ThemedText style={styles.cookButtonText}>Cuisiner</ThemedText>
+                        </TouchableOpacity>
+                    ) : (
+                        <TouchableOpacity
+                            style={[styles.cookButton, styles.continueButton]}
+                            onPress={handleContinue}
+                        >
+                            <ThemedText style={styles.cookButtonText}>Continuer</ThemedText>
+                        </TouchableOpacity>
+                    )}
+                </View>
             </View>
         </ThemedView>
     );
@@ -176,7 +177,7 @@ const styles = StyleSheet.create({
         borderRadius: 16,
         padding: 16,
         width: '60%',
-        minWidth: 280,
+        minWidth: 320,
         maxWidth: 320,
         margin: 6,
         flexShrink: 1,
@@ -195,6 +196,7 @@ const styles = StyleSheet.create({
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
+        flex: 1,
     },
     header: {
         flexDirection: 'column',
@@ -266,12 +268,14 @@ const styles = StyleSheet.create({
         fontFamily: 'Jua',
         textAlign: 'center',
     },
+    buttonContainer: {
+        marginTop: 'auto',
+    },
     cookButton: {
         backgroundColor: '#E8A85F',
         borderRadius: 12,
         padding: 10,
         alignItems: 'center',
-        marginTop: 'auto',
     },
     cookButtonText: {
         color: '#FFFFFF',
@@ -349,13 +353,14 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
-        padding: 12,
+        padding: 10,
         borderRadius: 8,
         width: '48%',
         minWidth: 120,
         backgroundColor: '#FFFFFF',
         position: 'relative',
         overflow: 'hidden',
+        flexWrap: 'wrap',
     }
 });
 

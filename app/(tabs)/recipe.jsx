@@ -266,8 +266,8 @@ const RecipePage = () => {
                 )}
                 {substep.tip && (
                   <View style={styles.tipContainer}>
-                  <Icon name="lightbulb-on-outline" size={24} color="#000" />
-                  <Text style={styles.tipText}>{substep.tip}</Text>
+                    <Icon name="lightbulb-on-outline" size={24} color="#000" />
+                    <Text style={styles.tipText}>{substep.tip}</Text>
                   </View>
                 )}
               </View>
@@ -643,7 +643,7 @@ const styles = StyleSheet.create({
 
   recipeHeader: {
     padding: 16,
-    backgroundColor: '#FFF',
+    backgroundColor: '#F9F7FA',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
@@ -656,6 +656,7 @@ const styles = StyleSheet.create({
   recipeNumber: {
     color: '#666',
     fontSize: 16,
+    fontFamily: 'Jua',
   },
   headerIcons: {
     flexDirection: 'row',
@@ -713,28 +714,39 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFF',
     padding: 16,
     borderRadius: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 5 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3.84,
+    elevation: 4,
+    zIndex: 2,
   },
   warningText: {
     color: '#ED9405',
     fontWeight: 'bold',
+    fontFamily: 'Jua',
   },
   substepText: {
     fontSize: 16,
     backgroundColor: '#FFF',
     padding: 16,
     borderRadius: 8,
+    fontFamily: 'Jua',
   },
   tipContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: '#FFEFDF',
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 8,
+    padding: 6,
+    borderBottomLeftRadius: 8,
+    borderBottomRightRadius: 8,
+    marginLeft: 15,
+    marginRight: 15,
   },
   tipText: {
     marginLeft: 8,
     color: '#666',
+    fontFamily: 'Jua',
   },
   navigationContainer: {
     alignItems: 'center',
@@ -768,6 +780,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#666',
     marginBottom: 8,
+    fontFamily: 'Jua',
   },
   progressBar: {
     flexDirection: 'row',

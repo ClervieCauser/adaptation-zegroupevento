@@ -148,22 +148,28 @@ const TabLayout = () => {
                                 }}
                             />
                             <Tabs.Screen
-                                name="settings"
-                                options={{
-                                    title: 'Settings',
-                                    headerShown: false,
-                                    tabBarIcon: ({ color, focused }) => (
-                                        <TabIcon icon={icons.profile} color={color} name="Paramètres" focused={focused} />
-                                    ),
-                                }}
-                            />
-                            <Tabs.Screen
                                 name="stats"
                                 options={{
                                     title: 'Statistiques',
                                     headerShown: false,
                                     tabBarIcon: ({ color, focused }) => (
                                         <TabIcon icon={icons.profile} color={color} name="Statistiques" focused={focused} />
+                                    ),
+                                }}
+                            />
+                            <Tabs.Screen
+                                name="create"
+                                options={{
+                                    tabBarButton: () => null,
+                                }}
+                            />
+                            <Tabs.Screen
+                                name="settings"
+                                options={{
+                                    title: 'Settings',
+                                    headerShown: false,
+                                    tabBarIcon: ({ color, focused }) => (
+                                        <TabIcon icon={icons.profile} color={color} name="Paramètres" focused={focused} />
                                     ),
                                 }}
                             />
