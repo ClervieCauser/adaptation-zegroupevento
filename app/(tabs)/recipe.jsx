@@ -35,6 +35,13 @@ const RecipePage = () => {
   const ids = id ? id.split(',').map(i => parseInt(i, 10)) : [];
   const orderid = orderId ? parseInt(orderId, 10) : null;
 
+  useEffect(() => {
+    if (orderid) {
+      setCurrentStep(0);
+      setIsRecipeHome(true);
+    }
+  }, [orderid]);
+
   const recipesMatched = recipes.filter(recipe => ids.includes(recipe.id));
   if (recipesMatched.length === 0) {
     return <Text>Recette(s) introuvable(s)</Text>;
