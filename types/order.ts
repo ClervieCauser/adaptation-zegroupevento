@@ -34,19 +34,28 @@ export const MOCK_ORDERS: Order[] = [
         id: '1294',
         time: '16:34',
         status: 'PENDING',
-        items: Array(12).fill({ name: 'Poulet citron', quantity: 2 }),
+        items: [
+            { name: 'Quiche Lorraine', quantity: 3 },
+            { name: 'Risotto aux champignons', quantity: 2 },
+        ],
     },
     {
         id: '1295',
         time: '16:30',
         status: 'PENDING',
-        items: Array(8).fill({ name: 'Poulet citron', quantity: 2 }),
+        items : [
+            { name: 'Poulet citron', quantity: 2 },
+            { name: 'Quiche Lorraine', quantity: 1 },
+        ],
     },
     {
         id: '1296',
         time: '16:28',
         status: 'PENDING',
-        items: Array(6).fill({ name: 'Poulet citron', quantity: 2 }),
+        items: [
+            { name: 'Risotto aux champignons', quantity: 2 },
+            { name: 'Tartiflette Savoyarde', quantity: 2 },
+        ],
     },
     {
         id: '1297',
@@ -73,8 +82,9 @@ export const MOCK_ORDERS: Order[] = [
         time: '17:15',
         status: 'PENDING',
         items: [
-            { name: 'Poulet citron', quantity: 3 },
-            { name: 'Risotto aux champignons', quantity: 4 },
+            { name: 'Poulet citron', quantity: 2 },
+            { name: 'Tartiflette Savoyarde', quantity: 1 },
+            { name: 'Quiche Lorraine', quantity: 3 },
         ],
     },
     {
@@ -144,8 +154,9 @@ export const MOCK_ORDERS: Order[] = [
         time: '18:05',
         status: 'PENDING',
         items: [
-            { name: 'Poulet citron', quantity: 3 },
-            { name: 'Risotto aux champignons', quantity: 1 },
+            { name: 'Poulet citron', quantity: 1 },
+            { name: 'Tartiflette Savoyarde', quantity: 3 },
+            { name: 'Quiche Lorraine', quantity: 2 },
         ],
     },
 ];
