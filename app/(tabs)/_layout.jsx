@@ -153,7 +153,7 @@ const TabLayout = () => {
                                     title: 'Statistiques',
                                     headerShown: false,
                                     tabBarIcon: ({ color, focused }) => (
-                                        <TabIcon icon={icons.profile} color={color} name="Statistiques" focused={focused} />
+                                        <TabIcon icon={icons.statistiques} color={color} name="Statistiques" focused={focused} />
                                     ),
                                 }}
                             />
@@ -169,7 +169,7 @@ const TabLayout = () => {
                                     title: 'Settings',
                                     headerShown: false,
                                     tabBarIcon: ({ color, focused }) => (
-                                        <TabIcon icon={icons.profile} color={color} name="Paramètres" focused={focused} />
+                                        <TabIcon icon={icons.settings} color={color} name="Paramètres" focused={focused} />
                                     ),
                                 }}
                             />
