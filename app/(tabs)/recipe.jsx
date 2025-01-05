@@ -380,7 +380,7 @@ const RecipePage = () => {
                 <ScrollView style={styles.scrollableContainer} contentContainerStyle={styles.ingredientsContainer}>
                   {recipesMatched[currentRecipeIndex].utensils.map((item, index) => (
                     <View key={index} style={styles.ingredientContainer}>
-                      <UtensilRow utensil={item.utensil} />
+                      <UtensilRow utensil={item.utensil}/>
                     </View>
                   ))}
                 </ScrollView>
