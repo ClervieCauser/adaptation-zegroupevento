@@ -17,8 +17,6 @@ const OrdersInProgress = () => {
     const { processingOrders } = useOrderProcessing();
     const { cleanupOrderState } = useOrderSelection();
 
-
-
     // Grouper les ordres par groupId
     const groupedOrders = useMemo(() => {
         const groups = {};
@@ -34,7 +32,6 @@ const OrdersInProgress = () => {
     useEffect(() => {
         cleanupOrderState();
     }, [cleanupOrderState]);
-
 
     return (
         <ThemedView style={styles.container}>
@@ -55,52 +52,25 @@ const OrdersInProgress = () => {
                 <View style={styles.scrollableContent}>
                     <View style={styles.ordersGrid}>
                         {groupedOrders.map((group) => {
-
                             const orderGroup = group[0];
                             const groupIds = group.map(order => order.orderId);
                             const completedItems = group.reduce((sum, order) =>
-                                sum + order.items.filter(item => item.isReady).reduce((itemSum, item) => itemSum + item.quantity, 0), 0);
+                                sum + order.items.filter(item => item.isReady).length, 0);
                             const totalItems = group.reduce((sum, order) =>
-                                sum + order.items.reduce((itemSum, item) => itemSum + item.quantity, 0), 0);
+                                sum + order.items.length, 0);
 
-
-                            const aggregatedItems = group.reduce((acc, order) => {
-                                order.items.forEach(item => {
-                                    const key = item.name;
-                                    if (!acc[key]) {
-                                        acc[key] = {
-                                            name: key,
-                                            quantity: 0,
-                                            readyCount: 0,
-                                            isReady: false
-                                        };
-                                    }
-                                    acc[key].quantity += item.quantity;
-                                    if (item.isReady) {
-                                        acc[key].readyCount += item.quantity;
-                                        acc[key].isReady = acc[key].readyCount === acc[key].quantity;
-                                    }
-                                });
-                                return acc;
-                            }, {});
-
-                            const readyOrders = group.map(order => {
-                                return order.items.every(item => item.isReady) ? order.orderId : null
-                            }).filter(Boolean);
-
-                            const isOrderReady = (orderIdToCheck) => {
-                                return group.find(o => o.orderId === orderIdToCheck)?.items.every(item => item.isReady);
-                            };
                             return (
                                 <OrderCard
                                     key={`order-${orderGroup.groupId}`}
                                     order={{
                                         id: groupIds.join(', #'),
-                                        items: Object.values(aggregatedItems),
+                                        items: group.flatMap(order => ({
+                                            ...order.items[0],
+                                            isReady: order.items.every(item => item.isReady)
+                                        })),
                                         status: 'IN_PROGRESS',
                                         time: `${completedItems}/${totalItems} ready`,
-                                        groupId: orderGroup.groupId,
-                                        readyOrders: readyOrders
+                                        groupId: orderGroup.groupId
                                     }}
                                     expanded={expandedCardId === orderGroup.groupId}
                                     onToggleExpand={() => setExpandedCardId(
@@ -109,7 +79,6 @@ const OrdersInProgress = () => {
                                     showContinue={true}
                                     isSelectMode={false}
                                     isSelected={false}
-                                    showProgress={true}
                                     onSelect={() => {}}
                                 />
                             );
