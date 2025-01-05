@@ -91,7 +91,7 @@ const Settings = () => {
                 color="#666"
               />                        
             </TouchableOpacity>
-            <Text style={styles.settingTitle}>Text to speech</Text>
+            <Text style={styles.settingTitle}>Synthèse vocale</Text>
           </View>
           <Switch
             value={textToSpeech}

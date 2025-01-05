@@ -249,7 +249,6 @@ const RecipePage = () => {
                 onPress={handleBackToHome}
                 containerStyles={styles.backHomeButton}
                 textStyles={styles.backHomeText}
-                Icon={() => <ChevronLeft size={24} color="#fff" />}
             />
            <Text style={styles.recipeName}>{recipe.name}</Text>
           { orderId ? (
@@ -680,7 +679,8 @@ const styles = StyleSheet.create({
   // RECIPE PREP
 
   recipeHeader: {
-    padding: 16,
+    paddingLeft: 16,
+    paddingRight: 16,
     backgroundColor: '#F9F7FA',
     flexDirection: 'row',
     alignItems: 'center',
@@ -817,7 +817,7 @@ const styles = StyleSheet.create({
     padding: 5,
     minHeight: 40,
     maxWidth: 40,
-    marginBottom: 16,
+    margin: 0,
   },
   backHomeText: {
     color: '#FFF',

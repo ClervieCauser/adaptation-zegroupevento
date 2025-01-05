@@ -174,7 +174,7 @@ const RecipePrep = () => {
                 <CustomHeader />
                 <View style={styles.content}>
                     <View style={styles.ordersList}>
-                        <ThemedText style={styles.ordersTitle}>ORDERS:</ThemedText>
+                        <ThemedText style={styles.ordersTitle}>Commandes:</ThemedText>
                         {ordersToDisplay.map(id => {
                             const order = processingOrders.find(o => o.orderId === id);
                             return (
@@ -212,21 +212,21 @@ const RecipePrep = () => {
                             onPress={resetSelection}
                             style={styles.footerButton}
                         >
-                            <ThemedText style={styles.buttonText}>Back</ThemedText>
+                            <ThemedText style={styles.buttonText}>Retour</ThemedText>
                         </TouchableOpacity>
                         {allOrdersCompleted ? (
                             <TouchableOpacity
                                 style={[styles.footerButton, styles.finishButton]}
                                 onPress={handleFinishOrders}
                             >
-                                <ThemedText style={styles.buttonText}>Finish Orders</ThemedText>
+                                <ThemedText style={styles.buttonText}>Finir les commandes</ThemedText>
                             </TouchableOpacity>
                         ) : (
                             <TouchableOpacity
                                 style={styles.footerButton}
                                 onPress={() => setShowSettings(true)}
                             >
-                                <ThemedText style={styles.buttonText}>Settings</ThemedText>
+                                <ThemedText style={styles.buttonText}>Paramètres</ThemedText>
                             </TouchableOpacity>
                         )}
                     </View>

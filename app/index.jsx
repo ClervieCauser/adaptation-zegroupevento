@@ -25,9 +25,8 @@ export default function App() {
           <CustomButton
             title="Continuer avec l'email"
             onPress={() => router.push('/sign-in')}
-            containerStyles={{width: '100%', marginTop: 20}}
+            containerStyles={{width: '80%', marginBottom: 20}}
           />
-          <Link href="/recipe-prep">Go to home</Link>
         </View>
       </ScrollView>
       <StatusBar style='dark' backgroundColor='#F9F7FA'/>
