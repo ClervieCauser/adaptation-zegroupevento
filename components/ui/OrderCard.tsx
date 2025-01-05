@@ -1,4 +1,4 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useState} from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
 import { ThemedText } from '@/components/ThemedText';
 import { ThemedView } from '@/components/ThemedView';
@@ -33,59 +33,45 @@ const OrderCard = ({
     const EXPANDED_COLUMNS = 8;
     const MAX_VISIBLE_ITEMS = GRID_COLUMNS * MAX_VISIBLE_ROWS;
     const hasMoreItems = order.items.length > MAX_VISIBLE_ITEMS;
-
-    const renderMealGrid = () => {
-        const visibleItems = expanded ? order.items : order.items.slice(0, MAX_VISIBLE_ITEMS);
-        const rows = [];
-        const columns = expanded ? EXPANDED_COLUMNS : GRID_COLUMNS;
-        const numRows = Math.ceil(visibleItems.length / columns);
-
-        for (let i = 0; i < numRows; i++) {
-            const rowItems = visibleItems.slice(i * columns, (i + 1) * columns);
-            const isLastVisibleRow = !expanded && i === MAX_VISIBLE_ROWS - 1;
-            const showSeeMore = hasMoreItems && isLastVisibleRow;
-
-            const row = (
-                <View key={i} style={styles.gridRow}>
-                    {rowItems.map((item, index) => (
-                        <View key={index} style={[
-                            styles.gridCell,
-                            item.isReady && styles.itemCompleted
-                        ]}>
-                            <ThemedText style={styles.mealName}>{item.name}</ThemedText>
-                            <ThemedText style={styles.mealQuantity}>×{item.quantity}</ThemedText>
-                        </View>
-                    ))}
-                    {showSeeMore && rowItems.length === GRID_COLUMNS && (
-                        <TouchableOpacity
-                            style={[styles.gridCell, styles.seeMoreCell]}
-                            onPress={onToggleExpand}
-                        >
-                            <ThemedText style={styles.seeMoreText}>Voir plus</ThemedText>
-                        </TouchableOpacity>
-                    )}
-                    {rowItems.length < columns && !showSeeMore && (
-                        Array(columns - rowItems.length).fill(0).map((_, i) => (
-                            <View key={`empty-${i}`} style={[styles.gridCell, styles.emptyCell]} />
-                        ))
-                    )}
-                </View>
-            );
-            rows.push(row);
-        }
-        return rows;
-    };
+    const [isExpanded, setIsExpanded] = useState(false);
+    const visibleItems = isExpanded ? order.items : order.items.slice(0, MAX_VISIBLE_ITEMS);
+    const remainingItems = order.items.length - MAX_VISIBLE_ITEMS;
+    const isExpert = order.items.length > 4;
 
     const handleContinue = useCallback(() => {
         // Utiliser order.groupId de la props
         handleSingleCook(order.id.split(', #')[0], order.groupId);
     }, [order.id, order.groupId, handleSingleCook]);
 
+    const renderToggleButton = () => {
+        if (!hasMoreItems) return null;
+        
+        if (isExpanded) {
+            return (
+                <TouchableOpacity 
+                    style={[styles.itemBox, styles.seeMoreBox]}
+                    onPress={() => setIsExpanded(false)}
+                >
+                    <ThemedText style={styles.seeMoreText}>Voir moins</ThemedText>
+                </TouchableOpacity>
+            );
+        }
+
+        return (
+            <TouchableOpacity 
+                style={[styles.itemBox, styles.seeMoreBox]}
+                onPress={() => setIsExpanded(true)}
+            >
+                <ThemedText style={styles.seeMoreText}>Voir plus ({remainingItems})</ThemedText>
+            </TouchableOpacity>
+        );
+    };
+
     return (
         <ThemedView style={[
             styles.card,
             expanded && styles.cardExpanded,
-            { width: expanded ? '100%' : 'calc(25% - 12px)' }]}>
+            { width: expanded ? '100%' : 'calc(25% - 12px)' }]}>   
             {isSelectMode && (
                 <TouchableOpacity
                     style={[styles.selectCircle, isSelected && styles.selectCircleActive]}
@@ -107,17 +93,20 @@ const OrderCard = ({
                         <View style={styles.tag}>
                             <ThemedText style={styles.tagText}>Plus ancien</ThemedText>
                         </View>
-                        <View style={[styles.tag, styles.tagExport]}>
-                            <ThemedText style={styles.tagText}>EXPORT</ThemedText>
+                        <View style={[styles.tag, isExpert ? styles.expertTag : styles.noviceTag]}>
+                            <ThemedText style={styles.tagText}>{isExpert ? 'EXPERT' : 'NOVICE'}</ThemedText>
                         </View>
                     </View>
                 </View>
 
-                <View style={[
-                    styles.mealsContainer,
-                    expanded && styles.mealsContainerExpanded
-                ]}>
-                    {renderMealGrid()}
+                <View style={styles.itemsGrid}>
+                    {visibleItems.map((item, index) => (
+                        <View key={index} style={styles.itemBox}>
+                            <ThemedText style={styles.itemName}>{item.name}</ThemedText>
+                            <ThemedText style={styles.itemQuantity}>×{item.quantity}</ThemedText>
+                        </View>
+                    ))}
+                    {renderToggleButton()}
                 </View>
 
                 {!showContinue ? (
@@ -142,15 +131,18 @@ const OrderCard = ({
 
 const styles = StyleSheet.create({
     card: {
-        backgroundColor: '#F8F9FE',
-        borderRadius: 12,
-        height: 420,
+        backgroundColor: '#DEEEFA',
+        borderRadius: 16,
+        padding: 16,
+        width: '60%',
+        minWidth: 280,
+        maxWidth: 320,
         margin: 6,
-        overflow: 'hidden',
+        flexShrink: 1,
     },
     cardExpanded: {
-        marginBottom: 24,
-        height: 'auto',
+        width: '100%',
+        maxWidth: '100%',
     },
     itemCompleted: {
         backgroundColor: '#E8F5E9',
@@ -158,16 +150,14 @@ const styles = StyleSheet.create({
         borderWidth: 1
     },
     cardContent: {
-        padding: 16,
-        height: '100%',
+        padding: 4,
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'space-between',
     },
     header: {
-        alignItems: 'center',
-        gap: 12,
-        marginBottom: 20,
+        flexDirection: 'column',
+        justifyContent: 'center',
     },
     orderInfo: {
         alignItems: 'center',
@@ -185,7 +175,9 @@ const styles = StyleSheet.create({
     },
     tags: {
         flexDirection: 'row',
+        justifyContent: 'center',
         gap: 8,
+        marginBottom: 16,
     },
     tag: {
         backgroundColor: '#E8A85F',
@@ -196,56 +188,59 @@ const styles = StyleSheet.create({
     tagExport: {
         backgroundColor: '#EF476F',
     },
+    expertTag: {
+        backgroundColor: '#EF476F',
+    },
+    noviceTag: {
+        backgroundColor: '#008AEC',
+    },
     tagText: {
         color: '#FFFFFF',
         fontSize: 12,
         fontFamily: 'Jua',
     },
-    mealsContainer: {
-        flex: 1,
-        marginVertical: 16,
-    },
-    gridRow: {
+    itemsGrid: {
         flexDirection: 'row',
-        marginBottom: 8,
+        flexWrap: 'wrap',
         gap: 8,
+        marginBottom: 16,
     },
-    gridCell: {
-        flex: 1,
-        backgroundColor: '#FFFFFF',
-        borderRadius: 8,
-        padding: 12,
+    itemBox: {
         flexDirection: 'row',
         justifyContent: 'space-between',
         alignItems: 'center',
+        backgroundColor: '#FFFFFF',
+        padding: 12,
+        borderRadius: 8,
+        width: '48%',
+        minWidth: 120,
     },
-    seeMoreCell: {
+    seeMoreBox: {
         justifyContent: 'center',
+        cursor: 'pointer',
     },
-    emptyCell: {
-        backgroundColor: 'transparent',
-    },
-    mealName: {
+    itemName: {
         fontSize: 14,
         color: '#1C0D45',
+        fontFamily: 'Jua',
     },
-    mealQuantity: {
+    itemQuantity: {
         fontSize: 14,
         color: '#1C0D45',
         opacity: 0.6,
-        marginLeft: 8,
     },
     seeMoreText: {
-        color: '#E8A85F',
         fontSize: 14,
+        color: '#E8A85F',
+        fontFamily: 'Jua',
         textAlign: 'center',
     },
     cookButton: {
         backgroundColor: '#E8A85F',
         borderRadius: 12,
-        padding: 16,
+        padding: 10,
         alignItems: 'center',
-        marginTop: 16,
+        marginTop: 'auto',
     },
     cookButtonText: {
         color: '#FFFFFF',
