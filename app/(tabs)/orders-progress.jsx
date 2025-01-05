@@ -95,7 +95,7 @@ const OrdersInProgress = () => {
                                         id: groupIds.join(', #'),
                                         items: Object.values(aggregatedItems),
                                         status: 'IN_PROGRESS',
-                                        time: `${completedItems}/${totalItems} ready`,
+                                        time: `${completedItems}/${totalItems} prêts`,
                                         groupId: orderGroup.groupId,
                                         readyOrders: readyOrders
                                     }}

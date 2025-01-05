@@ -157,7 +157,7 @@ const PendingOrders = () => {
                 <View style={styles.pagination}>
                     {currentPage > 1 && (
                         <TouchableOpacity style={styles.prevButton} onPress={handlePreviousPage}>
-                            <ThemedText style={styles.prevButtonText}>Precedent</ThemedText>
+                            <ThemedText style={styles.prevButtonText}>Précédent</ThemedText>
                         </TouchableOpacity>
                     )}
                     {[...Array(totalPages)].map((_, index) => (

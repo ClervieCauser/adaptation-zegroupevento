@@ -12,7 +12,7 @@ export const DisplaySettings = ({ onValidate, selectedMode, onModeChange }) => {
     console.log('DisplaySettings render, onValidate:', onValidate);
     return (
         <View style={styles.settingsModal}>
-            <ThemedText style={styles.modalTitle}>Choose your display setting</ThemedText>
+            <ThemedText style={styles.modalTitle}>Choisissez votre affichage</ThemedText>
             <View style={[styles.optionsGrid , !isTablet && styles.optionsGridPhone]}>
                 {['1', '2', '3', '4'].map((mode) => (
                     <DisplayOption
@@ -31,7 +31,7 @@ export const DisplaySettings = ({ onValidate, selectedMode, onModeChange }) => {
                     onValidate();
                 }}
             >
-                <ThemedText style={styles.validateText}>VALIDATE</ThemedText>
+                <ThemedText style={styles.validateText}>VALIDER</ThemedText>
             </TouchableOpacity>
         </View>
     );

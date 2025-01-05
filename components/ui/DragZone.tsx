@@ -59,16 +59,16 @@ const DragZone = ({ zoneId, onMeasure, onReadyAll }) => {
                     <View style={styles.plusIcon}>
                         <ThemedText style={styles.plusText}>+</ThemedText>
                     </View>
-                    <ThemedText style={styles.dragText}>DRAG AN ORDER</ThemedText>
+                    <ThemedText style={styles.dragText}>GLISSER UNE COMMANDE</ThemedText>
                 </>
             ) : (
                 <Animated.View style={[styles.content, opacity]}>
-                    <ThemedText style={styles.orderTitle}>Order #{orderData.id}</ThemedText>
+                    <ThemedText style={styles.orderTitle}>Commande #{orderData.id}</ThemedText>
                     <TouchableOpacity
                         style={styles.readyAllButton}
                         onPress={() => onReadyAll(order.orderId)}
                     >
-                        <ThemedText style={styles.readyAllText}>Ready All</ThemedText>
+                        <ThemedText style={styles.readyAllText}>Tout Prêt</ThemedText>
                     </TouchableOpacity>
                     <ScrollView style={styles.itemsContainer}>
                         {order?.items?.map((item, index) => (
