@@ -195,6 +195,7 @@ const styles = StyleSheet.create({
         padding: 16,
         backgroundColor: 'white',
         borderRadius: 8,
+        marginBottom: 20,
     },
     replayButton: {
         position: 'absolute',

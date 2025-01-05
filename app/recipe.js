@@ -292,6 +292,7 @@ export const recipes = [
         substeps: [
           {
             instruction: 'Lavez, émincez et faites revenir les champignons dans une poêle avec du beurre',
+            gif: require('../assets/gifs/mush.gif'),
             attachedIngredient: '400g de champignons',
             longinstruction: 'Lavez, émincez et faites revenir les champignons dans une poêle avec du beurre pour les rendre dorés',
             tip: 'Les champignons doivent être bien dorés pour apporter du goût au risotto',
@@ -307,12 +308,14 @@ export const recipes = [
           {
             instruction: 'Faites revenir le riz avec un peu d’huile d’olive jusqu’à ce qu’il devienne translucide',
             attachedIngredient: '300g de riz Arborio',
+            gif: require('../assets/gifs/rice.gif'),
             longinstruction: 'Faites revenir le riz avec un peu d’huile d’olive jusqu’à ce qu’il devienne translucide pour le rendre plus moelleux',
             important: true
           },
           {
             instruction: 'Ajoutez le bouillon louche par louche, en remuant constamment',
             attachedIngredient: '1L de bouillon de légumes',
+            
             longinstruction: 'Ajoutez le bouillon louche par louche, en remuant constamment pour que le riz absorbe le liquide',
             tip: 'N’ajoutez pas tout le bouillon d’un coup, laissez-le absorber par le riz entre chaque ajout',
             important: true
