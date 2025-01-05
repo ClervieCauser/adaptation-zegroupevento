@@ -11,6 +11,8 @@ import { OrderSelectionProvider } from '@/context/OrderContext';
 import { OrderProcessingProvider } from '@/context/OrderProcessingContext';
 import { DraxProvider } from 'react-native-drax';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import Settings from './settings';
+import Stats from './stats';
 
 const TabIcon = ({ icon, color, name, focused }) => {
     const { isTablet, isDesktop } = useResponsiveLayout();
@@ -69,11 +71,11 @@ const TabLayout = () => {
                                             />
                                             <Tabs.Screen
                                                 name="settings"
-                                                options={{ href: null }}
+                                                options={{ href: Settings }}
                                             />
                                             <Tabs.Screen
                                                 name="stats"
-                                                options={{ href: null }}
+                                                options={{ href: Stats }}
                                             />
                                         </Tabs>
                                     </View>
@@ -90,7 +92,6 @@ const TabLayout = () => {
             <OrderSelectionProvider>
                 <GestureHandlerRootView style={{ flex: 1 }}>
                     <DraxProvider>
-
                         <Tabs
                             screenOptions={{
                                 tabBarShowLabel: false,
