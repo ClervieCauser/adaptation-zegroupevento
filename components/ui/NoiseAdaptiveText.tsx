@@ -7,62 +7,99 @@ import * as Speech from 'expo-speech';
 
 let globalRecording = null;
 
+const NOISE_THRESHOLD_HIGH = -40;
+const NOISE_THRESHOLD_LOW = -60;
+const CHANGE_DELAY = 5000;
+
 const NoiseAdaptiveText = ({ instruction, longInstruction, micEnabled, tip }) => {
     const [isNoisy, setIsNoisy] = useState(false);
     const fadeAnim = useRef(new Animated.Value(1)).current;
     const textRef = useRef(instruction);
-    const { speak } = useTextToSpeech(micEnabled);
+    const { speak, stopSpeaking } = useTextToSpeech(micEnabled);
     const mountedRef = useRef(true);
     const isSpeakingRef = useRef(false);
     const timeoutRef = useRef(null);
+    const lastVolumeStateRef = useRef(false);
     const [debugInfo, setDebugInfo] = useState('Initializing...');
 
     const cleanup = async () => {
-        try {
-            if (timeoutRef.current) {
-                clearTimeout(timeoutRef.current);
-                timeoutRef.current = null;
-            }
-            if (globalRecording) {
-                await globalRecording.stopAndUnloadAsync();
-                globalRecording = null;
-            }
-        } catch (error) {
-            console.log('Cleanup error:', error);
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+            timeoutRef.current = null;
         }
+        if (globalRecording) {
+            try {
+                await globalRecording.stopAndUnloadAsync();
+            } catch (error) {
+                console.log('Cleanup recording error:', error);
+            }
+            globalRecording = null;
+        }
+        await stopSpeaking();
+        await Speech.stop();
     };
 
     const speakInstructions = async () => {
-        // Vérification stricte que le micro est activé
-        if (!micEnabled) {
-            console.log('Text-to-speech désactivé car micro désactivé');
+        if (!micEnabled || isNoisy) {
+            console.log('Text-to-speech désactivé car micro désactivé ou environnement bruyant');
             return;
         }
 
-        if (isSpeakingRef.current) return;
+        if (isSpeakingRef.current) {
+            await stopSpeaking();
+            await Speech.stop();
+        }
 
         isSpeakingRef.current = true;
         try {
-            // Tips first
             if (Array.isArray(tip) && tip.length > 0) {
                 await speak('Petits conseils : ' + tip.join('. '));
             } else if (tip) {
                 await speak('Petit conseil : ' + tip);
             }
 
-            // Pause
             await new Promise(resolve => setTimeout(resolve, 1000));
 
-            // Long instruction
             await speak(Array.isArray(longInstruction) ? longInstruction.join('. ') : longInstruction);
         } finally {
             isSpeakingRef.current = false;
         }
     };
 
+    const updateNoiseState = (volumeIsNoisy) => {
+        if (volumeIsNoisy === lastVolumeStateRef.current) {
+            return;
+        }
+
+        if (volumeIsNoisy) {
+            stopSpeaking();
+            Speech.stop();
+        }
+
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        timeoutRef.current = setTimeout(async () => {
+            if (mountedRef.current && volumeIsNoisy !== isNoisy) {
+                setIsNoisy(volumeIsNoisy);
+                if (!volumeIsNoisy && micEnabled) {
+                    setTimeout(() => {
+                        speakInstructions();
+                    }, 500);
+                }
+            }
+            timeoutRef.current = null;
+        }, CHANGE_DELAY);
+
+        lastVolumeStateRef.current = volumeIsNoisy;
+    };
+
     const startNoiseDetection = async () => {
         if (!micEnabled) {
             setIsNoisy(true);
+            stopSpeaking();
+            Speech.stop();
             return;
         }
 
@@ -95,21 +132,18 @@ const NoiseAdaptiveText = ({ instruction, longInstruction, micEnabled, tip }) =>
                 }
             });
 
-            // Détection du niveau sonore
             recording.setOnRecordingStatusUpdate((status) => {
                 if (!status.isRecording) return;
 
-                // Récupération du buffer audio pour analyser le volume
                 if (status.durationMillis > 0) {
-                    const lastUpdate = Date.now();
                     const volume = status.metering !== undefined ? status.metering : -160;
-                    // -20 dB est très fort (cri/musique forte)
-                    // -30 dB est une conversation normale
-                    // -40 dB est un murmure
-                    const newIsNoisy = volume > -20;  // Seuil conversation normale
 
-                    setDebugInfo(`Volume: ${volume.toFixed(2)}dB Time: ${lastUpdate}`);
-                    setIsNoisy(newIsNoisy);
+                    const volumeIsNoisy = isNoisy
+                        ? volume > NOISE_THRESHOLD_LOW
+                        : volume > NOISE_THRESHOLD_HIGH;
+
+                    setDebugInfo(`${volume.toFixed(0)} dB`);
+                    updateNoiseState(volumeIsNoisy);
                 }
             });
 
@@ -124,14 +158,23 @@ const NoiseAdaptiveText = ({ instruction, longInstruction, micEnabled, tip }) =>
 
     useEffect(() => {
         mountedRef.current = true;
+        lastVolumeStateRef.current = isNoisy;
+
         startNoiseDetection();
 
         return () => {
             mountedRef.current = false;
             cleanup();
-            Speech.stop(); // Ajout de l'arrêt du speech
         };
     }, [micEnabled]);
+
+    useEffect(() => {
+        if (isNoisy) {
+            stopSpeaking();
+            Speech.stop();
+            isSpeakingRef.current = false;
+        }
+    }, [isNoisy, stopSpeaking]);
 
     useEffect(() => {
         Animated.sequence([
@@ -145,30 +188,36 @@ const NoiseAdaptiveText = ({ instruction, longInstruction, micEnabled, tip }) =>
                 duration: 300,
                 useNativeDriver: true
             })
-        ]).start(() => {
-            textRef.current = isNoisy ? longInstruction : instruction;
-            // Ne parle que si le micro est activé et l'environnement est calme
-            if (!isNoisy && micEnabled && !isSpeakingRef.current) {
+        ]).start();
+
+        textRef.current = isNoisy ? longInstruction : instruction;
+
+        if (!isNoisy && micEnabled && !isSpeakingRef.current) {
+            setTimeout(() => {
                 speakInstructions();
-            }
-        });
-    }, [isNoisy, micEnabled]); // Réagit également aux changements de micEnabled
+            }, 600);
+        }
+    }, [isNoisy, instruction, longInstruction]);
 
     return (
         <View style={styles.container}>
             <Animated.Text
                 style={[styles.mainText, { opacity: fadeAnim }]}
             >
-                {textRef.current}
+                {isNoisy ? longInstruction : instruction}
             </Animated.Text>
 
             {micEnabled && (
                 <>
                     <TouchableOpacity
                         onPress={speakInstructions}
-                        style={styles.replayButton}
+                        style={[
+                            styles.replayButton,
+                            isNoisy && styles.replayButtonDisabled
+                        ]}
+                        disabled={isNoisy}
                     >
-                        <Icon name="volume-high" size={24} color="#ED9405" />
+                        <Icon name="volume-high" size={24} color={isNoisy ? "#ccc" : "#ED9405"} />
                     </TouchableOpacity>
 
                     <View style={styles.noiseIndicator}>
@@ -177,7 +226,10 @@ const NoiseAdaptiveText = ({ instruction, longInstruction, micEnabled, tip }) =>
                             size={16}
                             color={isNoisy ? "#ED9405" : "#666"}
                         />
-                        <Text style={styles.noiseText}>
+                        <Text style={[
+                            styles.noiseText,
+                            isNoisy ? styles.noisyText : styles.calmText
+                        ]}>
                             {isNoisy ? "Environnement bruyant" : "Environnement calme"}
                         </Text>
                         <Text style={styles.debugText}>{debugInfo}</Text>
@@ -210,6 +262,10 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         backgroundColor: '#FFF3E0',
     },
+    replayButtonDisabled: {
+        opacity: 0.5,
+        backgroundColor: '#f5f5f5',
+    },
     noiseIndicator: {
         position: 'absolute',
         left: 8,
@@ -220,8 +276,13 @@ const styles = StyleSheet.create({
     noiseText: {
         marginLeft: 4,
         fontSize: 12,
-        color: '#666',
         fontFamily: 'Jua',
+    },
+    noisyText: {
+        color: '#ED9405',
+    },
+    calmText: {
+        color: '#666',
     },
     debugText: {
         marginLeft: 8,
