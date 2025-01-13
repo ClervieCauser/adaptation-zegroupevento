@@ -70,12 +70,6 @@ export const recipes = [
         duration: '2 min',
         substeps: [
           {
-            instruction: 'Badigeonnez le poulet avec le mélange citron-huile',
-            longinstruction: 'Badigeonnez le poulet avec le mélange citron-huile pour le parfumer',
-            attachedIngredient: '2 c. à soupe d\'huile d\'olive',
-            important: false
-          },
-          {
             instruction: 'Saupoudrez d\'ail et de romarin',
             longinstruction: 'Saupoudrez d\'ail et de romarin pour donner du goût',
             attachedIngredient: '4 gousses d\'ail, 10g de romarin',
@@ -99,7 +93,7 @@ export const recipes = [
             instruction: 'Enfournez le plat à 200°C',
             longinstruction: 'Enfournez le plat à 200°C pour une cuisson homogène',
             attachedIngredient: 'Four préchauffé',
-            important: true
+            important: false
           },
           {
             instruction: 'Arrosez le poulet avec son jus toutes les 15 minutes',

@@ -7,8 +7,8 @@ import * as Speech from 'expo-speech';
 
 let globalRecording = null;
 
-const NOISE_THRESHOLD_HIGH = -40;
-const NOISE_THRESHOLD_LOW = -60;
+const NOISE_THRESHOLD_HIGH = -20;
+const NOISE_THRESHOLD_LOW = -40;
 const CHANGE_DELAY = 5000;
 
 const NoiseAdaptiveText = ({ instruction, longInstruction, micEnabled, tip }) => {

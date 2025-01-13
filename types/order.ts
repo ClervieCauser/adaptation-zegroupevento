@@ -28,6 +28,12 @@ export const MOCK_ORDERS: Order[] = [
             { name: 'Poulet citron', quantity: 1 },
             { name: 'Quiche Lorraine', quantity: 1 },
             { name: 'Risotto aux champignons', quantity: 1 },
+            { name: 'Risotto aux champignons', quantity: 1 },
+            { name: 'Risotto aux champignons', quantity: 1 },
+            { name: 'Risotto aux champignons', quantity: 1 },
+            { name: 'Risotto aux champignons', quantity: 1 },
+            { name: 'Risotto aux champignons', quantity: 1 },
+            { name: 'Risotto aux champignons', quantity: 1 },
         ],
     },
     {
@@ -64,6 +70,9 @@ export const MOCK_ORDERS: Order[] = [
         items: [
             { name: 'Tartiflette Savoyarde', quantity: 1 },
             { name: 'Quiche Lorraine', quantity: 1 },
+            { name: 'Quiche Lorraine', quantity: 1 },
+            { name: 'Risotto aux champignons', quantity: 2 },
+            { name: 'Poulet citron', quantity: 1 },
         ],
     },
     {
@@ -85,6 +94,11 @@ export const MOCK_ORDERS: Order[] = [
             { name: 'Poulet citron', quantity: 2 },
             { name: 'Tartiflette Savoyarde', quantity: 1 },
             { name: 'Quiche Lorraine', quantity: 3 },
+            { name: 'Risotto aux champignons', quantity: 1 },
+            { name: 'Risotto aux champignons', quantity: 1 },
+            { name: 'Risotto aux champignons', quantity: 1 },
+            { name: 'Risotto aux champignons', quantity: 1 },
+            { name: 'Risotto aux champignons', quantity: 1 },
         ],
     },
     {

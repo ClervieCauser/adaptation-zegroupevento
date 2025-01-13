@@ -115,7 +115,7 @@ const PendingOrders = () => {
                                         onPress={() => handleCookSelected()}
                                     >
                                         <ThemedText style={styles.cookButtonText}>
-                                            Cook({selectedIds.length})
+                                            Cuisiner({selectedIds.length})
                                         </ThemedText>
                                     </TouchableOpacity>
                                     <TouchableOpacity
