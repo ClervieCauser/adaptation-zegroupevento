@@ -2,11 +2,21 @@ import {StatusBar} from 'expo-status-bar';
 import { StyleSheet, ScrollView, Text, View, Image } from 'react-native';
 import {Link, Redirect, router} from 'expo-router';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import { useResponsiveLayout } from '../hooks/useResponsiveLayout';
+import TablePage from './table/TablePage';
 
 import {icons} from '../constants/icons';
 import CustomButton from '../components/ui/CustomButton';
 
 export default function App() {
+  const { isTable } = useResponsiveLayout();
+
+  if(isTable){
+    return (
+        <TablePage/>
+    )
+  }
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={{height:'100%'}}>
