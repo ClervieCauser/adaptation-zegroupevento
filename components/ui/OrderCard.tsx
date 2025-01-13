@@ -16,6 +16,7 @@ type OrderCardProps = {
     onSelect: (id: string) => void;
     showContinue?: boolean;
     showProgress?: boolean;
+    showButton?: boolean;
 };
 
 const OrderCard = ({
@@ -26,7 +27,8 @@ const OrderCard = ({
                        isSelected,
                        showProgress = false,
                        onSelect,
-                       showContinue = false
+                       showContinue = false,
+                       showButton = true
                    }) => {
     const router = useRouter();
     const { handleSingleCook } = useOrderSelection();
@@ -149,23 +151,25 @@ const OrderCard = ({
                     {renderToggleButton()}
                 </View>
 
-                <View style={styles.buttonContainer}>
-                    {!showContinue ? (
-                        <TouchableOpacity
-                            style={styles.cookButton}
-                            onPress={() => handleSingleCook(order.id)}
-                        >
-                            <ThemedText style={styles.cookButtonText}>Cuisiner</ThemedText>
-                        </TouchableOpacity>
-                    ) : (
-                        <TouchableOpacity
-                            style={[styles.cookButton, styles.continueButton]}
-                            onPress={handleContinue}
-                        >
-                            <ThemedText style={styles.cookButtonText}>Continuer</ThemedText>
-                        </TouchableOpacity>
-                    )}
-                </View>
+                {showButton && (
+                    <View style={styles.buttonContainer}>
+                        {!showContinue ? (
+                            <TouchableOpacity
+                                style={styles.cookButton}
+                                onPress={() => handleSingleCook(order.id)}
+                            >
+                                <ThemedText style={styles.cookButtonText}>Cuisiner</ThemedText>
+                            </TouchableOpacity>
+                        ) : (
+                            <TouchableOpacity
+                                style={[styles.cookButton, styles.continueButton]}
+                                onPress={handleContinue}
+                            >
+                                <ThemedText style={styles.cookButtonText}>Continuer</ThemedText>
+                            </TouchableOpacity>
+                        )}
+                    </View>
+                )}
             </View>
         </ThemedView>
     );
