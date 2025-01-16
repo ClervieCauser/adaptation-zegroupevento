@@ -108,6 +108,7 @@ const OrdersInProgress = () => {
                                     isSelected={false}
                                     showProgress={true}
                                     onSelect={() => {}}
+                                    showButton={true}
                                 />
                             );
                         })}
