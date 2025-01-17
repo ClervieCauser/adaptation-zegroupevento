@@ -9,6 +9,7 @@ import DisplaySettings from './DisplaySettings';
 import { DisplayMode } from '../../types/display';
 import { ThemedText } from '../ThemedText';
 import CustomButton from './CustomButton';
+import OrderSideBox from './OrderSideBox';
 
 const OrdersTableDisplay = () => {
   const orderSelection = useOrderSelection();
@@ -54,12 +55,7 @@ const OrdersTableDisplay = () => {
   return (
     <View style={styles.container}>
         <View style={styles.sidePart}>
-            <View style={styles.orderWrapper}>
-                <Text style={styles.ordersTitle}>Commandes :</Text>
-                <View style={styles.orderContent}>
-                {/* Contenu des commandes */}
-              </View>
-            </View>
+            <OrderSideBox></OrderSideBox>
             <CustomButton 
               title="Settings" 
               onPress={() => setShowSettings(!showSettings)} 
@@ -132,11 +128,6 @@ footer: {
     alignItems: 'center',
     marginTop: 16,
 },
-ordersTitle: {
-    fontSize: 18,
-    color: '#1C0D45',
-    fontFamily: 'Jua',
-},
 ordersTableDisplay: {
     flex: 1,
     width: '80%'
@@ -166,19 +157,7 @@ ordersTableDisplay: {
     buttonText: {
         color: 'white',
         textAlign: 'center',
-    },
-  orderWrapper: {
-    flex: 1,
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-    borderStyle: 'dashed',
-  },
-  orderContent: {
-    marginTop: 16,
-  },
+    }
   
 });
 
