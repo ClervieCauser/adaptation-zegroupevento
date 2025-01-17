@@ -3,6 +3,8 @@ import React from 'react'
 import { OrderSelectionProvider } from '@/context/OrderContext'
 import { OrderProcessingProvider } from '@/context/OrderProcessingContext'
 import MiddleTableContent from '@/components/ui/MiddleTableContent'
+import OrdersTableDisplay from '@/components/ui/OrdersTableDisplay'
+import CustomButton from '@/components/ui/CustomButton'
 
 const TablePage = () => {
   return (
@@ -13,14 +15,9 @@ const TablePage = () => {
           <View style={styles.topSection}>
             {/* Zone haut gauche */}
             <View style={styles.quarterSection}>
-              <View style={styles.orderList}>
-                <Text style={styles.orderTitle}>Commande #1293</Text>
-                {/* Liste des plats */}
-              </View>
-              <View style={styles.dropZone}>
-                <Text style={styles.dropZoneText}>GLISSER UNE COMMANDE</Text>
-              </View>
+              <OrdersTableDisplay />
             </View>
+
 
             {/* Zone haut droite */}
             <View style={[styles.quarterSection, styles.borderLeft]}>
@@ -104,7 +101,7 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     display: 'flex',
-    flexDirection: 'column',
+    flexDirection: 'row',
   },
   borderLeft: {
     borderLeftWidth: 1,
@@ -149,7 +146,7 @@ const styles = StyleSheet.create({
   dropZoneText: {
     color: 'white',
     fontFamily: 'Jua',
-  }
+  },
 })
 
 export default TablePage;
