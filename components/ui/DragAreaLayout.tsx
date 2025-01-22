@@ -7,7 +7,7 @@ interface DragAreaLayoutProps {
     mode: DisplayMode;
     onMeasure: (zoneId: string, layout: any) => void;
     onReadyAll: (orderId: string) => void;
-    children: React.ReactNode;
+    children?: React.ReactNode;
 }
 const DragAreaLayout = ({ mode, onMeasure, onReadyAll }: DragAreaLayoutProps) => {
     const containerRef = useRef<View>(null);

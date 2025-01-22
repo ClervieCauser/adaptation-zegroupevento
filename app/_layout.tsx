@@ -24,7 +24,7 @@ const RootLayout = () => {
   if(isTable) {
     return (
       <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(table)" options={{ headerShown: false }} />
+        <Stack.Screen name="table" options={{ headerShown: false }} />
       </Stack>
     );
   }

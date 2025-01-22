@@ -54,6 +54,7 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
     borderWidth: 1,
     padding: 8,
+    zIndex: 10,
   },
   imagesGrid: {
     flexDirection: 'row',

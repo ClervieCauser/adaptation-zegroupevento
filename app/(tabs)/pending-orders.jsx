@@ -335,7 +335,9 @@ const styles = StyleSheet.create({
         position: 'sticky',
         bottom: 10,
         backgroundColor: '#F9F7FA',
-        borderTop: '1px solid #EAEAEA',
+        borderTopWidth: '1px',
+        borderTopStyle: 'solid',
+        borderTopColor: '#EAEAEA',
     },
     actionButtons: {
         flexDirection: 'row',
