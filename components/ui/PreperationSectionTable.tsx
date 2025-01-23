@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View, TouchableOpacity } from 'react-native';
 import React, { useState } from 'react';
+import { Switch } from '@/components/ui/Switch';
+
 
 interface DisplaySettingsProps {
   onValidate: () => void;
@@ -65,12 +67,24 @@ const DisplaySettings: React.FC<DisplaySettingsProps> = ({ onValidate, selectedM
 
 const PreperationSectionTable = ({ settings = false }) => {
   const [selectedMode, setSelectedMode] = useState('4');
+  const [autoSuggestEnabled, setAutoSuggestEnabled] = useState(false);
+
+  const onAutoSuggestChange = (checked: boolean) => {
+    setAutoSuggestEnabled(checked);
+  };
 
   if (settings) {
     return (
       <View style={styles.container}>
         <View style={styles.waitingZone}>
             <Text style={styles.title}>Zone d'attente</Text>
+            <View style={styles.autoSuggestContainer}>
+              <Text style={styles.autoSuggestLabel}>Suggestions auto</Text>
+              <Switch
+                checked={autoSuggestEnabled}
+                onCheckedChange={onAutoSuggestChange}
+              />
+            </View>
         </View>
         <View style={styles.preparationZone}>
         <View style={styles.header}>
@@ -93,6 +107,13 @@ const PreperationSectionTable = ({ settings = false }) => {
     <View style={styles.container}>
       <View style={styles.waitingZone}>
         <Text style={styles.title}>Zone d'attente</Text>
+        <View style={styles.autoSuggestContainer}>
+              <Text style={styles.autoSuggestLabel}>Suggestions auto</Text>
+              <Switch
+                checked={autoSuggestEnabled}
+                onCheckedChange={onAutoSuggestChange}
+              />
+            </View>
       </View>
       
       <View style={styles.preparationZone}>
@@ -249,6 +270,7 @@ const styles = StyleSheet.create({
    borderWidth: 1,
    borderColor: '#E0E0E0', 
    padding: 16,
+   alignItems: 'center',
  },
  preparationZone: {
    flex: 3,
@@ -316,6 +338,17 @@ const styles = StyleSheet.create({
    fontSize: 14,
    textAlign: 'center',
  },
+ autoSuggestContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  gap: 8,
+  marginTop: 16,
+},
+autoSuggestLabel: {
+  fontFamily: 'Jua',
+  color: '#1C0D45',
+  fontSize: 14,
+},
 });
 
 

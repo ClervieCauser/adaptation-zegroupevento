@@ -410,7 +410,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   column: {
-    width: 345,
+    width: 350,
     height: '100%',
     borderRightWidth: 1,
     borderRightColor: '#E8A85F',
@@ -495,7 +495,7 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
   },
   greyedOut: {
-    display: 'none',
+    opacity: 0.5,
   },
   waitingZoneHeader: {
     justifyContent: 'space-between',
