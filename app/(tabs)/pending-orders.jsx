@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, TouchableOpacity, ScrollView } from 'react-native';
+import React, { useState, useEffect, useCallback } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { StyleSheet, View, TouchableOpacity, ScrollView, Alert } from 'react-native';
 import { ThemedView } from '@/components/ThemedView';
 import { ThemedText } from '@/components/ThemedText';
 import SearchBar from '@/components/ui/SearchBar';
@@ -11,7 +12,7 @@ import CustomHeader from "../../components/ui/CustomHeader";
 import { useOrderSelection } from "@/context/OrderContext";
 import { useResponsiveLayout } from "../../hooks/useResponsiveLayout";
 import { Columns } from 'lucide-react';
-
+import CustomPopUp from '@/components/ui/CustomPopUp';
 
 const FilterButton = ({ label, active, onPress }) => (
     <TouchableOpacity
@@ -30,6 +31,9 @@ const PendingOrders = () => {
     const [expandedCardId, setExpandedCardId] = useState(null);
     const [currentPage, setCurrentPage] = useState(1);
     const { isTablet } = useResponsiveLayout();
+    const [isExpertMode, setIsExpertMode] = useState(MOCK_USER.level === 'EXPERT');
+    const [isPopupOpen, setIsPopupOpen] = useState(false);
+
 
     const {
         isSelectMode,
@@ -83,6 +87,16 @@ const PendingOrders = () => {
         setSelectionState(prev => ({ ...prev, orderToCook: orderId }));
         router.push(targetRoute);
     };
+
+    useFocusEffect(
+        useCallback(() => {
+            const expertMode = MOCK_USER.level === 'EXPERT';
+            
+            if (expertMode && pendingOrders && pendingOrders.length > 10) {
+                setIsPopupOpen(true);
+            }
+        }, [pendingOrders, isExpertMode])
+    );  
 
     return (
         <ThemedView style={styles.container}>
@@ -187,6 +201,12 @@ const PendingOrders = () => {
                     )}
                 </View>
             </View>
+            <CustomPopUp 
+                isOpen={isPopupOpen}
+                onClose={() => setIsPopupOpen(false)}
+                title="Attention"
+                message="Il y a plus de 10 commandes à preparer. Veuillez passer à la table tactile."
+            />
         </ThemedView>
     );
 };
@@ -335,7 +355,7 @@ const styles = StyleSheet.create({
         position: 'sticky',
         bottom: 10,
         backgroundColor: '#F9F7FA',
-        borderTopWidth: '1px',
+        borderTopWidth: 1,
         borderTopStyle: 'solid',
         borderTopColor: '#EAEAEA',
     },
