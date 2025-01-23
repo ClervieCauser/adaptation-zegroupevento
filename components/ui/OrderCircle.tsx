@@ -6,11 +6,12 @@ import { recipes } from '../../app/recipe';
 
 interface OrderCircleProps {
   order: Order;
+  isCompleted?: boolean;
 }
 
 const MAX_IMAGES = 3;
 
-const OrderCircle = ({ order }: OrderCircleProps) => {
+const OrderCircle = ({ order, isCompleted = false }: OrderCircleProps) => {
   const getRecipeImage = (recipeName: string) => {
     const recipe = recipes.find(recipe => recipe.name === recipeName);
     return recipe?.imageUrl || '/images/citron.png';
@@ -21,7 +22,7 @@ const OrderCircle = ({ order }: OrderCircleProps) => {
   const remainingItems = totalItems > MAX_IMAGES ? totalItems - MAX_IMAGES : 0;
 
   return (
-    <View style={styles.orderContainer}>
+    <View style={[styles.orderContainer, isCompleted && styles.completedOrder]}>
       <View style={styles.imagesGrid}>
         {displayedItems.map((item, index) => (
           <RecipeImage
@@ -55,6 +56,11 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 15,
     zIndex: 10,
+  },
+  completedOrder: {
+    borderColor: '#4CAF50',
+    borderWidth: 2,
+    backgroundColor: '#E8F5E9',
   },
   imagesGrid: {
     flexDirection: 'row',

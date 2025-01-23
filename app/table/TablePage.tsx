@@ -8,46 +8,71 @@ import DragAreaLayout from '@/components/ui/DragAreaLayout';
 import DisplaySettings from '@/components/ui/DisplaySettings';
 import { ThemedText } from '@/components/ThemedText';
 import { DisplayMode } from '@/types/display';
+import PreperationSectionTable from '@/components/ui/PreperationSectionTable';
 
-interface RecipeColumnProps {
-  recipeName: string;
-  orders: Array<{ id: string; items: Array<{ name: string; quantity: number }>; time: string; status: string }>;
+interface Order {
+  id: string;
+  items: Array<{ name: string; quantity: number }>;
+  time: string;
+  status: "PENDING" | "IN_PROGRESS" | "COMPLETED";
+  zoneId?: string;
+}
+
+interface WaitingZoneProps {
+  orders: Order[];
   onDragEnd: (orderId: string, position: { x: number; y: number }) => void;
   getCompletedOrderIds: () => string[];
 }
 
-const RecipeColumn: React.FC<RecipeColumnProps> = ({ recipeName, orders, onDragEnd, getCompletedOrderIds }) => {
-  const relevantOrders = orders.filter(order => {
-    const quantities = new Map();
-    order.items.forEach(item => {
-      quantities.set(item.name, (quantities.get(item.name) || 0) + item.quantity);
-    });
-    const maxEntry = Array.from(quantities.entries())
-      .reduce((max, current) => current[1] > max[1] ? current : max);
-    return maxEntry[0] === recipeName;
-  }).map(order => ({
-    ...order,
-    time: order.time || '',
-    status: order.status as "PENDING" | "IN_PROGRESS" | "COMPLETED"
-  }));
+interface RecipeColumnProps {
+  recipeName: string;
+  orders: Order[];
+  onDragEnd: (orderId: string, position: { x: number; y: number }) => void;
+  getCompletedOrderIds: () => string[];
+  onAddToWaitingZone: (order: Order) => void;
+}
+const RecipeColumn: React.FC<RecipeColumnProps> = ({ recipeName, orders, onDragEnd, getCompletedOrderIds, onAddToWaitingZone }) => {
+  const [greyedOutOrders, setGreyedOutOrders] = useState<string[]>([]);
+
+  const handleDragStart = (order: Order) => {
+    setGreyedOutOrders(prev => [...prev, order.id]);
+    onAddToWaitingZone(order);
+  };
 
   return (
     <View style={styles.column}>
       <Text style={styles.columnTitle}>{recipeName}</Text>
       <ScrollView 
         horizontal
-        showsHorizontalScrollIndicator={true}
+        showsHorizontalScrollIndicator={false}
         contentContainerStyle={styles.scrollViewContent}
       >
         <View style={styles.ordersList}>
-          {relevantOrders.map(order => (
-            <DraggableOrderCircle 
-              key={order.id}
-              order={order}
-              onDragEnd={onDragEnd}
-              isCompleted={getCompletedOrderIds().includes(order.id)}
-            />
-          ))}
+          {orders
+            .filter(order => {
+              const quantities = new Map<string, number>();
+              order.items.forEach(item => {
+                quantities.set(item.name, (quantities.get(item.name) || 0) + item.quantity);
+              });
+              const maxEntry = Array.from(quantities.entries())
+                .reduce((max, current) => current[1] > max[1] ? current : max);
+              return maxEntry[0] === recipeName;
+            })
+            .map(order => (
+              <View 
+                key={order.id} 
+                style={[
+                  greyedOutOrders.includes(order.id) && styles.greyedOut
+                ]}
+              >
+                <DraggableOrderCircle 
+                  order={order}
+                  onDragEnd={onDragEnd}
+                  onDragStart={() => handleDragStart(order)}
+                  isCompleted={getCompletedOrderIds().includes(order.id)}
+                />
+              </View>
+            ))}
         </View>
       </ScrollView>
       <View style={styles.bottomTitleContainer}>
@@ -59,32 +84,54 @@ const RecipeColumn: React.FC<RecipeColumnProps> = ({ recipeName, orders, onDragE
   );
 };
 
+const WaitingZone: React.FC<WaitingZoneProps> = ({ orders, onDragEnd, getCompletedOrderIds }) => {
+  return (
+    <View style={styles.waitingZone}>
+      <ThemedText style={styles.waitingZoneTitle}>Zone d'attente</ThemedText>
+      <ScrollView contentContainerStyle={styles.waitingZoneContent}>
+        {orders.map(order => (
+          <DraggableOrderCircle 
+            key={order.id}
+            order={order}
+            onDragEnd={onDragEnd}
+            isCompleted={getCompletedOrderIds().includes(order.id)}
+          />
+        ))}
+      </ScrollView>
+    </View>
+  );
+};
+
 const TableContent = () => {
   const { isTable } = useResponsiveLayout();
   const { pendingOrders, markOrdersAsInProgress } = useOrderSelection();
-  const { 
-    addOrderToProcessing, 
-    addOrderToZone, 
-    processingOrders,
-    setAllItemsReady,
-    getCompletedOrderIds 
-  } = useOrderProcessing();
+  const { addOrderToProcessing, addOrderToZone, processingOrders, setAllItemsReady, getCompletedOrderIds } = useOrderProcessing();
   const [displayMode, setDisplayMode] = useState<DisplayMode>('4');
   const [showSettings, setShowSettings] = useState(false);
   const [zoneMeasures, setZoneMeasures] = useState<Record<string, { x: number; y: number; width: number; height: number }>>({});
+  const [waitingZoneOrders, setWaitingZoneOrders] = useState<Order[]>([]);
 
   const uniqueRecipes = useMemo(() => {
-    const recipeNames = new Set<string>();
+    const recipes = new Set<string>();
     pendingOrders?.forEach(order => {
       order.items.forEach(item => {
-        recipeNames.add(item.name);
+        recipes.add(item.name);
       });
     });
-    return Array.from(recipeNames).sort();
+    return Array.from(recipes);
   }, [pendingOrders]);
 
+  const handleAddToWaitingZone = useCallback((order: Order) => {
+    setWaitingZoneOrders(prev => {
+      if (!prev.find(o => o.id === order.id)) {
+        return [...prev, order];
+      }
+      return prev;
+    });
+  }, []);
+
   const handleDragEnd = useCallback((orderId: string, position: { x: number; y: number }) => {
-    const order = pendingOrders.find(o => o.id === orderId);
+    const order = waitingZoneOrders.find(o => o.id === orderId) || pendingOrders?.find(o => o.id === orderId);
     if (!order) return;
 
     for (const [zoneId, measure] of Object.entries(zoneMeasures)) {
@@ -102,10 +149,11 @@ const TableContent = () => {
         addOrderToProcessing(order, groupId);
         addOrderToZone(orderId, zoneId);
         markOrdersAsInProgress([orderId]);
+        setWaitingZoneOrders(prev => prev.filter(o => o.id !== orderId));
         return;
       }
     }
-  }, [pendingOrders, processingOrders, zoneMeasures, addOrderToProcessing, addOrderToZone, markOrdersAsInProgress]);
+  }, [waitingZoneOrders, pendingOrders, processingOrders, zoneMeasures, addOrderToProcessing, addOrderToZone, markOrdersAsInProgress]);
 
   const handleReadyAll = useCallback((orderId: string) => {
     setAllItemsReady(orderId);
@@ -119,23 +167,18 @@ const TableContent = () => {
 
   return (
     <View style={styles.container}>
-      {/* Top Section */}
       <View style={styles.topSection}>
         <View style={styles.emptySpace}>
-          <ThemedText>Top Left Space</ThemedText>
+          <PreperationSectionTable />
         </View>
+        <View style={styles.separatorLine} />
         <View style={styles.emptySpace}>
-          <ThemedText>Top Right Space</ThemedText>
+          <PreperationSectionTable settings={true}/>
         </View>
       </View>
 
-      {/* Middle Section - Recipe Columns */}
       <View style={styles.middleSection}>
-        <ScrollView 
-          horizontal 
-          showsHorizontalScrollIndicator={false}
-          contentContainerStyle={styles.columnsContainer}
-        >
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.columnsContainer}>
           {uniqueRecipes.map(recipeName => (
             <RecipeColumn 
               key={recipeName}
@@ -143,46 +186,57 @@ const TableContent = () => {
               orders={pendingOrders || []}
               onDragEnd={handleDragEnd}
               getCompletedOrderIds={getCompletedOrderIds}
+              onAddToWaitingZone={handleAddToWaitingZone}
             />
           ))}
         </ScrollView>
       </View>
 
-      {/* Bottom Section */}
       <View style={styles.bottomSection}>
-        <View style={styles.dragAreaContainer}>
-          <View style={styles.dragAreaHeader}>
-            <ThemedText style={styles.dragAreaTitle}>Zones de préparation</ThemedText>
-            <TouchableOpacity
-              style={styles.settingsButton}
-              onPress={() => setShowSettings(true)}
-            >
-              <ThemedText style={styles.buttonText}>Settings</ThemedText>
-            </TouchableOpacity>
+        <View style={styles.splitSection}>
+          <WaitingZone 
+            orders={waitingZoneOrders}
+            onDragEnd={handleDragEnd}
+            getCompletedOrderIds={getCompletedOrderIds}
+          />
+          <View style={styles.dragAreaContainer}>
+            <View style={styles.dragAreaHeader}>
+              <ThemedText style={styles.dragAreaTitle}>Zones de préparation</ThemedText>
+              <TouchableOpacity style={styles.settingsButton} onPress={() => setShowSettings(true)}>
+                <ThemedText style={styles.buttonText}>Settings</ThemedText>
+              </TouchableOpacity>
+            </View>
+            {showSettings ? (
+              <DisplaySettings
+                selectedMode={displayMode}
+                onModeChange={setDisplayMode}
+                onValidate={handleValidate}
+              />
+            ) : (
+              <DragAreaLayout 
+                mode={displayMode}
+                onMeasure={(zoneId, layout) => {
+                  setZoneMeasures(prev => ({
+                    ...prev,
+                    [zoneId]: layout
+                  }));
+                }}
+                onReadyAll={handleReadyAll}
+              />
+            )}
           </View>
-          {showSettings ? (
-            <DisplaySettings
-              selectedMode={displayMode}
-              onModeChange={setDisplayMode}
-              onValidate={handleValidate}
-            />
-          ) : (
-            <DragAreaLayout 
-              mode={displayMode}
-              onMeasure={(zoneId, layout) => {
-                setZoneMeasures(prev => ({
-                  ...prev,
-                  [zoneId]: layout
-                }));
-              }}
-              onReadyAll={handleReadyAll}
-            />
-          )}
+        </View>
+        <View style={styles.splitSection}>
+          <View style={styles.separatorLine} />
+          <View style={styles.flip}>
+            <PreperationSectionTable/>
+          </View>
         </View>
       </View>
     </View>
   );
 };
+
 
 const styles = StyleSheet.create({
   container: {
@@ -196,6 +250,13 @@ const styles = StyleSheet.create({
     gap: 16,
     marginBottom: 8,
   },
+  separatorLine: {
+    width: 1,
+    height: '100%',
+    borderWidth: 1,
+    borderStyle: 'dashed',
+    borderColor: '#E8A85F',
+  },
   middleSection: {
     flex: 1,
     height: '24%',
@@ -206,17 +267,29 @@ const styles = StyleSheet.create({
     borderColor: '#E0E0E0',
   },
   bottomSection: {
-    height: '38%',
     flexDirection: 'row',
     gap: 16,
+    height: '38%',
   },
-  emptySpace: {
-    flex: 1,
+  splitSection: {
+    width: '49%',
+    gap: 16,
+    flexDirection: 'row',
+  },
+  flip: {
+    transform: [{ rotate: '180deg' }],
+    width: '100%',
+  },
+  dragAreaContainer: {
+    flex: 3,
     backgroundColor: 'white',
     borderRadius: 8,
     padding: 16,
     borderWidth: 1,
     borderColor: '#E0E0E0',
+  },
+  emptySpace: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -225,12 +298,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
   },
   column: {
-    width: 340,
+    width: 345,
     height: '100%',
     borderRightWidth: 1,
     borderRightColor: '#E8A85F',
     position: 'relative',
-    marginHorizontal: 8,
+    marginHorizontal: 4,
   },
   columnTitle: {
     fontSize: 18,
@@ -243,14 +316,13 @@ const styles = StyleSheet.create({
   },
   ordersList: {
     flexDirection: 'row',
-    gap: 10,
+    gap: 5,
     paddingHorizontal: 4,
-    padding: 12,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'white',
     borderRadius: 16,
-    margin: 8,
+    margin: 4,
     flex: 1,
   },
   bottomTitleContainer: {
@@ -269,19 +341,11 @@ const styles = StyleSheet.create({
     color: '#1C0D45',
     textAlign: 'center',
   },
-  dragAreaContainer: {
-    width: '50%',
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#E0E0E0',
-  },
   dragAreaHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 8,
   },
   dragAreaTitle: {
     fontSize: 18,
@@ -299,6 +363,28 @@ const styles = StyleSheet.create({
     fontFamily: 'Jua',
     fontSize: 14,
   },
+  waitingZone: {
+    flex: 1,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    padding: 16,
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+  },
+  waitingZoneTitle: {
+    fontSize: 18,
+    fontFamily: 'Jua',
+    color: '#1C0D45',
+    marginBottom: 8,
+  },
+  waitingZoneContent: {
+    alignItems: 'center',
+    gap: 8,
+    paddingVertical: 8,
+  },
+  greyedOut: {
+    display: 'none',
+  }
 });
 
 const TablePage = () => {

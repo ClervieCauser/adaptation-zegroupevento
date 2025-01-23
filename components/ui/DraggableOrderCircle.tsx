@@ -10,14 +10,19 @@ import Animated, {
 import OrderCircle from './OrderCircle';
 import { Order } from '@/types/order';
 
-
 interface DraggableOrderCircleProps {
   order: Order;
   onDragEnd?: (id: string, position: { x: number; y: number }) => void;
+  onDragStart?: () => void;
   isCompleted?: boolean;
 }
 
-const DraggableOrderCircle: React.FC<DraggableOrderCircleProps> = ({ order, onDragEnd, isCompleted = false }) => {
+const DraggableOrderCircle: React.FC<DraggableOrderCircleProps> = ({ 
+  order, 
+  onDragEnd, 
+  onDragStart,
+  isCompleted = false 
+}) => {
     const translateX = useSharedValue(0);
     const translateY = useSharedValue(0);
     const context = useSharedValue({ x: 0, y: 0 });
@@ -25,6 +30,9 @@ const DraggableOrderCircle: React.FC<DraggableOrderCircleProps> = ({ order, onDr
     const gesture = Gesture.Pan()
       .onStart(() => {
         context.value = { x: translateX.value, y: translateY.value };
+        if (onDragStart) {
+          runOnJS(onDragStart)();
+        }
       })
       .onUpdate((event) => {
         translateX.value = event.translationX + context.value.x;
@@ -53,7 +61,7 @@ const DraggableOrderCircle: React.FC<DraggableOrderCircleProps> = ({ order, onDr
     return (
       <GestureDetector gesture={gesture}>
         <Animated.View style={[styles.draggableContainer, rStyle]}>
-          <OrderCircle order={order} />
+          <OrderCircle order={order} isCompleted={isCompleted} />
         </Animated.View>
       </GestureDetector>
     );
