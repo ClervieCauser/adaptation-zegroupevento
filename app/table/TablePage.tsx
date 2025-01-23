@@ -9,6 +9,8 @@ import DisplaySettings from '@/components/ui/DisplaySettings';
 import { ThemedText } from '@/components/ThemedText';
 import { DisplayMode } from '@/types/display';
 import PreperationSectionTable from '@/components/ui/PreperationSectionTable';
+import Switch from '@/components/ui/Switch';
+
 
 interface Order {
   id: string;
@@ -22,7 +24,42 @@ interface WaitingZoneProps {
   orders: Order[];
   onDragEnd: (orderId: string, position: { x: number; y: number }) => void;
   getCompletedOrderIds: () => string[];
+  autoSuggestEnabled: boolean;
+  onAutoSuggestChange: (enabled: boolean) => void;
 }
+
+const WaitingZone: React.FC<WaitingZoneProps> = ({ 
+  orders, 
+  onDragEnd, 
+  getCompletedOrderIds,
+  autoSuggestEnabled,
+  onAutoSuggestChange
+}) => {
+  return (
+    <View style={styles.waitingZone}>
+      <View style={styles.waitingZoneHeader}>
+        <ThemedText style={styles.waitingZoneTitle}>Zone d'attente</ThemedText>
+        <View style={styles.autoSuggestContainer}>
+          <ThemedText style={styles.autoSuggestLabel}>Suggestions auto</ThemedText>
+          <Switch
+            checked={autoSuggestEnabled}
+            onCheckedChange={onAutoSuggestChange}
+          />
+        </View>
+      </View>
+      <ScrollView contentContainerStyle={styles.waitingZoneContent}>
+        {orders.map(order => (
+          <DraggableOrderCircle 
+            key={order.id}
+            order={order}
+            onDragEnd={onDragEnd}
+            isCompleted={getCompletedOrderIds().includes(order.id)}
+          />
+        ))}
+      </ScrollView>
+    </View>
+  );
+};
 
 interface RecipeColumnProps {
   recipeName: string;
@@ -30,8 +67,17 @@ interface RecipeColumnProps {
   onDragEnd: (orderId: string, position: { x: number; y: number }) => void;
   getCompletedOrderIds: () => string[];
   onAddToWaitingZone: (order: Order) => void;
+  autoSelectedOrders: string[];
 }
-const RecipeColumn: React.FC<RecipeColumnProps> = ({ recipeName, orders, onDragEnd, getCompletedOrderIds, onAddToWaitingZone }) => {
+
+const RecipeColumn: React.FC<RecipeColumnProps> = ({ 
+  recipeName, 
+  orders, 
+  onDragEnd, 
+  getCompletedOrderIds, 
+  onAddToWaitingZone,
+  autoSelectedOrders 
+}) => {
   const [greyedOutOrders, setGreyedOutOrders] = useState<string[]>([]);
 
   const handleDragStart = (order: Order) => {
@@ -62,7 +108,7 @@ const RecipeColumn: React.FC<RecipeColumnProps> = ({ recipeName, orders, onDragE
               <View 
                 key={order.id} 
                 style={[
-                  greyedOutOrders.includes(order.id) && styles.greyedOut
+                  (greyedOutOrders.includes(order.id) || autoSelectedOrders.includes(order.id)) && styles.greyedOut
                 ]}
               >
                 <DraggableOrderCircle 
@@ -84,24 +130,6 @@ const RecipeColumn: React.FC<RecipeColumnProps> = ({ recipeName, orders, onDragE
   );
 };
 
-const WaitingZone: React.FC<WaitingZoneProps> = ({ orders, onDragEnd, getCompletedOrderIds }) => {
-  return (
-    <View style={styles.waitingZone}>
-      <ThemedText style={styles.waitingZoneTitle}>Zone d'attente</ThemedText>
-      <ScrollView contentContainerStyle={styles.waitingZoneContent}>
-        {orders.map(order => (
-          <DraggableOrderCircle 
-            key={order.id}
-            order={order}
-            onDragEnd={onDragEnd}
-            isCompleted={getCompletedOrderIds().includes(order.id)}
-          />
-        ))}
-      </ScrollView>
-    </View>
-  );
-};
-
 const TableContent = () => {
   const { isTable } = useResponsiveLayout();
   const { pendingOrders, markOrdersAsInProgress } = useOrderSelection();
@@ -110,7 +138,122 @@ const TableContent = () => {
   const [showSettings, setShowSettings] = useState(false);
   const [zoneMeasures, setZoneMeasures] = useState<Record<string, { x: number; y: number; width: number; height: number }>>({});
   const [waitingZoneOrders, setWaitingZoneOrders] = useState<Order[]>([]);
-
+  const [autoSuggestEnabled, setAutoSuggestEnabled] = useState(false);
+  const [manualOrderCount, setManualOrderCount] = useState(0);
+  const [autoSelectedOrderIds, setAutoSelectedOrderIds] = useState<string[]>([]);
+  
+    // Fonction pour obtenir les items d'une commande
+    const getOrderItems = (order: Order): string[] => {
+      return order.items.map(item => item.name);
+    };
+  
+    // Fonction pour compter les items communs entre deux commandes
+    const countCommonItems = (order1: Order, order2: Order): number => {
+      const items1 = getOrderItems(order1);
+      const items2 = getOrderItems(order2);
+      return items1.filter(item => items2.includes(item)).length;
+    };
+  
+    const handleAutoSuggest = useCallback(() => {
+      if (!autoSuggestEnabled || !pendingOrders) {
+        return;
+      }
+  
+      const maxAdditionalOrders = 2;
+      const currentAutoOrders = waitingZoneOrders.length - manualOrderCount;
+  
+      if (currentAutoOrders >= maxAdditionalOrders) {
+        return;
+      }
+  
+      const remainingSlots = maxAdditionalOrders - currentAutoOrders;
+  
+      let suggestedOrders: Order[] = [];
+  
+      if (waitingZoneOrders.length === 0) {
+        suggestedOrders = pendingOrders
+          .filter(order => !processingOrders.some(po => po.id === order.id))
+          .slice(0, remainingSlots);
+      } else {
+        suggestedOrders = pendingOrders
+          .filter(order => {
+            if (waitingZoneOrders.some(wo => wo.id === order.id)) return false;
+            if (processingOrders.some(po => po.id === order.id)) return false;
+            
+            const ordersWithCommonItems = waitingZoneOrders.filter(wo => 
+              countCommonItems(order, wo) >= 3
+            );
+  
+            return ordersWithCommonItems.length > 0;
+          })
+          .slice(0, remainingSlots);
+      }
+  
+      if (suggestedOrders.length > 0) {
+        const newAutoSelectedIds = suggestedOrders.map(order => order.id);
+        setAutoSelectedOrderIds(prev => [...prev, ...newAutoSelectedIds]);
+        setWaitingZoneOrders(prev => [...prev, ...suggestedOrders]);
+      }
+    }, [autoSuggestEnabled, pendingOrders, waitingZoneOrders, processingOrders, manualOrderCount]);
+  
+    const handleDragEnd = useCallback((orderId: string, position: { x: number; y: number }) => {
+      const order = waitingZoneOrders.find(o => o.id === orderId);
+      if (!order) return;
+  
+      for (const [zoneId, measure] of Object.entries(zoneMeasures)) {
+        const isInZone = 
+          position.x >= measure.x &&
+          position.x <= measure.x + measure.width &&
+          position.y >= measure.y &&
+          position.y <= measure.y + measure.height;
+  
+        if (isInZone) {
+          const existingOrder = processingOrders.find(o => o.zoneId === zoneId);
+          if (existingOrder) return;
+  
+          const groupId = `group_${Date.now()}`;
+          addOrderToProcessing(order, groupId);
+          addOrderToZone(orderId, zoneId);
+          markOrdersAsInProgress([orderId]);
+          
+          setWaitingZoneOrders(prev => prev.filter(o => o.id !== orderId));
+          // Si c'était une commande auto-sélectionnée, la retirer de la liste
+          setAutoSelectedOrderIds(prev => prev.filter(id => id !== orderId));
+          
+          if (!autoSelectedOrderIds.includes(orderId)) {
+            setManualOrderCount(count => Math.max(0, count - 1));
+          }
+          return;
+        }
+      }
+    }, [waitingZoneOrders, processingOrders, zoneMeasures, addOrderToProcessing, addOrderToZone, markOrdersAsInProgress, autoSelectedOrderIds]);
+  
+    // Effet pour les suggestions automatiques
+    useEffect(() => {
+      let interval: NodeJS.Timeout;
+      
+      if (autoSuggestEnabled) {
+        handleAutoSuggest(); // Appel immédiat
+        interval = setInterval(handleAutoSuggest, 5000);
+      }
+  
+      return () => {
+        if (interval) {
+          clearInterval(interval);
+        }
+      };
+    }, [autoSuggestEnabled, handleAutoSuggest]);
+  
+    const handleAddToWaitingZone = useCallback((order: Order) => {
+      setWaitingZoneOrders(prev => {
+        if (!prev.find(o => o.id === order.id)) {
+          setManualOrderCount(count => count + 1);
+          return [...prev, order];
+        }
+        return prev;
+      });
+    }, []);
+  
   const uniqueRecipes = useMemo(() => {
     const recipes = new Set<string>();
     pendingOrders?.forEach(order => {
@@ -120,40 +263,6 @@ const TableContent = () => {
     });
     return Array.from(recipes);
   }, [pendingOrders]);
-
-  const handleAddToWaitingZone = useCallback((order: Order) => {
-    setWaitingZoneOrders(prev => {
-      if (!prev.find(o => o.id === order.id)) {
-        return [...prev, order];
-      }
-      return prev;
-    });
-  }, []);
-
-  const handleDragEnd = useCallback((orderId: string, position: { x: number; y: number }) => {
-    const order = waitingZoneOrders.find(o => o.id === orderId) || pendingOrders?.find(o => o.id === orderId);
-    if (!order) return;
-
-    for (const [zoneId, measure] of Object.entries(zoneMeasures)) {
-      const isInZone = 
-        position.x >= measure.x &&
-        position.x <= measure.x + measure.width &&
-        position.y >= measure.y &&
-        position.y <= measure.y + measure.height;
-
-      if (isInZone) {
-        const existingOrder = processingOrders.find(o => o.zoneId === zoneId);
-        if (existingOrder) return;
-
-        const groupId = `group_${Date.now()}`;
-        addOrderToProcessing(order, groupId);
-        addOrderToZone(orderId, zoneId);
-        markOrdersAsInProgress([orderId]);
-        setWaitingZoneOrders(prev => prev.filter(o => o.id !== orderId));
-        return;
-      }
-    }
-  }, [waitingZoneOrders, pendingOrders, processingOrders, zoneMeasures, addOrderToProcessing, addOrderToZone, markOrdersAsInProgress]);
 
   const handleReadyAll = useCallback((orderId: string) => {
     setAllItemsReady(orderId);
@@ -187,6 +296,7 @@ const TableContent = () => {
               onDragEnd={handleDragEnd}
               getCompletedOrderIds={getCompletedOrderIds}
               onAddToWaitingZone={handleAddToWaitingZone}
+              autoSelectedOrders={autoSelectedOrderIds}
             />
           ))}
         </ScrollView>
@@ -194,10 +304,12 @@ const TableContent = () => {
 
       <View style={styles.bottomSection}>
         <View style={styles.splitSection}>
-          <WaitingZone 
+        <WaitingZone 
             orders={waitingZoneOrders}
             onDragEnd={handleDragEnd}
             getCompletedOrderIds={getCompletedOrderIds}
+            autoSuggestEnabled={autoSuggestEnabled}
+            onAutoSuggestChange={setAutoSuggestEnabled}
           />
           <View style={styles.dragAreaContainer}>
             <View style={styles.dragAreaHeader}>
@@ -384,7 +496,22 @@ const styles = StyleSheet.create({
   },
   greyedOut: {
     display: 'none',
-  }
+  },
+  waitingZoneHeader: {
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  autoSuggestContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  autoSuggestLabel: {
+    fontSize: 14,
+    fontFamily: 'Jua',
+    color: '#1C0D45',
+  },
 });
 
 const TablePage = () => {
