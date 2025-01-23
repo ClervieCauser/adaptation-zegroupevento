@@ -47,13 +47,13 @@ const OrderCircle = ({ order }: OrderCircleProps) => {
 const styles = StyleSheet.create({
   orderContainer: {
     alignItems: 'center',
-    marginVertical: 12,
-    width: 120,
-    height: 120,
+    marginVertical: 3,
+    width: 100,
+    height: 100,
     justifyContent: 'center',
     borderColor: '#E0E0E0',
     borderWidth: 1,
-    padding: 8,
+    borderRadius: 15,
     zIndex: 10,
   },
   imagesGrid: {
@@ -62,11 +62,11 @@ const styles = StyleSheet.create({
     gap: 4,
     width: 84,
     justifyContent: 'center',
-    marginTop: 8,
+    marginTop: 4,
   },
   remainingBadge: {
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     borderRadius: 8,
     backgroundColor: '#E8A85F',
     justifyContent: 'center',

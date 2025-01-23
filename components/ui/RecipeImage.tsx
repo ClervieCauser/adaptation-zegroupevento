@@ -38,8 +38,8 @@ const RecipeImage = ({ recipeName, quantity, image }: RecipeImageProps) => {
 const styles = StyleSheet.create({
   container: {
     position: 'relative',
-    width: 40,
-    height: 40,
+    width: 35,
+    height: 35,
     marginTop: 8,
   },
   image: {

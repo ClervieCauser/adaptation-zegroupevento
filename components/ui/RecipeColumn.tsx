@@ -56,9 +56,7 @@ const styles = StyleSheet.create({
     color: '#1C0D45',
     textAlign: 'center',
   },
-  scrollViewContent: {
-    flexGrow: 1,
-  },
+  
   ordersList: {
     flexDirection: 'row',
     gap: 10,
