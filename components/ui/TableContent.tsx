@@ -267,8 +267,8 @@ const styles = StyleSheet.create({
         marginBottom: 8,
         backgroundColor: 'white',
         borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#E0E0E0',
+        borderWidth: 2,
+        borderColor: 'black',
       },
       bottomSection: {
         flexDirection: 'row',

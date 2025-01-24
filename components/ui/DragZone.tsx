@@ -44,6 +44,16 @@ const DragZone = ({ zoneId, onMeasure, onReadyAll }) => {
         }
     }, [order?.isCompleted]);
 
+    const handleReadyAll = () => {
+        console.log('Ready All clicked for zone:', zoneId);
+        console.log('Order data:', orderData);
+        console.log('Processing order:', order);
+        
+        if (order) {
+            onReadyAll(order.orderId);
+        }
+    };
+
     return (
         <Animated.View
             style={[

@@ -12,6 +12,7 @@ type ProcessingOrder = {
 
 type OrderProcessingContextType = {
     processingOrders: ProcessingOrder[];
+    completedOrders: ProcessingOrder[];
     addOrderToZone: (orderId: string, zoneId: string) => void;
     removeOrderFromZone: (orderId: string) => void;
     toggleItemReady: (orderId: string, itemIndex: number) => void;
@@ -27,10 +28,10 @@ const OrderProcessingContext = createContext<OrderProcessingContextType | undefi
 
 export const OrderProcessingProvider = ({ children }: { children: React.ReactNode }) => {
     const [processingOrders, setProcessingOrders] = useState<ProcessingOrder[]>([]);
+    const [completedOrders, setCompletedOrders] = useState<ProcessingOrder[]>([]); // Nouveau state
 
     const addOrderToProcessing = useCallback((order: Order, groupId: string) => {
         setProcessingOrders(prev => {
-            // Vérifie si l'ordre existe déjà
             if (prev.some(po => po.orderId === order.id)) {
                 return prev;
             }
@@ -73,17 +74,42 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
         );
     }, []);
 
+    const handleOrderCompletion = useCallback((order: ProcessingOrder) => {
+        // Ajouter aux commandes terminées
+        setCompletedOrders(prev => {
+            if (!prev.some(po => po.orderId === order.orderId)) {
+                return [...prev, order];
+            }
+            return prev;
+        });
+        
+        // Retirer des commandes en cours
+        setProcessingOrders(prev => 
+            prev.filter(po => po.orderId !== order.orderId)
+        );
+    }, []);
+
     const toggleItemReady = useCallback((orderId: string, itemIndex: number) => {
         setProcessingOrders(prev => {
-            return prev.map(order => {
+            const newOrders = prev.map(order => {
                 if (order.orderId !== orderId) return order;
                 const newItems = [...order.items];
                 newItems[itemIndex] = { ...newItems[itemIndex], isReady: !newItems[itemIndex].isReady };
                 const isCompleted = newItems.every(item => item.isReady);
-                return { ...order, items: newItems, isCompleted };
+                const updatedOrder = { ...order, items: newItems, isCompleted };
+                
+                if (isCompleted) {
+                    // Appeler handleOrderCompletion de manière asynchrone
+                    setTimeout(() => handleOrderCompletion(updatedOrder), 0);
+                }
+                
+                return updatedOrder;
             });
+
+            return newOrders.filter(order => !order.isCompleted);
         });
-    }, []);
+    }, [handleOrderCompletion]);
+
 
     const isOrderInZone = useCallback((orderId: string) => {
         return processingOrders.some(order =>
@@ -130,21 +156,34 @@ export const OrderProcessingProvider = ({ children }: { children: React.ReactNod
     }, []);
 
     const setAllItemsReady = useCallback((orderId: string) => {
+        console.log('Setting all items ready for order:', orderId);
+        
         setProcessingOrders(prev => {
-            return prev.map(order => {
-                if (order.orderId !== orderId) return order;
-                return {
-                    ...order,
-                    items: order.items.map(item => ({ ...item, isReady: true })),
+            const orderToComplete = prev.find(o => o.orderId === orderId);
+            if (orderToComplete) {
+                const completedOrder = {
+                    ...orderToComplete,
+                    items: orderToComplete.items.map(item => ({ ...item, isReady: true })),
                     isCompleted: true
                 };
-            });
+                
+                // Appeler handleOrderCompletion de manière asynchrone
+                setTimeout(() => handleOrderCompletion(completedOrder), 0);
+                
+                return prev.filter(o => o.orderId !== orderId);
+            }
+            return prev;
         });
-    }, []);
+    }, [handleOrderCompletion]);
+
+    const getCompletedOrder = useCallback(() => {
+        return completedOrders.map(order => order.orderId);
+    }, [completedOrders]);
 
     return (
         <OrderProcessingContext.Provider value={{
             processingOrders,
+            completedOrders,
             addOrderToZone,
             removeOrderFromZone,
             toggleItemReady,
