@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useCallback } from 'react';
 import { Order, OrderItem } from '@/types/order';
 
 type ProcessingOrder = {
+    id: string;
     orderId: string;
     groupId: string;
     zoneId: string | null;

@@ -1,5 +1,5 @@
 import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
-import React, { useState, useMemo, useRef } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import DraggableOrderCircle from './DraggableOrderCircle';
 import { useOrderProcessing } from '@/context/OrderProcessingContext';
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -18,14 +18,15 @@ interface RecipeColumnProps {
     onDragEnd: (orderId: string, position: { x: number; y: number }) => void;
     onAddToWaitingZone: (order: Order) => void;
     autoSelectedOrders: string[];
+    getCompletedOrderIds: () => string[];
 }
 
 const RecipeColumn: React.FC<RecipeColumnProps> = ({ 
-    recipeName, 
-    orders, 
-    onDragEnd, 
-    onAddToWaitingZone,
-    autoSelectedOrders 
+  recipeName, 
+  orders, 
+  onDragEnd, 
+  onAddToWaitingZone,
+  autoSelectedOrders 
 }) => {
     const scrollViewRef = useRef<ScrollView>(null);
     const [showLeftArrow, setShowLeftArrow] = useState(false);
@@ -34,6 +35,19 @@ const RecipeColumn: React.FC<RecipeColumnProps> = ({
     const [showFinished, setShowFinished] = useState(false);
     const { completedOrders, getCompletedOrderIds } = useOrderProcessing();
     const completedIds = getCompletedOrderIds();
+
+    useEffect(() => {
+        const handleOrderRemoved = (event: CustomEvent<string>) => {
+            const removedOrderId = event.detail;
+            setGreyedOutOrders(prev => prev.filter(id => id !== removedOrderId));
+        };
+
+        window.addEventListener('orderRemoved', handleOrderRemoved as EventListener);
+
+        return () => {
+            window.removeEventListener('orderRemoved', handleOrderRemoved as EventListener);
+        };
+    }, []);
 
     const handleDragStart = (order: Order) => {
         setGreyedOutOrders(prev => [...prev, order.id]);
@@ -131,22 +145,22 @@ const RecipeColumn: React.FC<RecipeColumnProps> = ({
                     <View style={styles.ordersList}>
                         {displayedOrders.length > 0 ? (
                             displayedOrders.map(order => (
-                                <View 
-                                    key={order.orderId || order.id} 
-                                    style={[
-                                        styles.orderItem,
-                                        (greyedOutOrders.includes(order.id) || autoSelectedOrders.includes(order.id)) && 
-                                        styles.greyedOut,
-                                        showFinished && styles.completedItem
-                                    ]}
-                                >
-                                    <DraggableOrderCircle 
-                                        order={order}
-                                        onDragEnd={onDragEnd}
-                                        onDragStart={() => !showFinished && handleDragStart(order)}
-                                        isCompleted={showFinished}
-                                    />
-                                </View>
+                              <View 
+                                  key={order.orderId || order.id} 
+                                  style={[
+                                      styles.orderItem,
+                                      (greyedOutOrders.includes(order.id) || autoSelectedOrders.includes(order.id)) && 
+                                      styles.greyedOut,
+                                      showFinished && styles.completedItem
+                                  ]}
+                              >
+                                  <DraggableOrderCircle 
+                                      order={order}
+                                      onDragEnd={onDragEnd}
+                                      onDragStart={() => !showFinished && handleDragStart(order)}
+                                      isCompleted={showFinished}
+                                  />
+                              </View>
                             ))
                         ) : (
                             <View>

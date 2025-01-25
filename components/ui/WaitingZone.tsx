@@ -13,46 +13,50 @@ interface Order {
   }
     
 
-interface WaitingZoneProps {
-  orders: Order[];
-  onDragEnd: (orderId: string, position: { x: number; y: number }) => void;
-  getCompletedOrderIds: () => string[];
-  autoSuggestEnabled: boolean;
-  onAutoSuggestChange: (enabled: boolean) => void;
-}
-
-const WaitingZone: React.FC<WaitingZoneProps> = ({ 
-  orders, 
-  onDragEnd, 
-  getCompletedOrderIds,
-  autoSuggestEnabled,
-  onAutoSuggestChange
-}) => {
-  return (
-    <View style={styles.waitingZone}>
-      <View style={styles.waitingZoneHeader}>
-        <ThemedText style={styles.waitingZoneTitle}>Zone d'attente</ThemedText>
-        <View style={styles.autoSuggestContainer}>
-          <ThemedText style={styles.autoSuggestLabel}>Suggestions auto</ThemedText>
-          <Switch
-            checked={autoSuggestEnabled}
-            onCheckedChange={onAutoSuggestChange}
-          />
+  interface WaitingZoneProps {
+    orders: Order[];
+    onDragEnd: (orderId: string, position: { x: number; y: number }) => void;
+    getCompletedOrderIds: () => string[];
+    autoSuggestEnabled: boolean;
+    onAutoSuggestChange: (enabled: boolean) => void;
+    onRemoveOrder: (orderId: string) => void;
+  }
+  
+  const WaitingZone: React.FC<WaitingZoneProps> = ({ 
+    orders, 
+    onDragEnd, 
+    getCompletedOrderIds,
+    autoSuggestEnabled,
+    onAutoSuggestChange,
+    onRemoveOrder
+  }) => {
+    return (
+      <View style={styles.waitingZone}>
+        <View style={styles.waitingZoneHeader}>
+          <ThemedText style={styles.waitingZoneTitle}>Zone d'attente</ThemedText>
+          <View style={styles.autoSuggestContainer}>
+            <ThemedText style={styles.autoSuggestLabel}>Suggestions auto</ThemedText>
+            <Switch
+              checked={autoSuggestEnabled}
+              onCheckedChange={onAutoSuggestChange}
+            />
+          </View>
         </View>
+        <ScrollView contentContainerStyle={styles.waitingZoneContent}>
+          {orders.map(order => (
+            <DraggableOrderCircle 
+              key={order.id}
+              order={order}
+              onDragEnd={onDragEnd}
+              isCompleted={getCompletedOrderIds().includes(order.id)}
+              showMinus={true}
+              onRemove={onRemoveOrder}
+            />
+          ))}
+        </ScrollView>
       </View>
-      <ScrollView contentContainerStyle={styles.waitingZoneContent}>
-        {orders.map(order => (
-          <DraggableOrderCircle 
-            key={order.id}
-            order={order}
-            onDragEnd={onDragEnd}
-            isCompleted={getCompletedOrderIds().includes(order.id)}
-          />
-        ))}
-      </ScrollView>
-    </View>
-  );
-};
+    );
+  };
 
 export default WaitingZone
 

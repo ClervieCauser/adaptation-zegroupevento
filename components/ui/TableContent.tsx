@@ -119,6 +119,21 @@ interface Order {
         }
       }, [waitingZoneOrders, processingOrders, zoneMeasures, addOrderToProcessing, addOrderToZone, markOrdersAsInProgress, autoSelectedOrderIds]);
     
+      const handleRemoveFromWaitingZone = useCallback((orderId: string) => {
+        setWaitingZoneOrders(prev => prev.filter(o => o.id !== orderId));
+        // Si c'était une commande auto-sélectionnée, la retirer de la liste
+        setAutoSelectedOrderIds(prev => prev.filter(id => id !== orderId));
+        
+        // Notifier RecipeColumn qu'un ordre a été retiré
+        const orderRemovedEvent = new CustomEvent('orderRemoved', { detail: orderId });
+        window.dispatchEvent(orderRemovedEvent);
+        
+        // Mettre à jour le compteur de commandes manuelles si nécessaire
+        if (!autoSelectedOrderIds.includes(orderId)) {
+          setManualOrderCount(count => Math.max(0, count - 1));
+        }
+      }, [autoSelectedOrderIds]);
+
       // Effet pour les suggestions automatiques
       useEffect(() => {
         let interval: NodeJS.Timeout;
@@ -196,12 +211,13 @@ interface Order {
         <View style={styles.bottomSection}>
           <View style={styles.splitSection}>
           <WaitingZone 
-              orders={waitingZoneOrders}
-              onDragEnd={handleDragEnd}
-              getCompletedOrderIds={getCompletedOrderIds}
-              autoSuggestEnabled={autoSuggestEnabled}
-              onAutoSuggestChange={setAutoSuggestEnabled}
-            />
+            orders={waitingZoneOrders}
+            onDragEnd={handleDragEnd}
+            getCompletedOrderIds={getCompletedOrderIds}
+            autoSuggestEnabled={autoSuggestEnabled}
+            onAutoSuggestChange={setAutoSuggestEnabled}
+            onRemoveOrder={handleRemoveFromWaitingZone}
+          />
             <View style={styles.dragAreaContainer}>
               <View style={styles.dragAreaHeader}>
                 <ThemedText style={styles.dragAreaTitle}>Zones de préparation</ThemedText>

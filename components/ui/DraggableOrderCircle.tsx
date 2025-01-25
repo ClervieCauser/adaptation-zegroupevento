@@ -14,14 +14,18 @@ interface DraggableOrderCircleProps {
   order: Order;
   onDragEnd?: (id: string, position: { x: number; y: number }) => void;
   onDragStart?: () => void;
+  onRemove?: (orderId: string) => void;
   isCompleted?: boolean;
+  showMinus?: boolean;
 }
 
 const DraggableOrderCircle: React.FC<DraggableOrderCircleProps> = ({ 
   order, 
   onDragEnd, 
   onDragStart,
-  isCompleted = false 
+  onRemove,
+  isCompleted = false,
+  showMinus = false
 }) => {
     const translateX = useSharedValue(0);
     const translateY = useSharedValue(0);
@@ -61,7 +65,12 @@ const DraggableOrderCircle: React.FC<DraggableOrderCircleProps> = ({
     return (
       <GestureDetector gesture={gesture}>
         <Animated.View style={[styles.draggableContainer, rStyle]}>
-          <OrderCircle order={order} isCompleted={isCompleted} />
+          <OrderCircle 
+            order={order} 
+            isCompleted={isCompleted} 
+            showMinus={showMinus}
+            onRemove={onRemove}
+          />
         </Animated.View>
       </GestureDetector>
     );
