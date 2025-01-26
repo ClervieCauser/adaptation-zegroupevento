@@ -1,34 +1,46 @@
-import { StyleSheet, ScrollView, View, FlatList, Dimensions, TouchableOpacity, Text} from 'react-native';
-import React, { useState, useEffect} from 'react';
+import { StyleSheet, ScrollView, View, FlatList, Dimensions, TouchableOpacity, Text } from 'react-native';
+import React, { useState, useEffect } from 'react';
 import CustomHeader from "../../components/ui/CustomHeader";
 import SearchBar from '@/components/ui/SearchBar';
 import { ThemedView } from '@/components/ThemedView';
 import { RecipeList } from '@/components/ui/RecipeList';
 import { ThemedText } from '@/components/ThemedText';
-import { recipes } from '../../app/recipe';
+import { fetchRecipes, getRecipes } from '../../app/recipe';
 
 const { width } = Dimensions.get('window');
 const isTablet = width >= 600;
 
-const adaptedRecipes = recipes.map(recipe => ({
-  id: recipe.id.toString(),
-  title: recipe.name,
-  duration: recipe.duration,
-  difficulty: recipe.difficulty,
-  imageUrl: recipe.imageUrl,
-  ingredients: recipe.ingredients.map(ingredient => ingredient.ingredient),
-  calories: recipe.calories,
-  tags: recipe.tags,
-}));
-
-const allTags = [...new Set(adaptedRecipes.flatMap(recipe => recipe.tags))];
-
 const Home = () => {
-  const [searchText, setSearchText] = useState('');
-  const [selectedTags, setSelectedTags] = useState([]);
+  // Déclaration des hooks à l'intérieur du composant
+  const [recipes, setRecipes] = useState([]); // Utilise useState à l'intérieur du composant
+  const [loading, setLoading] = useState(true); // Utilise useState à l'intérieur du composant
+  const [searchText, setSearchText] = useState(''); // Pour la recherche de texte
+  const [selectedTags, setSelectedTags] = useState([]); // Pour les tags sélectionnés
+  
+  useEffect(() => {
+    // Appeler la fonction asynchrone fetchRecipes
+    const loadRecipes = async () => {
+      await fetchRecipes(); // Récupère les recettes depuis l'API
+      setRecipes(getRecipes()); // Met à jour l'état local avec les recettes récupérées
+      setLoading(false); // Fin du chargement
+    };
+    loadRecipes(); // Lance la récupération des recettes
+  }, []);  // Ce hook ne s'exécutera qu'une fois, quand le composant sera monté
 
-  useEffect(() => {}, [selectedTags]);
+  const adaptedRecipes = recipes.map(recipe => ({
+    id: recipe.id.toString(),
+    title: recipe.name,
+    duration: recipe.duration,
+    difficulty: recipe.difficulty,
+    imageUrl: recipe.imageUrl,
+    ingredients: recipe.ingredients.map(ingredient => ingredient.ingredient),
+    calories: recipe.calories,
+    tags: recipe.tags,
+  }));
 
+  const allTags = [...new Set(adaptedRecipes.flatMap(recipe => recipe.tags))];
+
+  // Gérer les tags sélectionnés
   const toggleTag = (tag) => {
     setSelectedTags(prevTags =>
       prevTags.includes(tag)

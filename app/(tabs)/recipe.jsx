@@ -11,12 +11,11 @@ import Counter from '../../components/ui/Counter';
 import CustomButton from '../../components/ui/CustomButton';
 import Pagination from '../../components/ui/Pagination';
 import UtensilRow from '../../components/ui/UtensilRow';
-import { recipes } from '../../app/recipe';
+import {recipes } from '../../app/recipe';  // Importer les fonctions pour manipuler les recettes
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import {MOCK_USER} from "../../types/user";
 import * as Speech from 'expo-speech';
 import { MOCK_ORDERS } from '../../types/order';
-
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import NoiseAdaptiveText from '../../components/ui/NoiseAdaptiveText';
 
@@ -32,21 +31,21 @@ const RecipePage = () => {
   const [currentRecipeIndex, setCurrentRecipeIndex] = useState(0);
   const [numberOfItemsOfCurrentRecipe, setNumberOfItemsOfCurrentRecipe] = useState(1);
   const { id, orderId } = useLocalSearchParams();
-  const ids = id ? id.split(',').map(i => parseInt(i, 10)) : [];
+  const ids = id ? id.split(',') : [];
+  console.log('ids', ids);
   const orderid = orderId ? parseInt(orderId, 10) : null;
-
   useEffect(() => {
     if (orderid) {
       setCurrentStep(0);
       setIsRecipeHome(true);
     }
   }, [orderid]);
-
   const recipesMatched = recipes.filter(recipe => ids.includes(recipe.id));
+  console.log('recipesMatched', recipesMatched);
   if (recipesMatched.length === 0) {
     return <Text>Recette(s) introuvable(s)</Text>;
   }
-
+  console.log('mock orders', MOCK_ORDERS);
   const order = MOCK_ORDERS.find(order => parseInt(order.id, 10) === orderid);
 
   // Effet pour mettre à jour `numberOfItemsOfCurrentRecipe` quand `currentRecipeIndex` change

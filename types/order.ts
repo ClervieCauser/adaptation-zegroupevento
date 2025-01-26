@@ -1,10 +1,10 @@
 // types/order.ts
+
 export type OrderItem = {
     name: string;
     quantity: number;
 };
 
-// types/order.ts
 export type Order = {
     id: string;
     time: string;
@@ -18,160 +18,99 @@ export type OrderSelectionState = {
     isSelectMode: boolean;
     selectedIds: string[];
 };
-// Sample data
-export const MOCK_ORDERS: Order[] = [
-    {
-        id: '1293',
-        time: '16:58',
-        status: 'PENDING',
-        items: [
-            { name: 'Poulet citron', quantity: 1 },
-            { name: 'Quiche Lorraine', quantity: 1 },
-            { name: 'Risotto aux champignons', quantity: 1 },
-            { name: 'Risotto aux champignons', quantity: 1 },
-            { name: 'Risotto aux champignons', quantity: 1 },
-            { name: 'Risotto aux champignons', quantity: 1 },
-            { name: 'Risotto aux champignons', quantity: 1 },
-            { name: 'Risotto aux champignons', quantity: 1 },
-            { name: 'Risotto aux champignons', quantity: 1 },
-        ],
-    },
-    {
-        id: '1294',
-        time: '16:34',
-        status: 'PENDING',
-        items: [
-            { name: 'Quiche Lorraine', quantity: 3 },
-            { name: 'Risotto aux champignons', quantity: 2 },
-        ],
-    },
-    {
-        id: '1295',
-        time: '16:30',
-        status: 'PENDING',
-        items : [
-            { name: 'Poulet citron', quantity: 2 },
-            { name: 'Quiche Lorraine', quantity: 1 },
-        ],
-    },
-    {
-        id: '1296',
-        time: '16:28',
-        status: 'PENDING',
-        items: [
-            { name: 'Risotto aux champignons', quantity: 2 },
-            { name: 'Tartiflette Savoyarde', quantity: 2 },
-        ],
-    },
-    {
-        id: '1297',
-        time: '16:45',
-        status: 'PENDING',
-        items: [
-            { name: 'Tartiflette Savoyarde', quantity: 1 },
-            { name: 'Quiche Lorraine', quantity: 1 },
-            { name: 'Quiche Lorraine', quantity: 1 },
-            { name: 'Risotto aux champignons', quantity: 2 },
-            { name: 'Poulet citron', quantity: 1 },
-        ],
-    },
-    {
-        id: '1298',
-        time: '17:02',
-        status: 'PENDING',
-        items: [
-            { name: 'Poulet citron', quantity: 1 },
-            { name: 'Risotto aux champignons', quantity: 1 },
-            { name: 'Tartiflette Savoyarde', quantity: 1 },
-            { name: 'Quiche Lorraine', quantity: 1 },
-        ],
-    },
-    {
-        id: '1299',
-        time: '17:15',
-        status: 'PENDING',
-        items: [
-            { name: 'Poulet citron', quantity: 2 },
-            { name: 'Tartiflette Savoyarde', quantity: 1 },
-            { name: 'Quiche Lorraine', quantity: 3 },
-            { name: 'Risotto aux champignons', quantity: 1 },
-            { name: 'Risotto aux champignons', quantity: 1 },
-            { name: 'Risotto aux champignons', quantity: 1 },
-            { name: 'Risotto aux champignons', quantity: 1 },
-            { name: 'Risotto aux champignons', quantity: 1 },
-        ],
-    },
-    {
-        id: '1300',
-        time: '17:20',
-        status: 'PENDING',
-        items: [
-            { name: 'Risotto aux champignons', quantity: 1 },
-            { name: 'Poulet citron', quantity: 2 },
-        ],
-    },
-    {
-        id: '1301',
-        time: '17:30',
-        status: 'PENDING',
-        items: [
-            { name: 'Tartiflette Savoyarde', quantity: 1 },
-            { name: 'Quiche Lorraine', quantity: 2 },
-        ],
-    },
-    {
-        id: '1302',
-        time: '17:35',
-        status: 'PENDING',
-        items: [
-            { name: 'Risotto aux champignons', quantity: 1 },
-            { name: 'Tartiflette Savoyarde', quantity: 1 },
-            { name: 'Quiche Lorraine', quantity: 1 },
-            { name: 'Poulet citron', quantity: 1 },
-        ],
-    },
-    {
-        id: '1303',
-        time: '17:40',
-        status: 'PENDING',
-        items: Array(3).fill({ name: 'Risotto aux champignons', quantity: 1 }),
-    },
-    {
-        id: '1304',
-        time: '17:45',
-        status: 'PENDING',
-        items: [
-            { name: 'Poulet citron', quantity: 2 },
-            { name: 'Tartiflette Savoyarde', quantity: 1 },
-            { name: 'Quiche Lorraine', quantity: 1 },
-        ],
-    },
-    {
-        id: '1305',
-        time: '17:50',
-        status: 'PENDING',
-        items: Array(10).fill({ name: 'Risotto aux champignons', quantity: 1 }),
-    },
-    {
-        id: '1306',
-        time: '18:00',
-        status: 'PENDING',
-        items: [
-            { name: 'Poulet citron', quantity: 1 },
-            { name: 'Tartiflette Savoyarde', quantity: 1 },
-            { name: 'Risotto aux champignons', quantity: 1 },
-            { name: 'Quiche Lorraine', quantity: 1 },
-        ],
-    },
-    {
-        id: '1307',
-        time: '18:05',
-        status: 'PENDING',
-        items: [
-            { name: 'Poulet citron', quantity: 1 },
-            { name: 'Tartiflette Savoyarde', quantity: 3 },
-            { name: 'Quiche Lorraine', quantity: 2 },
-        ],
-    },
-];
 
+export let MOCK_ORDERS: Order[] = [];
+
+async function fetchTableNumbers(): Promise<number[]> {
+    const url = "http://localhost:3012/tables";
+    try {
+        const response = await fetch(url, {
+            method: "GET",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
+        const tableNumbers: number[] = await response.json(); // Assuming the response is a list of numbers
+        console.log("Table Numbers:", tableNumbers);
+
+        return tableNumbers; // Return the list of table numbers
+    } catch (error) {
+        console.error("Failed to fetch table numbers:", error);
+        return [];
+    }
+}
+
+async function fetchPreparationsForTables(): Promise<Order[]> {
+    const baseUrl = "http://localhost:3012/preparations";
+    const tableNumbers = await fetchTableNumbers(); // Fetch table numbers
+
+    const tableOrdersMap: Record<string, Order> = {}; // To store orders grouped by table number
+
+    try {
+        for (const tableNumber of tableNumbers) {
+            const queryParams = new URLSearchParams({
+                tableNumber: tableNumber.toString(),
+                state: "preparationStarted",
+            });
+
+            const response = await fetch(`${baseUrl}?${queryParams.toString()}`, {
+                method: "GET",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            });
+
+            if (!response.ok) {
+                console.warn(`Failed to fetch preparations for table ${tableNumber}: ${response.status}`);
+                continue;
+            }
+
+            const preparationData = await response.json();
+            console.log(`Preparations for table ${tableNumber}:`, preparationData);
+
+            // Loop over the preparations and consolidate them by table number
+            preparationData.forEach((preparation: any) => {
+                // Create or update an order for the tableNumber
+                if (!tableOrdersMap[tableNumber]) {
+                    tableOrdersMap[tableNumber] = {
+                        id: `table-${tableNumber}`, // Use table number as part of the ID
+                        time: preparation.time, // We'll use the same time for all orders of the same table
+                        status: preparation.status, // Status from the first preparation (to keep it consistent)
+                        items: [], // Initialize the items array
+                    };
+                }
+
+                // Add the items from the current preparation to the table's order
+                preparation.items.forEach((item: any) => {
+                    const existingItem = tableOrdersMap[tableNumber].items.find((existingItem) => existingItem.name === item.name);
+                    if (existingItem) {
+                        existingItem.quantity += item.quantity; // Increment the quantity if the item already exists
+                    } else {
+                        tableOrdersMap[tableNumber].items.push({ name: item.name, quantity: item.quantity });
+                    }
+                });
+            });
+        }
+
+        // Convert the map of orders into an array
+        const orders = Object.values(tableOrdersMap);
+
+        console.log("All consolidated orders:", orders);
+        return orders;
+
+    } catch (error) {
+        console.error("Failed to fetch preparations:", error);
+        return [];
+    }
+}
+
+// Initialize MOCK_ORDERS with fetched data
+fetchPreparationsForTables().then((orders) => {
+    MOCK_ORDERS = orders; // Assign the fetched orders to MOCK_ORDERS
+    console.log("MOCK_ORDERS initialized:", MOCK_ORDERS);
+});
