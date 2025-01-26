@@ -83,11 +83,11 @@ export const OrderSelectionProvider = ({ children }: { children: React.ReactNode
                 router.push('/recipe-prep');
             } else {
                 const order = pendingOrders.find(o => o.id === orderId);
+                console.log('here', order);
                 if (order) {
                     const recipeIds = order.items
-                        .map(item => recipes.find(recipe => recipe.name === item.name)?.id)
+                        .map(item => recipes.find(recipe => recipe.shortName === item.name)?.id)
                         .filter(Boolean);
-
                     if (recipeIds.length > 0) {
                         router.push({
                             pathname: '/recipe',
